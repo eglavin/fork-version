@@ -216,4 +216,49 @@ describe("version > getNextVersion", () => {
 		const result = await getNextVersion(config, logger, "1.2.3");
 		expect(result).toEqual({ version: "1.2.3" });
 	});
+
+	it("should recommend a pre-major bump", async () => {
+		const { config, logger, createCommits } = await createTestDir("version getNextVersion");
+
+		createCommits(["feat: A feature commit"]);
+
+		const result = await getNextVersion(config, logger, "0.1.0");
+		expect(result).toEqual({
+			level: 2,
+			preMajor: true,
+			reason: "There are 0 BREAKING CHANGES and 0 features",
+			releaseType: "patch",
+			version: "0.1.1",
+		});
+	});
+
+	it("should recommend a patch bump", async () => {
+		const { config, logger, createCommits } = await createTestDir("version getNextVersion");
+
+		createCommits(["fix: A fix commit"]);
+
+		const result = await getNextVersion(config, logger, "1.2.3");
+		expect(result).toEqual({
+			level: 2,
+			preMajor: false,
+			reason: "There are 0 BREAKING CHANGES and 0 features",
+			releaseType: "patch",
+			version: "1.2.4",
+		});
+	});
+
+	it.only("should recommend a minor bump", async () => {
+		const { config, logger, createCommits } = await createTestDir("version getNextVersion");
+
+		createCommits(["feat: A feature commit"]);
+
+		const result = await getNextVersion(config, logger, "1.2.3");
+		expect(result).toEqual({
+			level: 1,
+			preMajor: false,
+			reason: "There are 0 BREAKING CHANGES and 0 features",
+			releaseType: "minor",
+			version: "1.3.0",
+		});
+	});
 });

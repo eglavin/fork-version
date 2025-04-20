@@ -201,6 +201,11 @@ describe("commit-parser", () => {
 
 	describe("error handling", () => {
 		let debugSpy: MockInstance;
+		let logger: Logger;
+
+		beforeAll(() => {
+			logger = new Logger({ silent: false, debug: true, inspectVersion: false });
+		});
 		beforeEach(() => {
 			debugSpy = vi.spyOn(global.console, "debug").mockImplementation(() => undefined);
 		});
@@ -208,13 +213,10 @@ describe("commit-parser", () => {
 			debugSpy.mockRestore();
 		});
 
-		const logger = new Logger({ silent: false, debug: true, inspectVersion: false });
-		const subject = "refactor: add test file";
-
 		it("should log if date and email are swapped", () => {
 			const parser = new CommitParser().setLogger(logger);
 
-			const commit = [subject, "", hash, name, email, date, ""].join("\n");
+			const commit = ["refactor: add test file", "", hash, name, email, date, ""].join("\n");
 
 			expect(parser.parse(commit)).toBe(undefined);
 			expect(debugSpy).toHaveBeenCalledOnce();
@@ -223,7 +225,9 @@ describe("commit-parser", () => {
 		it("should throw if unknown extra content", () => {
 			const parser = new CommitParser().setLogger(logger);
 
-			const commit = [subject, "", hash, date, name, email, "extra line"].join("\n");
+			const commit = ["refactor: add test file", "", hash, date, name, email, "extra line"].join(
+				"\n",
+			);
 
 			expect(parser.parse(commit)).toBe(undefined);
 			expect(debugSpy).toHaveBeenCalledOnce();
@@ -232,7 +236,7 @@ describe("commit-parser", () => {
 		it("should throw if missing data", () => {
 			const parser = new CommitParser().setLogger(logger);
 
-			const commit = [subject, "", hash, date, name].join("\n");
+			const commit = ["refactor: add test file", "", hash, date, name].join("\n");
 
 			expect(parser.parse(commit)).toBe(undefined);
 			expect(debugSpy).toHaveBeenCalledOnce();
@@ -241,7 +245,7 @@ describe("commit-parser", () => {
 		it("should not log if not passed a logger instance", () => {
 			const parser = new CommitParser();
 
-			const commit = [subject, "", hash, name, email, date, ""].join("\n");
+			const commit = ["refactor: add test file", "", hash, name, email, date, ""].join("\n");
 
 			expect(parser.parse(commit)).toBe(undefined);
 			expect(debugSpy).not.toHaveBeenCalled();

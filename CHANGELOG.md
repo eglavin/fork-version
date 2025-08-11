@@ -1,5 +1,13 @@
 # Fork Version
 
+## 1.8.0 (2025-08-11)
+
+
+### Features
+
+* added bicep file support ([#87](https://github.com/eglavin/fork-version/issues/87)) ([d6d44ac](https://github.com/eglavin/fork-version/commit/d6d44ac3b64a59d39555c2b886f320a348b80efa))
+
+
 ## 1.7.9 (2024-11-26)
 
 

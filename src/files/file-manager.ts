@@ -2,6 +2,7 @@ import { JSONPackage } from "./json-package";
 import { YAMLPackage } from "./yaml-package";
 import { PlainText } from "./plain-text";
 import { MSBuildProject } from "./ms-build-project";
+import { ARMBicep } from "./arm-bicep";
 
 import type { ForkConfig } from "../config/types";
 import type { Logger } from "../utils/logger";
@@ -25,6 +26,7 @@ export class FileManager {
 	private YAMLPackage: YAMLPackage;
 	private PlainText: PlainText;
 	private MSBuildProject: MSBuildProject;
+	private ARMBicep: ARMBicep;
 
 	constructor(
 		private config: ForkConfig,
@@ -34,6 +36,7 @@ export class FileManager {
 		this.YAMLPackage = new YAMLPackage(config, logger);
 		this.PlainText = new PlainText(config, logger);
 		this.MSBuildProject = new MSBuildProject(config, logger);
+		this.ARMBicep = new ARMBicep(config, logger);
 	}
 
 	/**
@@ -66,6 +69,10 @@ export class FileManager {
 
 		if (this.MSBuildProject.isSupportedFile(_fileName)) {
 			return this.MSBuildProject.read(fileName);
+		}
+
+		if (this.ARMBicep.isSupportedFile(_fileName)) {
+			return this.ARMBicep.read(fileName);
 		}
 
 		this.logger.error(`[File Manager] Unsupported file: ${fileName}`);
@@ -102,6 +109,10 @@ export class FileManager {
 
 		if (this.MSBuildProject.isSupportedFile(_fileName)) {
 			return this.MSBuildProject.write(fileState, newVersion);
+		}
+
+		if (this.ARMBicep.isSupportedFile(_fileName)) {
+			return this.ARMBicep.write(fileState, newVersion);
 		}
 
 		this.logger.error(`[File Manager] Unsupported file: ${fileState.path}`);

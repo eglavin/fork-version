@@ -410,6 +410,7 @@ Adds a suffix to the end of the release message, useful to add a `[skip ci]` mes
 - [Yaml Package](#yaml-package)
 - [Plain Text](#plain-text)
 - [MS Build](#ms-build)
+- [ARM Bicep](#arm-bicep)
 
 #### Json Package
 
@@ -458,6 +459,15 @@ A MS build project is an xml file with with a `Version` property under the `Proj
 ```
 
 Fork-Version currently supports reading and updating the following file extensions: `.csproj` `.dbproj` `.esproj` `.fsproj` `.props` `.vbproj` `.vcxproj`
+
+#### ARM Bicep
+
+An ARM bicep file with metadata and variable called contentVersion.
+
+```bicep
+metadata contentVersion = '1.2.3.4'
+var contentVersion string = '1.2.3.4'
+```
 
 #### Custom File Updater's
 

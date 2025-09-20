@@ -12,7 +12,9 @@ export class Git {
 		this.getBranchName = this.getBranchName.bind(this);
 		this.getRemoteUrl = this.getRemoteUrl.bind(this);
 		this.getTags = this.getTags.bind(this);
-		this.getLatestTag = this.getLatestTag.bind(this);
+		this.getMostRecentTag = this.getMostRecentTag.bind(this);
+		this.getCleanedTags = this.getCleanedTags.bind(this);
+		this.getHighestSemverVersionFromTags = this.getHighestSemverVersionFromTags.bind(this);
 		this.getCommits = this.getCommits.bind(this);
 	}
 
@@ -205,7 +207,9 @@ export class Git {
 						tags.push(tag);
 					}
 				}
-			} else if (semver.valid(tag)) {
+			}
+			// If no tagPrefix is provided, only include tags that start with a digit and are valid semver
+			else if (/^\d/.test(tag) && semver.valid(tag)) {
 				tags.push(tag);
 			}
 		}
@@ -214,16 +218,29 @@ export class Git {
 	}
 
 	/**
-	 * Get the latest valid semver version tag in the commit history
+	 * Returns the latest git tag based on commit date
 	 *
 	 * @example
 	 * ```ts
-	 * await git.getLatestTag("v"); // "v1.2.3"
+	 * await git.getMostRecentTag("v"); // "1.2.3"
 	 * ```
 	 */
-	async getLatestTag(tagPrefix: string | undefined): Promise<string> {
+	async getMostRecentTag(tagPrefix: string | undefined): Promise<string | undefined> {
 		const tags = await this.getTags(tagPrefix);
-		if (!tags.length) return "";
+		return tags[0] || undefined;
+	}
+
+	/**
+	 * Get cleaned semver tags, with any tag prefix's removed
+	 *
+	 * @example
+	 * ```ts
+	 * await git.getCleanedTags("v"); // ["1.2.3", "1.2.2", "1.2.1"]
+	 * ```
+	 */
+	async getCleanedTags(tagPrefix: string | undefined): Promise<string[]> {
+		const tags = await this.getTags(tagPrefix);
+		if (!tags.length) return [];
 
 		const cleanedTags = [];
 		for (const tag of tags) {
@@ -233,7 +250,23 @@ export class Git {
 			}
 		}
 
-		return cleanedTags.sort(semver.rcompare)[0];
+		return cleanedTags;
+	}
+
+	/**
+	 * Get the highest semver version from git tags. This will return the highest
+	 * semver version found for the given tag prefix, regardless of the commit date.
+	 *
+	 * @example
+	 * ```ts
+	 * await git.getHighestSemverVersionFromTags("v"); // "1.2.3"
+	 * ```
+	 */
+	async getHighestSemverVersionFromTags(
+		tagPrefix: string | undefined,
+	): Promise<string | undefined> {
+		const cleanedTags = await this.getCleanedTags(tagPrefix);
+		return cleanedTags.sort(semver.rcompare)[0] || undefined;
 	}
 
 	/**
@@ -274,6 +307,20 @@ export class Git {
 			...paths,
 		);
 
-		return commits.split(`\n${SCISSOR}\n`).filter(Boolean);
+		const splitCommits = commits.split(`\n${SCISSOR}\n`);
+
+		if (splitCommits.length === 0) {
+			return [];
+		}
+
+		if (splitCommits[0] === SCISSOR) {
+			splitCommits.shift();
+		}
+
+		if (splitCommits[splitCommits.length - 1] === "") {
+			splitCommits.pop();
+		}
+
+		return splitCommits;
 	}
 }

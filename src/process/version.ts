@@ -42,9 +42,9 @@ export async function getCurrentVersion(
 		versions.add(config.currentVersion);
 	}
 
-	// If we still don't have a version, try to get the latest git tag
+	// If we still don't have a version, try to get the highest version from git tags
 	if (versions.size === 0 && config.gitTagFallback) {
-		const version = await git.getLatestTag(config.tagPrefix);
+		const version = await git.getHighestSemverVersionFromTags(config.tagPrefix);
 		if (version) {
 			logger.warn(`Using latest git tag as fallback`);
 			versions.add(version);

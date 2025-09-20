@@ -235,6 +235,9 @@ export async function setupTest(testName: string, options?: Partial<ISetupTestOp
 					this.commit(message);
 				}
 			},
+			tag: function _execGitTag(tag: string, message: string) {
+				execSync(`git tag --annotate "${tag}" --message "${message}"`, execSyncOptions);
+			},
 		},
 	};
 }

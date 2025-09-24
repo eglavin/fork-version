@@ -187,13 +187,12 @@ export class Git {
 	async getTags(tagPrefix: string | undefined): Promise<string[]> {
 		const logOutput = await this.log("--decorate", "--no-color", "--date-order");
 
-		const tags: string[] = [];
-
 		/**
 		 * Search for tags in the following formats:
 		 * @example "tag: 1.2.3," or "tag: 1.2.3)"
 		 */
 		const TAG_REGEX = /tag:\s*(?<tag>.+?)[,)]/gi;
+		const tags: string[] = [];
 
 		let tagMatch: RegExpExecArray | null = null;
 		while ((tagMatch = TAG_REGEX.exec(logOutput))) {
@@ -201,8 +200,7 @@ export class Git {
 
 			if (tagPrefix) {
 				if (tag.startsWith(tagPrefix)) {
-					const tagWithoutPrefix = tag.replace(tagPrefix, "");
-
+					const tagWithoutPrefix = tag.replace(new RegExp(`^${tagPrefix}`), "");
 					if (semver.valid(tagWithoutPrefix)) {
 						tags.push(tag);
 					}
@@ -240,11 +238,11 @@ export class Git {
 	 */
 	async getCleanedTags(tagPrefix: string | undefined): Promise<string[]> {
 		const tags = await this.getTags(tagPrefix);
-		if (!tags.length) return [];
 
 		const cleanedTags = [];
 		for (const tag of tags) {
-			const cleanedTag = semver.clean(tag.replace(new RegExp(`^${tagPrefix}`), ""));
+			const tagWithoutPrefix = tag.replace(new RegExp(`^${tagPrefix}`), "");
+			const cleanedTag = semver.clean(tagWithoutPrefix);
 			if (cleanedTag) {
 				cleanedTags.push(cleanedTag);
 			}

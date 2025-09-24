@@ -70,25 +70,27 @@ export interface ParserOptions {
 }
 
 export function createParserOptions(userOptions?: Partial<ParserOptions>): ParserOptions {
-	const referenceActions = (
-		trimStringArray(userOptions?.referenceActions) ?? [
-			"close",
-			"closes",
-			"closed",
-			"fix",
-			"fixes",
-			"fixed",
-			"resolve",
-			"resolves",
-			"resolved",
-		]
-	).join("|");
+	const referenceActions = trimStringArray(userOptions?.referenceActions) ?? [
+		"close",
+		"closes",
+		"closed",
+		"fix",
+		"fixes",
+		"fixed",
+		"resolve",
+		"resolves",
+		"resolved",
+	];
+	const joinedReferenceActions = referenceActions.join("|");
 
-	const issuePrefixes = (trimStringArray(userOptions?.issuePrefixes) ?? ["#"]).join("|");
+	const issuePrefixes = trimStringArray(userOptions?.issuePrefixes) ?? ["#"];
+	const joinedIssuePrefixes = issuePrefixes.join("|");
 
-	const noteKeywords = (
-		trimStringArray(userOptions?.noteKeywords) ?? ["BREAKING CHANGE", "BREAKING-CHANGE"]
-	).join("|");
+	const noteKeywords = trimStringArray(userOptions?.noteKeywords) ?? [
+		"BREAKING CHANGE",
+		"BREAKING-CHANGE",
+	];
+	const joinedNoteKeywords = noteKeywords.join("|");
 
 	return {
 		subjectPattern: /^(?<type>\w+)(?:\((?<scope>.*)\))?(?<breakingChange>!)?:\s+(?<title>.*)/,
@@ -101,20 +103,23 @@ export function createParserOptions(userOptions?: Partial<ParserOptions>): Parse
 
 		mentionPattern: /(?<!\w)@(?<username>[\w-]+)/,
 
-		referenceActionPattern: referenceActions
+		referenceActions,
+		referenceActionPattern: joinedReferenceActions
 			? new RegExp(
-					`(?<action>${referenceActions})(?:\\s+(?<reference>.*?))(?=(?:${referenceActions})|$)`,
+					`(?<action>${joinedReferenceActions})(?:\\s+(?<reference>.*?))(?=(?:${joinedReferenceActions})|$)`,
 				)
 			: undefined,
 
-		issuePattern: issuePrefixes
+		issuePrefixes,
+		issuePattern: joinedIssuePrefixes
 			? new RegExp(
-					`(?:.*?)??\\s*(?<repository>[\\w-\\.\\/]*?)??(?<prefix>${issuePrefixes})(?<issue>[\\w-]*\\d+)`,
+					`(?:.*?)??\\s*(?<repository>[\\w-\\.\\/]*?)??(?<prefix>${joinedIssuePrefixes})(?<issue>[\\w-]*\\d+)`,
 				)
 			: undefined,
 
-		notePattern: noteKeywords
-			? new RegExp(`^(?<title>${noteKeywords}):(\\s*(?<text>.*))`)
+		noteKeywords,
+		notePattern: joinedNoteKeywords
+			? new RegExp(`^(?<title>${joinedNoteKeywords}):(\\s*(?<text>.*))`)
 			: undefined,
 
 		// Override defaults with user options

@@ -216,40 +216,17 @@ describe("version > getCurrentVersion", () => {
 	});
 });
 
-function createCommit(type: string, subject: string): Commit {
-	return {
-		raw: "",
-
-		subject: "",
-		body: "",
-		hash: "abc123",
-		date: "",
-		name: "",
-		email: "",
-
-		type,
-		scope: "",
-		breakingChange: "",
-		title: subject,
-
-		merge: null,
-		revert: null,
-		mentions: [],
-		references: [],
-		notes: [],
-	};
-}
-
 describe("version > getNextVersion", () => {
 	it("should determine the next version as a minor bump", async () => {
 		const { config, logger } = await setupTest("version getNextVersion");
 
-		const result = await getNextVersion(
-			config,
-			logger,
-			[createCommit("feat", "A feature commit")],
-			"1.2.3",
-		);
+		const commit = {
+			type: "feat",
+			breakingChange: "",
+			notes: [],
+		} as unknown as Commit;
+
+		const result = await getNextVersion(config, logger, [commit], "1.2.3");
 		expect(result).toStrictEqual({
 			version: "1.3.0",
 			releaseType: "minor",
@@ -268,6 +245,15 @@ describe("version > getNextVersion", () => {
 
 		const result = await getNextVersion(config, logger, [], "1.2.3");
 		expect(result).toStrictEqual({ version: "2.0.0" });
+	});
+
+	it("should throw an error if next version in config is invalid", async () => {
+		const { config, logger } = await setupTest("version getNextVersion");
+		config.nextVersion = "invalid";
+
+		await expect(getNextVersion(config, logger, [], "1.2.3")).rejects.toThrow(
+			"Invalid Version: invalid",
+		);
 	});
 
 	it("should skip version bump", async () => {
@@ -294,15 +280,16 @@ describe("version > getNextVersion", () => {
 		});
 	});
 
-	it("should recommend a pre-major bump", async () => {
+	it("should recommend a pre-major patch bump", async () => {
 		const { config, logger } = await setupTest("version getNextVersion");
 
-		const result = await getNextVersion(
-			config,
-			logger,
-			[createCommit("feat", "A feature commit")],
-			"0.1.0",
-		);
+		const commit = {
+			type: "feat",
+			breakingChange: "",
+			notes: [],
+		} as unknown as Commit;
+
+		const result = await getNextVersion(config, logger, [commit], "0.1.0");
 		expect(result).toStrictEqual({
 			version: "0.1.1",
 			releaseType: "patch",
@@ -315,15 +302,65 @@ describe("version > getNextVersion", () => {
 		});
 	});
 
+	it("should recommend a pre-major minor bump", async () => {
+		const { config, logger } = await setupTest("version getNextVersion");
+
+		const commit = {
+			type: "feat",
+			breakingChange: "!",
+			notes: [],
+		} as unknown as Commit;
+
+		const result = await getNextVersion(config, logger, [commit], "0.1.0");
+		expect(result).toStrictEqual({
+			version: "0.2.0",
+			releaseType: "minor",
+			preMajor: true,
+			changes: {
+				major: 0,
+				minor: 1,
+				patch: 0,
+			},
+		});
+	});
+
+	it("should recommend a pre-major minor bump from notes", async () => {
+		const { config, logger } = await setupTest("version getNextVersion");
+
+		const commit = {
+			type: "feat",
+			breakingChange: "",
+			notes: [
+				{
+					title: "BREAKING CHANGE",
+					text: "A breaking change",
+				},
+			],
+		} as unknown as Commit;
+
+		const result = await getNextVersion(config, logger, [commit], "0.1.0");
+		expect(result).toStrictEqual({
+			version: "0.2.0",
+			releaseType: "minor",
+			preMajor: true,
+			changes: {
+				major: 0,
+				minor: 1,
+				patch: 0,
+			},
+		});
+	});
+
 	it("should recommend a patch bump", async () => {
 		const { config, logger } = await setupTest("version getNextVersion");
 
-		const result = await getNextVersion(
-			config,
-			logger,
-			[createCommit("fix", "A fix commit")],
-			"1.2.3",
-		);
+		const commit = {
+			type: "fix",
+			breakingChange: "",
+			notes: [],
+		} as unknown as Commit;
+
+		const result = await getNextVersion(config, logger, [commit], "1.2.3");
 		expect(result).toStrictEqual({
 			version: "1.2.4",
 			releaseType: "patch",
@@ -339,12 +376,13 @@ describe("version > getNextVersion", () => {
 	it("should recommend a minor bump", async () => {
 		const { config, logger } = await setupTest("version getNextVersion");
 
-		const result = await getNextVersion(
-			config,
-			logger,
-			[createCommit("feat", "A feature commit")],
-			"1.2.3",
-		);
+		const commit = {
+			type: "feat",
+			breakingChange: "",
+			notes: [],
+		} as unknown as Commit;
+
+		const result = await getNextVersion(config, logger, [commit], "1.2.3");
 		expect(result).toStrictEqual({
 			version: "1.3.0",
 			releaseType: "minor",
@@ -360,8 +398,11 @@ describe("version > getNextVersion", () => {
 	it("should recommend a major bump", async () => {
 		const { config, logger } = await setupTest("version getNextVersion");
 
-		const commit = createCommit("feat", "A feature commit");
-		commit.breakingChange = "!";
+		const commit = {
+			type: "feat",
+			breakingChange: "!",
+			notes: [],
+		} as unknown as Commit;
 
 		const result = await getNextVersion(config, logger, [commit], "1.2.3");
 		expect(result).toStrictEqual({
@@ -379,8 +420,16 @@ describe("version > getNextVersion", () => {
 	it("should recommend a major bump from notes", async () => {
 		const { config, logger } = await setupTest("version getNextVersion");
 
-		const commit = createCommit("feat", "A feature commit");
-		commit.notes.push({ title: "BREAKING CHANGE", text: "A breaking change" });
+		const commit = {
+			type: "feat",
+			breakingChange: "",
+			notes: [
+				{
+					title: "BREAKING CHANGE",
+					text: "A breaking change",
+				},
+			],
+		} as unknown as Commit;
 
 		const result = await getNextVersion(config, logger, [commit], "1.2.3");
 		expect(result).toStrictEqual({

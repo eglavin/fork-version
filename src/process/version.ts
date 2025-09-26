@@ -97,7 +97,11 @@ export async function getNextVersion(
 		};
 	}
 
-	if (config.nextVersion && semver.valid(config.nextVersion)) {
+	if (config.nextVersion) {
+		if (!semver.valid(config.nextVersion)) {
+			throw new Error(`Invalid Version: ${config.nextVersion}`);
+		}
+
 		logger.log(`Next version: ${config.nextVersion}`);
 		return {
 			version: config.nextVersion,
@@ -110,8 +114,6 @@ export async function getNextVersion(
 
 	if (config.releaseAs) {
 		releaseType = config.releaseAs;
-	} else if (commits.length === 0) {
-		logger.warn("No commits found since last tag.");
 	} else {
 		/**
 		 * - 0 = major
@@ -161,12 +163,17 @@ export async function getNextVersion(
 		) ?? "";
 
 	logger.log(`Next version: ${nextVersion} (${releaseTypeOrPreRelease})`);
-	logger.log(
-		`  - Commits: ${commits.length}` +
-			(changes.major > 0 ? `, Breaking Changes: ${changes.major}` : "") +
-			(changes.minor > 0 ? `, New Features: ${changes.minor}` : "") +
-			(changes.patch > 0 ? `, Bug Fixes: ${changes.patch}` : ""),
-	);
+
+	if (commits.length > 0) {
+		logger.log(
+			`  - Commits: ${commits.length}` +
+				(changes.major > 0 ? `, Breaking Changes: ${changes.major}` : "") +
+				(changes.minor > 0 ? `, New Features: ${changes.minor}` : "") +
+				(changes.patch > 0 ? `, Bug Fixes: ${changes.patch}` : ""),
+		);
+	} else {
+		logger.log("  - No commits found.");
+	}
 
 	return {
 		version: nextVersion,

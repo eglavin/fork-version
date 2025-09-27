@@ -94,6 +94,40 @@ describe("git", () => {
 		expect(branch).toBe("main");
 	});
 
+	it("should handle no branch name", async () => {
+		const { config } = await setupTest("execute-file");
+		const git = new Git(config);
+
+		// No commits, so no branch name
+		await expect(git.getBranchName()).resolves.toBe("");
+	});
+
+	it("should be able to get the remote url", async () => {
+		const { config, create, execGit } = await setupTest("execute-file");
+
+		const git = new Git(config);
+
+		create.json({ version: "1.0.0" }, "package.json").add();
+		execGit.commits();
+
+		// No remote set
+		await expect(git.getRemoteUrl()).resolves.toBe("");
+
+		// Set remote and test again
+		await execGit.raw("remote", "add", "origin", "https://github.com/eglavin/fork-version-unknown");
+		await expect(git.getRemoteUrl()).resolves.toBe(
+			"https://github.com/eglavin/fork-version-unknown",
+		);
+	});
+
+	it("should handle no remote url", async () => {
+		const { config } = await setupTest("execute-file");
+		const git = new Git(config);
+
+		// No commits, so no remote url
+		await expect(git.getRemoteUrl()).resolves.toBe("");
+	});
+
 	it("should check if a file is ignored by git", async () => {
 		const { config, create } = await setupTest("execute-file");
 		const git = new Git(config);
@@ -281,6 +315,16 @@ test/**
 		await expect(git.getCleanedTags(undefined)).resolves.toStrictEqual([]);
 	});
 
+	it("should handle no tags", async () => {
+		const { config } = await setupTest("execute-file");
+		const git = new Git(config);
+
+		await expect(git.getTags(config.tagPrefix)).resolves.toStrictEqual([]);
+		await expect(git.getMostRecentTag(config.tagPrefix)).resolves.toBe(undefined);
+		await expect(git.getCleanedTags(config.tagPrefix)).resolves.toStrictEqual([]);
+		await expect(git.getHighestSemverVersionFromTags(config.tagPrefix)).resolves.toBe(undefined);
+	});
+
 	it("should read commits", async () => {
 		const { config, create } = await setupTest("execute-file");
 		const git = new Git(config);
@@ -360,6 +404,41 @@ system so we'll see what happens.`,
 		expect(allCommits[3].includes("refactor: add lib file")).toBe(true);
 		expect(allCommits[4].includes("feat: initial commit")).toBe(true);
 		expect(allCommits.length).toBe(5);
+	});
+
+	it("should handle folder with no commits", async () => {
+		const { config, create } = await setupTest("execute-file");
+		const git = new Git(config);
+
+		// Create a commit in the root src folder
+		create.directory("src");
+		create.file("", "src", "file1.txt");
+		await git.add("src/file1.txt");
+		await git.commit(
+			"-m",
+			"feat: initial commit",
+			"-m",
+			"BREAKING CHANGE: this is a breaking change",
+		);
+		await git.tag("v1.0.0");
+
+		// Create a commit in the src/libs folder
+		create.directory("src", "libs");
+		create.file("", "src", "libs", "file2.txt");
+		await git.add("src/libs/file2.txt");
+		await git.commit("-m", "refactor: add lib file");
+		await git.tag("v1.0.1");
+
+		const commits = await git.getCommits(undefined, undefined, "non-existing-folder");
+		expect(commits.length).toBe(0);
+	});
+
+	it("should handle no commits", async () => {
+		const { config } = await setupTest("execute-file");
+		const git = new Git(config);
+
+		const commits = await git.getCommits();
+		expect(commits).toStrictEqual([]);
 	});
 
 	it("should handle unset user email in git config", async () => {

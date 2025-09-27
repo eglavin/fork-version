@@ -104,7 +104,11 @@ export class Git {
 	 * ```
 	 */
 	async log(...args: (string | undefined)[]): Promise<string> {
-		return this.#execGit("log", args.filter(Boolean) as string[]);
+		try {
+			return await this.#execGit("log", args.filter(Boolean) as string[]);
+		} catch {
+			return "";
+		}
 	}
 
 	/**
@@ -138,9 +142,13 @@ export class Git {
 	 * ```
 	 */
 	async getBranchName(): Promise<string> {
-		const branchName = await this.#execGit("rev-parse", ["--abbrev-ref", "HEAD"]);
+		try {
+			const branchName = await this.#execGit("rev-parse", ["--abbrev-ref", "HEAD"]);
 
-		return branchName.trim();
+			return branchName.trim();
+		} catch {
+			return "";
+		}
 	}
 
 	/**
@@ -169,11 +177,11 @@ export class Git {
 	 * Using `git log` to get the commit history, we then parse the tags from the
 	 * commit details which is expected to be in the following format:
 	 * ```txt
-	 * commit 3841b1d05750d42197fe958e3d8e06df378a842d (HEAD -> main, tag: 1.0.2, tag: 1.0.1, tag: 1.0.0)
+	 * commit 3841b1d05750d42197fe958e3d8e06df378a842d (HEAD -> main, tag: v1.0.2, tag: v1.0.1, tag: v1.0.0)
 	 * Author: Username <username@example.com>
 	 * Date:   Sat Nov 9 15:00:00 2024 +0000
 	 *
-	 *     chore(release): 1.2.3
+	 *     chore(release): v1.0.0
 	 * ```
 	 *
 	 * - [Functionality extracted from the conventional-changelog - git-semver-tags project](https://github.com/conventional-changelog/conventional-changelog/blob/fac8045242099c016f5f3905e54e02b7d466bd7b/packages/git-semver-tags/index.js)
@@ -181,7 +189,7 @@ export class Git {
 	 *
 	 * @example
 	 * ```ts
-	 * await git.getTags("v"); // ["v1.2.3", "v1.2.2", "v1.2.1"]
+	 * await git.getTags("v"); // ["v1.0.2", "v1.0.1", "v1.0.0"]
 	 * ```
 	 */
 	async getTags(tagPrefix: string | undefined): Promise<string[]> {
@@ -308,7 +316,7 @@ export class Git {
 		const splitCommits = commits.split(`\n${SCISSOR}\n`);
 
 		if (splitCommits.length === 0) {
-			return [];
+			return splitCommits;
 		}
 
 		if (splitCommits[0] === SCISSOR) {

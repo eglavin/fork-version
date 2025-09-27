@@ -121,12 +121,13 @@ export async function getNextVersion(
 		 * - 2 = patch
 		 */
 		let level = 2;
+		const MINOR_TYPES = ["feat", "feature"];
 
 		for (const commit of commits) {
 			if (commit.notes.length > 0 || commit.breakingChange) {
 				changes.major += commit.notes.length + (commit.breakingChange ? 1 : 0);
 				level = 0;
-			} else if (commit.type === "feat" || commit.type === "feature") {
+			} else if (MINOR_TYPES.includes(commit.type.toLowerCase())) {
 				changes.minor += 1;
 				if (level === 2) {
 					level = 1;

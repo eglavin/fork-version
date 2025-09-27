@@ -97,7 +97,7 @@ export function createParserOptions(userOptions?: Partial<ParserOptions>): Parse
 
 		mergePattern: /^Merge pull request #(?<id>\d*) from (?<source>.*)/,
 
-		revertPattern: /^Revert "(?<subject>.*)"(\s*This reverts commit (?<hash>[a-zA-Z0-9]*)\.)?/,
+		revertPattern: /^[Rr]evert "(?<subject>.*)"(\s*This reverts commit (?<hash>[a-zA-Z0-9]*)\.)?/,
 
 		commentPattern: /^#(?!\d+\s)/,
 

@@ -197,6 +197,17 @@ describe("commit-parser", () => {
 				references: [],
 			} as Commit);
 		});
+
+		it("should parse type with capital letters", () => {
+			const parser = new CommitParser();
+
+			const commit = parser.parse(createCommit("FEAT: add test file"));
+
+			expect(commit).toMatchObject({
+				type: "FEAT",
+				title: "add test file",
+			});
+		});
 	});
 
 	describe("error handling", () => {
@@ -545,6 +556,30 @@ describe("commit-parser", () => {
 			const commit = parser.parse(
 				createCommit(
 					`Revert "feat: initial commit"
+
+This reverts commit 4a79e9e546b4020d2882b7810dc549fa71960f4f.`,
+				),
+			);
+
+			expect(commit).toMatchObject({
+				type: "",
+				scope: "",
+				breakingChange: "",
+				title: "",
+
+				revert: {
+					hash: "4a79e9e546b4020d2882b7810dc549fa71960f4f",
+					subject: "feat: initial commit",
+				},
+			});
+		});
+
+		it("should parse revert commit with lowercase r", () => {
+			const parser = new CommitParser();
+
+			const commit = parser.parse(
+				createCommit(
+					`revert "feat: initial commit"
 
 This reverts commit 4a79e9e546b4020d2882b7810dc549fa71960f4f.`,
 				),

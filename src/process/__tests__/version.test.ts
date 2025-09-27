@@ -510,4 +510,26 @@ describe("version > getNextVersion", () => {
 			"Invalid Version: invalid",
 		);
 	});
+
+	it("should handle capitalized feat commit types", async () => {
+		const { config, logger } = await setupTest("version getNextVersion");
+
+		const commit = {
+			type: "Feat",
+			breakingChange: "",
+			notes: [],
+		} as unknown as Commit;
+
+		const result = await getNextVersion(config, logger, [commit], "1.2.3");
+		expect(result).toStrictEqual({
+			version: "1.3.0",
+			releaseType: "minor",
+			preMajor: false,
+			changes: {
+				major: 0,
+				minor: 1,
+				patch: 0,
+			},
+		});
+	});
 });

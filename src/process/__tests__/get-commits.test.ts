@@ -48,4 +48,22 @@ describe("get-commits", () => {
 		expect(commits[0]?.subject).toBe("feat: package-2 feat");
 		expect(commits[1]?.subject).toBe("feat: package-1 feat");
 	});
+
+	it("should log a warning if no previous tag is found", async () => {
+		const { config, execGit, git, logger } = await setupTest("get-commits");
+
+		const warnSpy = vi.spyOn(logger, "warn").mockImplementation(() => {});
+
+		execGit.commit("chore: init");
+		execGit.commit("feat: an amazing new feature");
+
+		const { latestTag, commits } = await getCommitsSinceTag(config, logger, git);
+
+		expect(latestTag).toBeUndefined();
+		expect(commits).toHaveLength(2);
+		expect(commits[0]?.subject).toBe("feat: an amazing new feature");
+		expect(commits[1]?.subject).toBe("chore: init");
+
+		expect(warnSpy).toHaveBeenCalledWith("No previous tag found, using all commits");
+	});
 });

@@ -217,53 +217,6 @@ describe("version > getCurrentVersion", () => {
 });
 
 describe("version > getNextVersion", () => {
-	it("should determine the next version as a minor bump", async () => {
-		const { config, logger } = await setupTest("version getNextVersion");
-
-		const commit = {
-			type: "feat",
-			breakingChange: "",
-			notes: [],
-		} as unknown as Commit;
-
-		const result = await getNextVersion(config, logger, [commit], "1.2.3");
-		expect(result).toStrictEqual({
-			version: "1.3.0",
-			releaseType: "minor",
-			preMajor: false,
-			changes: {
-				major: 0,
-				minor: 1,
-				patch: 0,
-			},
-		});
-	});
-
-	it("should be able to define the next version using the config", async () => {
-		const { config, logger } = await setupTest("version getNextVersion");
-		config.nextVersion = "2.0.0";
-
-		const result = await getNextVersion(config, logger, [], "1.2.3");
-		expect(result).toStrictEqual({ version: "2.0.0" });
-	});
-
-	it("should throw an error if next version in config is invalid", async () => {
-		const { config, logger } = await setupTest("version getNextVersion");
-		config.nextVersion = "invalid";
-
-		await expect(getNextVersion(config, logger, [], "1.2.3")).rejects.toThrow(
-			"Invalid Version: invalid",
-		);
-	});
-
-	it("should skip version bump", async () => {
-		const { config, logger } = await setupTest("version getNextVersion");
-		config.skipBump = true;
-
-		const result = await getNextVersion(config, logger, [], "1.2.3");
-		expect(result).toStrictEqual({ version: "1.2.3" });
-	});
-
 	it("should recommend a patch bump when no commits found", async () => {
 		const { config, logger } = await setupTest("version getNextVersion");
 
@@ -275,77 +228,6 @@ describe("version > getNextVersion", () => {
 			changes: {
 				major: 0,
 				minor: 0,
-				patch: 0,
-			},
-		});
-	});
-
-	it("should recommend a pre-major patch bump", async () => {
-		const { config, logger } = await setupTest("version getNextVersion");
-
-		const commit = {
-			type: "feat",
-			breakingChange: "",
-			notes: [],
-		} as unknown as Commit;
-
-		const result = await getNextVersion(config, logger, [commit], "0.1.0");
-		expect(result).toStrictEqual({
-			version: "0.1.1",
-			releaseType: "patch",
-			preMajor: true,
-			changes: {
-				major: 0,
-				minor: 0,
-				patch: 1,
-			},
-		});
-	});
-
-	it("should recommend a pre-major minor bump", async () => {
-		const { config, logger } = await setupTest("version getNextVersion");
-
-		const commit = {
-			type: "feat",
-			breakingChange: "!",
-			notes: [],
-		} as unknown as Commit;
-
-		const result = await getNextVersion(config, logger, [commit], "0.1.0");
-		expect(result).toStrictEqual({
-			version: "0.2.0",
-			releaseType: "minor",
-			preMajor: true,
-			changes: {
-				major: 0,
-				minor: 1,
-				patch: 0,
-			},
-		});
-	});
-
-	it("should recommend a pre-major minor bump from notes", async () => {
-		const { config, logger } = await setupTest("version getNextVersion");
-
-		const commit = {
-			type: "feat",
-			breakingChange: "",
-			notes: [
-				{
-					title: "BREAKING CHANGE",
-					text: "A breaking change",
-				},
-			],
-		} as unknown as Commit;
-
-		const result = await getNextVersion(config, logger, [commit], "0.1.0");
-		expect(result).toStrictEqual({
-			version: "0.2.0",
-			releaseType: "minor",
-			preMajor: true,
-			changes: {
-				major: 0,
-				minor: 1,
 				patch: 0,
 			},
 		});
@@ -444,14 +326,85 @@ describe("version > getNextVersion", () => {
 		});
 	});
 
-	it('should be able to set "releaseAs" as a major bump', async () => {
+	it("should recommend a pre-major patch bump", async () => {
 		const { config, logger } = await setupTest("version getNextVersion");
-		config.releaseAs = "major";
+
+		const commit = {
+			type: "feat",
+			breakingChange: "",
+			notes: [],
+		} as unknown as Commit;
+
+		const result = await getNextVersion(config, logger, [commit], "0.1.0");
+		expect(result).toStrictEqual({
+			version: "0.1.1",
+			releaseType: "patch",
+			preMajor: true,
+			changes: {
+				major: 0,
+				minor: 0,
+				patch: 1,
+			},
+		});
+	});
+
+	it("should recommend a pre-major minor bump", async () => {
+		const { config, logger } = await setupTest("version getNextVersion");
+
+		const commit = {
+			type: "feat",
+			breakingChange: "!",
+			notes: [],
+		} as unknown as Commit;
+
+		const result = await getNextVersion(config, logger, [commit], "0.1.0");
+		expect(result).toStrictEqual({
+			version: "0.2.0",
+			releaseType: "minor",
+			preMajor: true,
+			changes: {
+				major: 0,
+				minor: 1,
+				patch: 0,
+			},
+		});
+	});
+
+	it("should recommend a pre-major minor bump from notes", async () => {
+		const { config, logger } = await setupTest("version getNextVersion");
+
+		const commit = {
+			type: "feat",
+			breakingChange: "",
+			notes: [
+				{
+					title: "BREAKING CHANGE",
+					text: "A breaking change",
+				},
+			],
+		} as unknown as Commit;
+
+		const result = await getNextVersion(config, logger, [commit], "0.1.0");
+		expect(result).toStrictEqual({
+			version: "0.2.0",
+			releaseType: "minor",
+			preMajor: true,
+			changes: {
+				major: 0,
+				minor: 1,
+				patch: 0,
+			},
+		});
+	});
+
+	it('should be able to set "releaseAs" as a patch bump', async () => {
+		const { config, logger } = await setupTest("version getNextVersion");
+		config.releaseAs = "patch";
 
 		const result = await getNextVersion(config, logger, [], "1.2.3");
 		expect(result).toStrictEqual({
-			version: "2.0.0",
-			releaseType: "major",
+			version: "1.2.4",
+			releaseType: "patch",
 			preMajor: false,
 			changes: {
 				major: 0,
@@ -478,14 +431,14 @@ describe("version > getNextVersion", () => {
 		});
 	});
 
-	it('should be able to set "releaseAs" as a patch bump', async () => {
+	it('should be able to set "releaseAs" as a major bump', async () => {
 		const { config, logger } = await setupTest("version getNextVersion");
-		config.releaseAs = "patch";
+		config.releaseAs = "major";
 
 		const result = await getNextVersion(config, logger, [], "1.2.3");
 		expect(result).toStrictEqual({
-			version: "1.2.4",
-			releaseType: "patch",
+			version: "2.0.0",
+			releaseType: "major",
 			preMajor: false,
 			changes: {
 				major: 0,
@@ -523,6 +476,31 @@ describe("version > getNextVersion", () => {
 				patch: 0,
 			},
 		});
+	});
+
+	it("should skip version bump", async () => {
+		const { config, logger } = await setupTest("version getNextVersion");
+		config.skipBump = true;
+
+		const result = await getNextVersion(config, logger, [], "1.2.3");
+		expect(result).toStrictEqual({ version: "1.2.3" });
+	});
+
+	it("should be able to define the next version using the config", async () => {
+		const { config, logger } = await setupTest("version getNextVersion");
+		config.nextVersion = "2.0.0";
+
+		const result = await getNextVersion(config, logger, [], "1.2.3");
+		expect(result).toStrictEqual({ version: "2.0.0" });
+	});
+
+	it("should throw an error if next version in config is invalid", async () => {
+		const { config, logger } = await setupTest("version getNextVersion");
+		config.nextVersion = "invalid";
+
+		await expect(getNextVersion(config, logger, [], "1.2.3")).rejects.toThrow(
+			"Invalid Version: invalid",
+		);
 	});
 
 	it("should handle an invalid current version", async () => {

@@ -39,11 +39,12 @@ export function filterRevertedCommits(parsedCommits: Commit[]): Commit[] {
 	for (const commit of parsedCommits) {
 		if (commit.revert) continue;
 
-		if (
-			revertedCommits.some(
-				(r) => r.revert?.hash === commit.hash || r.revert?.subject === commit.subject,
-			)
-		) {
+		const revertedIndex = revertedCommits.findIndex(
+			(r) => r.revert?.hash === commit.hash || r.revert?.subject === commit.subject,
+		);
+		if (revertedIndex !== -1) {
+			// Remove the reverted commit from the list to prevent multiple removals.
+			revertedCommits.splice(revertedIndex, 1);
 			continue;
 		}
 

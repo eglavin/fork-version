@@ -105,6 +105,37 @@ This reverts commit .`,
 		expect(filteredCommits).toHaveLength(1);
 	});
 
+	it("should not remove commits by subject if there are multiple with the same subject", () => {
+		const parser = new CommitParser();
+
+		const commits = [
+			createCommit({
+				body: "fix: resolve issue",
+				hash: "4ef2c86d393a9660aa9f753144256b1f200c16b3",
+			}),
+			createCommit({
+				body: `Revert "feat: implement feature"
+
+This reverts commit .`,
+				hash: "53949384380cc2b62785275bca38ac261256e278",
+			}),
+			createCommit({
+				body: "feat: implement feature",
+				hash: "356a192b7913b04c54574d18c28d46e6395428ab",
+			}),
+			createCommit({
+				body: "feat: implement feature",
+				hash: "1b6453892473a467d07372d45eb05abc2031647a",
+			}),
+		].map((raw) => parser.parse(raw)!);
+
+		const filteredCommits = filterRevertedCommits(commits);
+
+		expect(filteredCommits).toHaveLength(2);
+		expect(filteredCommits[0].subject).toBe("fix: resolve issue");
+		expect(filteredCommits[1].subject).toBe("feat: implement feature");
+	});
+
 	it("should remove reverted revert commits", () => {
 		const parser = new CommitParser();
 

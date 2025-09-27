@@ -91,7 +91,6 @@
     "conventional-changelog": "5.1.0",
     "conventional-changelog-config-spec": "2.1.0",
     "conventional-changelog-conventionalcommits": "7.0.2",
-    "conventional-recommended-bump": "9.0.0",
     "esbuild": "0.24.0",
     "glob": "10.3.12",
     "joycon": "3.1.1",

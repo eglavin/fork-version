@@ -782,6 +782,7 @@ Signed-off-by: Fork Version <fork-version@example.com>
 
 Closes gh-456, #789
 fixes owner/repo#1234
+resolves owner/my-repo#5678
 fixes repo#3333
 # ignored
 # closes #1
@@ -796,6 +797,7 @@ fixes repo#3333
 					{ prefix: "gh-", issue: "456", action: "Closes", owner: null, repository: null },
 					{ prefix: "#", issue: "789", action: "Closes", owner: null, repository: null },
 					{ prefix: "#", issue: "1234", action: "fixes", owner: "owner", repository: "repo" },
+					{ action: "resolves", issue: "5678", owner: "owner", prefix: "#", repository: "my-repo" },
 					{ action: "fixes", issue: "3333", owner: null, prefix: "#", repository: "repo" },
 					{ prefix: "gh-", issue: "88", action: "closes", owner: null, repository: null },
 					{ prefix: "#", issue: "89", action: "fixes", owner: null, repository: null },

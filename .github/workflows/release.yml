@@ -4,13 +4,13 @@ on:
   release:
     types: [created]
 
+permissions:
+  contents: read
+  id-token: write
+
 jobs:
   release:
     runs-on: ubuntu-latest
-
-    permissions:
-      contents: read
-      id-token: write
 
     steps:
       - name: Checkout Repository
@@ -52,10 +52,8 @@ jobs:
           pnpm build
 
       - name: Publish npm package
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
-          npm publish --provenance
+          npm publish
 
       - name: Publish jsr package
         run: npx jsr publish --allow-slow-types

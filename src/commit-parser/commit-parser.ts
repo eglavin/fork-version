@@ -269,6 +269,8 @@ export class CommitParser {
 				if (slashIndex !== -1) {
 					reference.owner = repository.slice(0, slashIndex);
 					reference.repository = repository.slice(slashIndex + 1);
+				} else {
+					reference.repository = repository;
 				}
 			}
 

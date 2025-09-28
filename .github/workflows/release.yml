@@ -23,6 +23,11 @@ jobs:
           node-version: lts/*
           registry-url: "https://registry.npmjs.org"
 
+      - name: Update npm
+        run: |
+          npm install -g npm@latest
+          npm --version
+
       - name: Install pnpm
         uses: pnpm/action-setup@v3
         id: pnpm-install

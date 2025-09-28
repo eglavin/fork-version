@@ -1,6 +1,6 @@
 {
   "name": "fork-version",
-  "version": "1.8.0",
+  "version": "2.0.0",
   "license": "MIT",
   "description": "Fork-Version automates version control tasks such as determining, updating, and committing versions, files, and changelogs, simplifying the process when adhering to the conventional commit standard.",
   "keywords": [

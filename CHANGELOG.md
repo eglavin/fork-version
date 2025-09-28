@@ -1,5 +1,17 @@
 # Fork Version
 
+## 2.0.0 (2025-09-28)
+
+
+### ⚠ BREAKING CHANGES
+
+* introduce new commit parsing class (#88)
+
+### Refactor
+
+* introduce new commit parsing class ([#88](https://github.com/eglavin/fork-version/issues/88)) ([99f9698](https://github.com/eglavin/fork-version/commit/99f96980f63c2c5f50009abaef2542eb460c95fa))
+
+
 ## 1.8.0 (2025-08-11)
 
 

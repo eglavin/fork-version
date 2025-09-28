@@ -1,4 +1,4 @@
-import { execFile } from "node:child_process";
+import { Git } from "../utils/git";
 
 export interface DetectedGitHost {
 	detectedGitHost: string;
@@ -18,11 +18,10 @@ export interface DetectedGitHost {
  * correctly.
  */
 export async function detectGitHost(cwd: string): Promise<DetectedGitHost | null> {
-	const remoteUrl = await new Promise<string>((onResolve) => {
-		execFile("git", ["config", "--get", "remote.origin.url"], { cwd }, (_error, stdout) => {
-			onResolve(stdout ? stdout.trim() : "");
-		});
-	});
+	const remoteUrl = await new Git({
+		path: cwd,
+		dryRun: false,
+	}).getRemoteUrl();
 
 	// A checked out Azure DevOps remote URL looks like one of these:
 	//

@@ -1,11 +1,11 @@
 import semver, { type ReleaseType } from "semver";
-import conventionalRecommendedBump from "conventional-recommended-bump";
 
 import { getReleaseType } from "../utils/release-type";
 import type { ForkConfig } from "../config/types";
 import type { FileManager, FileState } from "../files/file-manager";
 import type { Logger } from "../utils/logger";
 import type { Git } from "../utils/git";
+import type { Commit } from "../commit-parser/types";
 
 export interface CurrentVersion {
 	version: string;
@@ -42,9 +42,9 @@ export async function getCurrentVersion(
 		versions.add(config.currentVersion);
 	}
 
-	// If we still don't have a version, try to get the latest git tag
+	// If we still don't have a version, try to get the highest version from git tags
 	if (versions.size === 0 && config.gitTagFallback) {
-		const version = await git.getLatestTag(config.tagPrefix);
+		const version = await git.getHighestSemverVersionFromTags(config.tagPrefix);
 		if (version) {
 			logger.warn(`Using latest git tag as fallback`);
 			versions.add(version);
@@ -79,15 +79,15 @@ export async function getCurrentVersion(
 
 export interface NextVersion {
 	version: string;
-	level?: number;
-	preMajor?: boolean;
-	reason?: string;
 	releaseType?: ReleaseType;
+	preMajor?: boolean;
+	changes?: { major: number; minor: number; patch: number };
 }
 
 export async function getNextVersion(
 	config: ForkConfig,
 	logger: Logger,
+	commits: Commit[],
 	currentVersion: string,
 ): Promise<NextVersion> {
 	if (config.skipBump) {
@@ -97,7 +97,11 @@ export async function getNextVersion(
 		};
 	}
 
-	if (config.nextVersion && semver.valid(config.nextVersion)) {
+	if (config.nextVersion) {
+		if (!semver.valid(config.nextVersion)) {
+			throw new Error(`Invalid Version: ${config.nextVersion}`);
+		}
+
 		logger.log(`Next version: ${config.nextVersion}`);
 		return {
 			version: config.nextVersion,
@@ -105,54 +109,77 @@ export async function getNextVersion(
 	}
 
 	const isPreMajor = semver.lt(currentVersion, "1.0.0");
+	let releaseType: "major" | "minor" | "patch" = "patch";
+	const changes = { major: 0, minor: 0, patch: 0 } satisfies NextVersion["changes"];
 
-	let recommendedBump: Awaited<ReturnType<typeof conventionalRecommendedBump>>;
 	if (config.releaseAs) {
-		recommendedBump = {
-			releaseType: config.releaseAs,
-			level: -1,
-			reason: "User defined",
-		};
+		releaseType = config.releaseAs;
 	} else {
-		try {
-			recommendedBump = await conventionalRecommendedBump({
-				preset: {
-					name: "conventionalcommits",
-					...config.changelogPresetConfig,
-					preMajor: isPreMajor,
-				},
-				path: config.path,
-				tagPrefix: config.tagPrefix,
-				cwd: config.path,
-			});
-		} catch (cause) {
-			throw new Error(`[conventional-recommended-bump] Unable to determine next version`, {
-				cause,
-			});
+		/**
+		 * - 0 = major
+		 * - 1 = minor
+		 * - 2 = patch
+		 */
+		let level = 2;
+		const MINOR_TYPES = ["feat", "feature"];
+
+		for (const commit of commits) {
+			if (commit.notes.length > 0 || commit.breakingChange) {
+				changes.major += commit.notes.length + (commit.breakingChange ? 1 : 0);
+				level = 0;
+			} else if (MINOR_TYPES.includes(commit.type.toLowerCase())) {
+				changes.minor += 1;
+				if (level === 2) {
+					level = 1;
+				}
+			} else {
+				changes.patch += 1;
+			}
+		}
+
+		// If we are pre 1.0.0, we want to downgrade major bumps to minor, and minor bumps to patch.
+		// This is because 0.x.y versions are considered unstable, and breaking changes are expected.
+		if (isPreMajor && level < 2) {
+			level++;
+			changes.patch += changes.minor;
+			changes.minor = changes.major;
+			changes.major = 0;
+		}
+
+		if (level === 0) {
+			releaseType = "major";
+		} else if (level === 1) {
+			releaseType = "minor";
+		} else {
+			releaseType = "patch";
 		}
 	}
 
-	if (recommendedBump.releaseType) {
-		const releaseType = getReleaseType(
-			recommendedBump.releaseType,
+	const releaseTypeOrPreRelease = getReleaseType(releaseType, currentVersion, config.preRelease);
+	const nextVersion =
+		semver.inc(
 			currentVersion,
-			config.preRelease,
-		);
-		const nextVersion =
-			semver.inc(
-				currentVersion,
-				releaseType,
-				typeof config.preRelease === "string" ? config.preRelease : undefined,
-			) ?? "";
+			releaseTypeOrPreRelease,
+			typeof config.preRelease === "string" ? config.preRelease : undefined,
+		) ?? "";
 
-		logger.log(`Next version: ${nextVersion} (${releaseType})`);
-		return {
-			...recommendedBump,
-			preMajor: isPreMajor,
-			releaseType,
-			version: nextVersion,
-		};
+	logger.log(`Next version: ${nextVersion} (${releaseTypeOrPreRelease})`);
+
+	if (commits.length > 0) {
+		logger.log(
+			`  - Commits: ${commits.length}` +
+				(changes.major > 0 ? `, Breaking Changes: ${changes.major}` : "") +
+				(changes.minor > 0 ? `, New Features: ${changes.minor}` : "") +
+				(changes.patch > 0 ? `, Bug Fixes: ${changes.patch}` : ""),
+		);
+	} else {
+		logger.log("  - No commits found.");
 	}
 
-	throw new Error("Unable to find next version");
+	return {
+		version: nextVersion,
+		releaseType: releaseTypeOrPreRelease,
+		preMajor: isPreMajor,
+		changes,
+	};
 }

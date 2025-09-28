@@ -10,6 +10,7 @@ import { Logger } from "./utils/logger";
 import { FileManager } from "./files/file-manager";
 import { Git } from "./utils/git";
 
+import { getCommitsSinceTag } from "./process/get-commits";
 import { getCurrentVersion, getNextVersion } from "./process/version";
 import { updateChangelog } from "./process/changelog";
 import { commitChanges } from "./process/commit";
@@ -27,8 +28,10 @@ async function runFork(cliArguments: ReturnType<typeof getCliArguments>) {
 	logger.log(`Running fork-version - ${new Date().toUTCString()}`);
 	logger.warn(config.dryRun ? "[Dry Run] No changes will be written to disk.\n" : "");
 
+	const commits = await getCommitsSinceTag(config, logger, git);
+
 	const current = await getCurrentVersion(config, logger, git, fileManager, config.files);
-	const next = await getNextVersion(config, logger, current.version);
+	const next = await getNextVersion(config, logger, commits.commits, current.version);
 
 	logger.log("Updating files: ");
 	for (const outFile of current.files) {
@@ -42,7 +45,7 @@ async function runFork(cliArguments: ReturnType<typeof getCliArguments>) {
 	await tagChanges(config, logger, git, next.version);
 
 	// Print git push command
-	const branchName = await git.getCurrentBranchName();
+	const branchName = await git.getBranchName();
 	logger.log(
 		`\nRun \`git push --follow-tags origin ${branchName}\` to push the changes and the tag.`,
 	);

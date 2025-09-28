@@ -7,6 +7,30 @@ import { getUserConfig } from "../src/config/user-config";
 import { Logger } from "../src/utils/logger";
 import { Git } from "../src/utils/git";
 
+interface ISetupTestOptions {
+	/**
+	 * The name to use for the git user.
+	 */
+	userName: string;
+	/**
+	 * The email address to use for the git user.
+	 */
+	userEmail: string;
+}
+
+function createSetupTestOptions(options?: Partial<ISetupTestOptions>) {
+	const defaultOptions: ISetupTestOptions = {
+		userName: "Fork Version",
+		userEmail: "fork-version@example.com",
+	};
+
+	// Override default options with user options.
+	if (options?.userName != undefined) defaultOptions.userName = options.userName;
+	if (options?.userEmail != undefined) defaultOptions.userEmail = options.userEmail;
+
+	return defaultOptions;
+}
+
 /**
  * Setup a test environment with a test folder, config, logger and git instances.
  *
@@ -17,9 +41,11 @@ import { Git } from "../src/utils/git";
  * const { config, create, logger, git } = await setupTest("execute-file");
  * ```
  */
-export async function setupTest(testName: string) {
+export async function setupTest(testName: string, options?: Partial<ISetupTestOptions>) {
 	const testFolderLocation = join(process.cwd(), "..", "fork-version.tests"); // Need to step up outside of the fork-version repo to avoid git conflicts.
 	const testFolder = join(testFolderLocation, `${randomBytes(16).toString("hex")}-${testName}`);
+
+	const { userName, userEmail } = createSetupTestOptions(options);
 
 	const execSyncOptions: ExecSyncOptionsWithBufferEncoding = {
 		cwd: testFolder,
@@ -39,6 +65,9 @@ export async function setupTest(testName: string) {
 	execSync("git init --initial-branch=main", execSyncOptions);
 	execSync("git config commit.gpgSign false", execSyncOptions);
 	execSync("git config core.autocrlf false", execSyncOptions);
+
+	execSync(`git config user.name "${userName}"`, execSyncOptions);
+	execSync(`git config user.email "${userEmail}"`, execSyncOptions);
 
 	//#region Create default test config, logger and git instances
 	const config = await getUserConfig({});
@@ -205,6 +234,9 @@ export async function setupTest(testName: string) {
 				for (const message of commits) {
 					this.commit(message);
 				}
+			},
+			tag: function _execGitTag(tag: string, message: string) {
+				execSync(`git tag --annotate "${tag}" --message "${message}"`, execSyncOptions);
 			},
 		},
 	};

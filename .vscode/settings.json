@@ -1,7 +1,6 @@
 {
-	"eslint.experimental.useFlatConfig": true,
 	"typescript.tsdk": "node_modules/typescript/lib",
-	"[typescript]": {
+	"[javascript][typescript]": {
 		"editor.formatOnSave": true,
 		"editor.defaultFormatter": "esbenp.prettier-vscode"
 	},

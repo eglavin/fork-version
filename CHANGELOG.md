@@ -1,5 +1,13 @@
 # Fork Version
 
+## 2.0.2 (2025-09-30)
+
+
+### Chore
+
+* bump dependencies ([#93](https://github.com/eglavin/fork-version/issues/93)) ([84efab8](https://github.com/eglavin/fork-version/commit/84efab8d2d8a7a4e87e580b2dc5f7519c5fdf401))
+
+
 ## 2.0.1 (2025-09-28)
 
 

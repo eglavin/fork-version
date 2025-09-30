@@ -160,7 +160,7 @@ export async function getNextVersion(
 		semver.inc(
 			currentVersion,
 			releaseTypeOrPreRelease,
-			typeof config.preRelease === "string" ? config.preRelease : undefined,
+			typeof config.preRelease === "string" ? config.preRelease : "",
 		) ?? "";
 
 	logger.log(`Next version: ${nextVersion} (${releaseTypeOrPreRelease})`);

@@ -506,7 +506,7 @@ describe("version > getNextVersion", () => {
 	it("should handle an invalid current version", async () => {
 		const { config, logger } = await setupTest("version getNextVersion");
 
-		expect(getNextVersion(config, logger, [], "invalid")).rejects.toThrow(
+		await expect(getNextVersion(config, logger, [], "invalid")).rejects.toThrow(
 			"Invalid Version: invalid",
 		);
 	});

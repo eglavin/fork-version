@@ -86,8 +86,8 @@ runFork(cliArguments).catch((error: Error | any) => {
 		// If the error is a ZodError, print the keys that failed validation
 		if (error.cause instanceof ZodError) {
 			console.error(error.message);
-			for (const err of error.cause.errors) {
-				console.log(`${err.path} => ${err.message}`);
+			for (const err of error.cause.issues) {
+				console.log(`${err.path.join(", ")} => ${err.message}`);
 			}
 			process.exit(3);
 		}

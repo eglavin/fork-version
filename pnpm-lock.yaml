@@ -45,8 +45,8 @@ importers:
         specifier: 2.6.0
         version: 2.6.0
       zod:
-        specifier: 3.23.8
-        version: 3.23.8
+        specifier: 4.1.11
+        version: 4.1.11
     devDependencies:
       '@types/json-schema':
         specifier: 7.0.15
@@ -93,9 +93,6 @@ importers:
       vitest:
         specifier: 3.2.4
         version: 3.2.4(@types/node@20.11.30)(@vitest/ui@3.2.4)(yaml@2.6.0)
-      zod-to-json-schema:
-        specifier: 3.24.6
-        version: 3.24.6(zod@3.23.8)
 
 packages:
 
@@ -2049,13 +2046,8 @@ packages:
     resolution: {integrity: sha512-9bnSc/HEW2uRy67wc+T8UwauLuPJVn28jb+GtJY16iiKWyvmYJRXVT4UamsAEGQfPohgr2q4Tq0sQbQlxTfi1g==}
     engines: {node: '>=12.20'}
 
-  zod-to-json-schema@3.24.6:
-    resolution: {integrity: sha512-h/z3PKvcTcTetyjl1fkj79MHNEjm+HpD6NXheWjzOekY7kV+lwDYnHw+ivHkijnCSMz1yJaWBD9vu/Fcmk+vEg==}
-    peerDependencies:
-      zod: ^3.24.1
-
-  zod@3.23.8:
-    resolution: {integrity: sha512-XBx9AXhXktjUqnepgTiE5flcKIYWi/rme0Eaj+5Y0lftuGBq+jyRu/md4WnuxqgP1ubdpNCsYEYPxrzVHD8d6g==}
+  zod@4.1.11:
+    resolution: {integrity: sha512-WPsqwxITS2tzx1bzhIKsEs19ABD5vmCVa4xBo2tq/SrV4RNZtfws1EnCWQXM6yh8bD08a1idvkB5MZSBiZsjwg==}
 
 snapshots:
 
@@ -3905,8 +3897,4 @@ snapshots:
 
   yocto-queue@1.0.0: {}
 
-  zod-to-json-schema@3.24.6(zod@3.23.8):
-    dependencies:
-      zod: 3.23.8
-
-  zod@3.23.8: {}
+  zod@4.1.11: {}

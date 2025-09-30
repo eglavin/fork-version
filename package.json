@@ -98,7 +98,7 @@
     "meow": "13.2.0",
     "semver": "7.6.3",
     "yaml": "2.6.0",
-    "zod": "3.23.8"
+    "zod": "4.1.11"
   },
   "devDependencies": {
     "@types/json-schema": "7.0.15",
@@ -115,7 +115,6 @@
     "tsup": "8.5.0",
     "typescript": "5.9.2",
     "typescript-eslint": "8.45.0",
-    "vitest": "3.2.4",
-    "zod-to-json-schema": "3.24.6"
+    "vitest": "3.2.4"
   }
 }

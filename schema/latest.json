@@ -1,181 +1,194 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
-  "additionalProperties": false,
   "properties": {
     "inspectVersion": {
-      "type": "boolean",
-      "description": "If set, Fork-Version will print the current version and exit."
+      "description": "If set, Fork-Version will print the current version and exit.",
+      "type": "boolean"
     },
     "files": {
+      "description": "List of the files to be updated.",
       "type": "array",
       "items": {
         "type": "string"
-      },
-      "description": "List of the files to be updated."
+      }
     },
     "glob": {
-      "type": "string",
-      "description": "Glob pattern to match files to be updated."
+      "description": "Glob pattern to match files to be updated.",
+      "type": "string"
     },
     "path": {
-      "type": "string",
-      "description": "The path Fork-Version will run from. Defaults to \"process.cwd()\"."
+      "description": "The path Fork-Version will run from. Defaults to \"process.cwd()\".",
+      "type": "string"
     },
     "changelog": {
-      "type": "string",
-      "description": "Name of the changelog file. Defaults to \"CHANGELOG.md\"."
+      "description": "Name of the changelog file. Defaults to \"CHANGELOG.md\".",
+      "type": "string"
     },
     "header": {
-      "type": "string",
-      "description": "The header text for the changelog."
+      "description": "The header text for the changelog.",
+      "type": "string"
     },
     "tagPrefix": {
-      "type": "string",
-      "description": "Specify a prefix for the created tag. Defaults to \"v\"."
+      "description": "Specify a prefix for the created tag. Defaults to \"v\".",
+      "type": "string"
     },
     "preRelease": {
-      "type": [
-        "string",
-        "boolean"
-      ],
-      "description": "Make a pre-release with optional label if given value is a string."
+      "description": "Make a pre-release with optional label if given value is a string.",
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "boolean"
+        }
+      ]
     },
     "currentVersion": {
-      "type": "string",
-      "description": "If set, Fork-Version will use this version instead of trying to determine one."
+      "description": "If set, Fork-Version will use this version instead of trying to determine one.",
+      "type": "string"
     },
     "nextVersion": {
-      "type": "string",
-      "description": "If set, Fork-Version will attempt to update to this version, instead of incrementing using \"conventional-commit\"."
+      "description": "If set, Fork-Version will attempt to update to this version, instead of incrementing using \"conventional-commit\".",
+      "type": "string"
     },
     "releaseAs": {
-      "type": "string",
-      "enum": [
-        "major",
-        "minor",
-        "patch"
-      ],
-      "description": "Release as increments the version by the specified level. Overrides the default behaviour of \"conventional-commit\"."
+      "description": "Release as increments the version by the specified level. Overrides the default behaviour of \"conventional-commit\".",
+      "anyOf": [
+        {
+          "type": "string",
+          "const": "major"
+        },
+        {
+          "type": "string",
+          "const": "minor"
+        },
+        {
+          "type": "string",
+          "const": "patch"
+        }
+      ]
     },
     "allowMultipleVersions": {
-      "type": "boolean",
-      "description": "Don't throw an error if multiple versions are found in the given files."
+      "description": "Don't throw an error if multiple versions are found in the given files.",
+      "type": "boolean"
     },
     "commitAll": {
-      "type": "boolean",
-      "description": "Commit all changes, not just files updated by Fork-Version."
+      "description": "Commit all changes, not just files updated by Fork-Version.",
+      "type": "boolean"
     },
     "changelogAll": {
-      "type": "boolean",
-      "description": "If this flag is set, all default commit types will be added to the changelog, not just `feat` and `fix`."
+      "description": "If this flag is set, all default commit types will be added to the changelog, not just `feat` and `fix`.",
+      "type": "boolean"
     },
     "debug": {
-      "type": "boolean",
-      "description": "Output debug information."
+      "description": "Output debug information.",
+      "type": "boolean"
     },
     "dryRun": {
-      "type": "boolean",
-      "description": "No output will be written to disk or committed."
+      "description": "No output will be written to disk or committed.",
+      "type": "boolean"
     },
     "silent": {
-      "type": "boolean",
-      "description": "Run without logging to the terminal."
+      "description": "Run without logging to the terminal.",
+      "type": "boolean"
     },
     "gitTagFallback": {
-      "type": "boolean",
-      "description": "If unable to find a version in the given files, fallback and attempt to use the latest git tag. Defaults to true."
+      "description": "If unable to find a version in the given files, fallback and attempt to use the latest git tag. Defaults to true.",
+      "type": "boolean"
     },
     "sign": {
-      "type": "boolean",
-      "description": "If true, git will sign the commit with the systems GPG key."
+      "description": "If true, git will sign the commit with the systems GPG key.",
+      "type": "boolean"
     },
     "verify": {
-      "type": "boolean",
-      "description": "If true, git will run user defined git hooks before committing."
+      "description": "If true, git will run user defined git hooks before committing.",
+      "type": "boolean"
     },
     "skipBump": {
-      "type": "boolean",
-      "description": "Skip the bump step."
+      "description": "Skip the bump step.",
+      "type": "boolean"
     },
     "skipChangelog": {
-      "type": "boolean",
-      "description": "Skip the changelog step."
+      "description": "Skip the changelog step.",
+      "type": "boolean"
     },
     "skipCommit": {
-      "type": "boolean",
-      "description": "Skip the commit step."
+      "description": "Skip the commit step.",
+      "type": "boolean"
     },
     "skipTag": {
-      "type": "boolean",
-      "description": "Skip the tag step."
+      "description": "Skip the tag step.",
+      "type": "boolean"
     },
     "changelogPresetConfig": {
+      "description": "Override the default \"conventional-changelog-conventionalcommits\" preset configuration.",
       "type": "object",
       "properties": {
         "types": {
+          "description": "List of explicitly supported commit message types.",
           "type": "array",
           "items": {
             "type": "object",
             "properties": {
               "type": {
-                "type": "string",
-                "description": "The type of commit message, such as \"feat\", \"fix\", \"chore\"."
+                "description": "The type of commit message, such as \"feat\", \"fix\", \"chore\".",
+                "type": "string"
               },
               "scope": {
-                "type": "string",
-                "description": "The scope of the commit message."
+                "description": "The scope of the commit message.",
+                "type": "string"
               },
               "section": {
-                "type": "string",
-                "description": "The section of the `CHANGELOG` the commit should show up in."
+                "description": "The section of the `CHANGELOG` the commit should show up in.",
+                "type": "string"
               },
               "hidden": {
-                "type": "boolean",
-                "description": "Should show in the generated changelog message?"
+                "description": "Should show in the generated changelog message?",
+                "type": "boolean"
               }
             },
             "required": [
               "type"
             ],
             "additionalProperties": false
-          },
-          "description": "List of explicitly supported commit message types."
+          }
         },
         "commitUrlFormat": {
-          "type": "string",
-          "description": "A URL representing a specific commit at a hash."
+          "description": "A URL representing a specific commit at a hash.",
+          "type": "string"
         },
         "compareUrlFormat": {
-          "type": "string",
-          "description": "A URL representing the comparison between two git SHAs."
+          "description": "A URL representing the comparison between two git SHAs.",
+          "type": "string"
         },
         "issueUrlFormat": {
-          "type": "string",
-          "description": "A URL representing the issue format."
+          "description": "A URL representing the issue format.",
+          "type": "string"
         },
         "userUrlFormat": {
-          "type": "string",
-          "description": "A URL representing a user's profile on GitHub, Gitlab, etc."
+          "description": "A URL representing a user's profile on GitHub, Gitlab, etc.",
+          "type": "string"
         },
         "releaseCommitMessageFormat": {
-          "type": "string",
-          "description": "A string to be used to format the auto-generated release commit message."
+          "description": "A string to be used to format the auto-generated release commit message.",
+          "type": "string"
         },
         "issuePrefixes": {
+          "description": "List of prefixes used to detect references to issues.",
           "type": "array",
           "items": {
             "type": "string"
-          },
-          "description": "List of prefixes used to detect references to issues."
+          }
         }
       },
-      "additionalProperties": false,
-      "description": "Override the default \"conventional-changelog-conventionalcommits\" preset configuration."
+      "additionalProperties": false
     },
     "releaseMessageSuffix": {
-      "type": "string",
-      "description": "Add a suffix to the release commit message."
+      "description": "Add a suffix to the release commit message.",
+      "type": "string"
     }
-  }
+  },
+  "required": [],
+  "additionalProperties": false
 }

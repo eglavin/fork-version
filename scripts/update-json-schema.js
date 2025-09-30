@@ -4,21 +4,19 @@
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import { writeFileSync } from "node:fs";
-import { zodToJsonSchema } from "zod-to-json-schema";
+import z from "zod";
 import { ForkConfigSchema } from "../src/config/schema.js";
 import { clickableLink } from "./utils/clickable-link.js";
 
 const schemaLocation = join(import.meta.dirname, "..", "schema", `latest.json`);
-const jsonSchema = zodToJsonSchema(ForkConfigSchema);
+const jsonSchema = z.toJSONSchema(ForkConfigSchema);
 
 writeFileSync(
 	schemaLocation,
 	JSON.stringify(
 		{
-			$schema: "http://json-schema.org/draft-07/schema#",
-			type: "object",
-			additionalProperties: false,
-			properties: jsonSchema["properties"],
+			...jsonSchema,
+			required: [], // Make all properties optional
 		},
 		null,
 		2,

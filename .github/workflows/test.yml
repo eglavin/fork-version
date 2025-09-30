@@ -9,7 +9,7 @@ jobs:
   test_node:
     strategy:
       matrix:
-        node: [18, 20]
+        node: [20, 22]
         os: [ubuntu-latest, windows-latest]
 
     name: Test ${{ matrix.os }} on node v${{ matrix.node }}
@@ -19,35 +19,20 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      - name: Install PNPM
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+
       - name: Install Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node }}
+          cache: 'pnpm'
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v3
-        id: pnpm-install
-        with:
-          version: 9
-          run_install: false
-
-      - name: Get pnpm store directory
-        id: pnpm-cache
-        shell: bash
+      - name: Install Dependencies
         run: |
-          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
-
-      - name: Setup pnpm cache
-        uses: actions/cache@v4
-        with:
-          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
-
-      - name: Install dependencies
-        run: |
-          pnpm install --frozen-lockfile
+          pnpm install
 
       - name: Run Typecheck
         run: |
@@ -75,25 +60,24 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - uses: oven-sh/setup-bun@v1
+      - name: Install Bun
+        uses: oven-sh/setup-bun@v1
         with:
           bun-version: latest
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v3
-        id: pnpm-install
+      - name: Install PNPM
+        uses: pnpm/action-setup@v4
         with:
-          version: 9
           run_install: false
           standalone: true
 
-      - name: Get pnpm store directory
+      - name: Get PNPM Store Directory
         id: pnpm-cache
         shell: bash
         run: |
           echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
 
-      - name: Setup pnpm cache
+      - name: Setup PNPM Cache
         uses: actions/cache@v4
         with:
           path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
@@ -101,9 +85,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
 
-      - name: Install dependencies
+      - name: Install Dependencies
         run: |
-          pnpm install --frozen-lockfile
+          pnpm install
 
       - name: Run Typecheck
         run: |

@@ -11,55 +11,38 @@ permissions:
 
 jobs:
   release:
+    name: Release
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      - name: Install PNPM
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+
       - name: Install Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: lts/*
+          node-version-file: .node-version
           registry-url: "https://registry.npmjs.org"
+          cache: 'pnpm'
 
-      - name: Update npm
+      - name: Install Dependencies
         run: |
-          npm install -g npm@latest
-          npm --version
+          pnpm install
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v3
-        id: pnpm-install
-        with:
-          version: 9
-          run_install: false
-
-      - name: Get pnpm store directory
-        id: pnpm-cache
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
-
-      - name: Setup pnpm cache
-        uses: actions/cache@v4
-        with:
-          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
-
-      - name: Install dependencies
-        run: |
-          pnpm install --frozen-lockfile
-
-      - name: Build package
+      - name: Build
         run: |
           pnpm build
 
-      - name: Publish npm package
+      - name: Publish NPM Package
         run: |
+          npm install -g npm@latest
           npm publish
 
-      - name: Publish jsr package
-        run: npx jsr publish --allow-slow-types
+      - name: Publish JSR Package
+        run: |
+          npx jsr publish --allow-slow-types

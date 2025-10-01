@@ -30,7 +30,7 @@
   },
   "packageManager": "pnpm@10.17.1+sha512.17c560fca4867ae9473a3899ad84a88334914f379be46d455cbf92e5cf4b39d34985d452d2583baf19967fa76cb5c17bc9e245529d0b98745721aa7200ecaf7a",
   "engines": {
-    "node": ">=18.0.0",
+    "node": ">=20.0.0",
     "pnpm": ">=10.0.0"
   },
   "private": false,
@@ -92,10 +92,10 @@
     "conventional-changelog-config-spec": "2.1.0",
     "conventional-changelog-conventionalcommits": "7.0.2",
     "esbuild": "0.25.10",
-    "glob": "10.3.12",
+    "glob": "11.0.3",
     "joycon": "3.1.1",
     "jsonc-parser": "3.3.1",
-    "meow": "13.2.0",
+    "meow": "14.0.0",
     "semver": "7.7.2",
     "yaml": "2.8.1",
     "zod": "4.1.11"

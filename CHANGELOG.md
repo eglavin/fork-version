@@ -1,5 +1,22 @@
 # Fork Version
 
+## [3.0.0](https://github.com/eglavin/fork-version/compare/v2.0.3...v3.0.0) (2025-10-01)
+
+
+### ⚠ BREAKING CHANGES
+
+* bump minimum node version to 20
+
+### Chore
+
+* bump minimum node version to 20 ([0df3e97](https://github.com/eglavin/fork-version/commit/0df3e9716609b389f9eccc7cf4f5c5529416d344))
+
+
+### Docs
+
+* update supported versions ([1f9e1ea](https://github.com/eglavin/fork-version/commit/1f9e1ea08b1d049a6e2fa8ab55179072c471c72b))
+
+
 ## [2.0.3](https://github.com/eglavin/fork-version/compare/v2.0.2...v2.0.3) (2025-10-01)
 
 

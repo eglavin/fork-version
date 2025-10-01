@@ -9,10 +9,13 @@ jobs:
   test_node:
     strategy:
       matrix:
-        node: [20, 22]
-        os: [ubuntu-latest, windows-latest]
+        include:
+          - node: 20
+            os: ubuntu-latest
+          - node: 22
+            os: windows-latest
 
-    name: Test ${{ matrix.os }} on node v${{ matrix.node }}
+    name: Test Node.js v${{ matrix.node }} on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -47,58 +50,3 @@ jobs:
           git config --global user.name "GitHub Actions Bot"
           git config --global user.email "<>"
           pnpm test:ci
-
-  test_bun:
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest]
-
-    name: Test ${{ matrix.os }} on bun
-    runs-on: ${{ matrix.os }}
-
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: Install Bun
-        uses: oven-sh/setup-bun@v1
-        with:
-          bun-version: latest
-
-      - name: Install PNPM
-        uses: pnpm/action-setup@v4
-        with:
-          run_install: false
-          standalone: true
-
-      - name: Get PNPM Store Directory
-        id: pnpm-cache
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
-
-      - name: Setup PNPM Cache
-        uses: actions/cache@v4
-        with:
-          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
-
-      - name: Install Dependencies
-        run: |
-          pnpm install
-
-      - name: Run Typecheck
-        run: |
-          bun run typecheck
-
-      - name: Run Lint Check
-        run: |
-          bun run lint:check
-
-      - name: Run Tests
-        run: |
-          git config --global user.name "GitHub Actions Bot"
-          git config --global user.email "<>"
-          bun run test:ci

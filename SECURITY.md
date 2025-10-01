@@ -6,8 +6,8 @@ Versions of the project that are currently supported with security updates.
 
 | Version    |  Release Date | Supported          |
 | ---------- | ------------- | ------------------ |
-| ^1.7.0     | 31/10/2024    | :white_check_mark: |
-| <1.7.0     | -             | :x:                |
+| ^2.0.2     | 01/10/2025    | :white_check_mark: |
+| 1.x.x      | -             | :x:                |
 
 ## Reporting a Vulnerability
 

@@ -1,5 +1,13 @@
 # Fork Version
 
+## [3.0.1](https://github.com/eglavin/fork-version/compare/v3.0.0...v3.0.1) (2025-10-01)
+
+
+### Chore
+
+* run pnpm dedupe ([e33ec62](https://github.com/eglavin/fork-version/commit/e33ec62743d039a349a11c5e5dd06176bbec3f90))
+
+
 ## [3.0.0](https://github.com/eglavin/fork-version/compare/v2.0.3...v3.0.0) (2025-10-01)
 
 

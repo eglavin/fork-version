@@ -318,4 +318,41 @@ describe("getNextVersion", () => {
 			},
 		});
 	});
+
+	it("should not count merges or reverts as changes", async () => {
+		const { config, logger } = await setupTest("version getNextVersion");
+
+		const mergeCommit = {
+			type: "",
+			breakingChange: "",
+			notes: [],
+			merge: {
+				id: 1,
+				source: "branch",
+			},
+		} as unknown as Commit;
+
+		const revertCommit = {
+			type: "",
+			breakingChange: "",
+			notes: [],
+			revert: {
+				subject: "This is a revert",
+				hash: "abc123",
+			},
+		} as unknown as Commit;
+
+		const result = await getNextVersion(config, logger, [mergeCommit, revertCommit], "1.2.3");
+
+		expect(result).toStrictEqual({
+			version: "1.2.4",
+			releaseType: "patch",
+			preMajor: false,
+			changes: {
+				major: 0,
+				minor: 0,
+				patch: 0,
+			},
+		});
+	});
 });

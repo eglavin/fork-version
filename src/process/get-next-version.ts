@@ -9,7 +9,11 @@ export interface NextVersion {
 	version: string;
 	releaseType?: ReleaseType;
 	preMajor?: boolean;
-	changes?: { major: number; minor: number; patch: number };
+	changes?: {
+		major: number;
+		minor: number;
+		patch: number;
+	};
 }
 
 export async function getNextVersion(
@@ -52,6 +56,11 @@ export async function getNextVersion(
 		const MINOR_TYPES = ["feat", "feature"];
 
 		for (const commit of commits) {
+			// We shouldn't consider merge commits or reverts as changes.
+			if (commit.merge || commit.revert) {
+				continue;
+			}
+
 			if (commit.notes.length > 0 || commit.breakingChange) {
 				changes.major += commit.notes.length + (commit.breakingChange ? 1 : 0);
 				level = 0;

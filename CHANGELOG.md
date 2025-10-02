@@ -1,5 +1,19 @@
 # Fork Version
 
+## [3.0.2](https://github.com/eglavin/fork-version/compare/v3.0.1...v3.0.2) (2025-10-02)
+
+
+### Bug Fixes
+
+* dont count merges or reverts as changes ([bacf7fe](https://github.com/eglavin/fork-version/commit/bacf7fe3f10e0abaa084c068a132fedbe26c12d5))
+
+
+### Refactor
+
+* move git and logger classes to the services folder ([577c4bf](https://github.com/eglavin/fork-version/commit/577c4bf2b8923b2ed17309b0d73bd1279f69a407))
+* split version file into two ([ccf63be](https://github.com/eglavin/fork-version/commit/ccf63bed774986834642a5729b6ac56aae63e6c8))
+
+
 ## [3.0.1](https://github.com/eglavin/fork-version/compare/v3.0.0...v3.0.1) (2025-10-01)
 
 

@@ -11,7 +11,8 @@ import { FileManager } from "./files/file-manager";
 import { Git } from "./utils/git";
 
 import { getCommitsSinceTag } from "./process/get-commits";
-import { getCurrentVersion, getNextVersion } from "./process/version";
+import { getCurrentVersion } from "./process/get-current-version";
+import { getNextVersion } from "./process/get-next-version";
 import { updateChangelog } from "./process/changelog";
 import { commitChanges } from "./process/commit";
 import { tagChanges } from "./process/tag";

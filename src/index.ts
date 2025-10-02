@@ -15,12 +15,8 @@ export { defineConfig } from "./config/define-config";
 export { getUserConfig } from "./config/user-config";
 
 export { getCommitsSinceTag, type CommitsSinceTag } from "./process/get-commits";
-export {
-	getCurrentVersion,
-	getNextVersion,
-	type CurrentVersion,
-	type NextVersion,
-} from "./process/version";
+export { getCurrentVersion, type CurrentVersion } from "./process/get-current-version";
+export { getNextVersion, type NextVersion } from "./process/get-next-version";
 export { updateChangelog } from "./process/changelog";
 export { commitChanges } from "./process/commit";
 export { tagChanges } from "./process/tag";

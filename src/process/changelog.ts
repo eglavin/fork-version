@@ -4,7 +4,7 @@ import conventionalChangelog from "conventional-changelog";
 
 import { fileExists } from "../utils/file-state";
 import type { ForkConfig } from "../config/types";
-import type { Logger } from "../utils/logger";
+import type { Logger } from "../services/logger";
 
 /**
  * Matches the following changelog header formats:

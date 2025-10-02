@@ -4,8 +4,8 @@ import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { type ExecSyncOptionsWithBufferEncoding, execFile, execSync } from "node:child_process";
 
 import { getUserConfig } from "../src/config/user-config";
-import { Logger } from "../src/utils/logger";
-import { Git } from "../src/utils/git";
+import { Logger } from "../src/services/logger";
+import { Git } from "../src/services/git";
 
 interface ISetupTestOptions {
 	/**

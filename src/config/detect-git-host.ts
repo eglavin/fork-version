@@ -1,4 +1,4 @@
-import { Git } from "../utils/git";
+import { Git } from "../services/git";
 
 export interface DetectedGitHost {
 	detectedGitHost: string;

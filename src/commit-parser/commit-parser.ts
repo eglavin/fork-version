@@ -1,6 +1,6 @@
 import { createParserOptions, type ParserOptions } from "./options";
 import { ParserError } from "./parser-error";
-import type { Logger } from "../utils/logger";
+import type { Logger } from "../services/logger";
 import type { Commit, CommitNote, CommitReference } from "./types";
 
 export class CommitParser {

@@ -6,9 +6,9 @@ import { ZodError } from "zod";
 
 import { getCliArguments } from "./config/cli-arguments";
 import { getUserConfig } from "./config/user-config";
-import { Logger } from "./utils/logger";
+import { Logger } from "./services/logger";
 import { FileManager } from "./files/file-manager";
-import { Git } from "./utils/git";
+import { Git } from "./services/git";
 
 import { getCommitsSinceTag } from "./process/get-commits";
 import { getCurrentVersion } from "./process/get-current-version";

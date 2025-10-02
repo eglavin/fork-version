@@ -5,7 +5,7 @@ import { MSBuildProject } from "./ms-build-project";
 import { ARMBicep } from "./arm-bicep";
 
 import type { ForkConfig } from "../config/types";
-import type { Logger } from "../utils/logger";
+import type { Logger } from "../services/logger";
 
 export interface FileState {
 	name: string;

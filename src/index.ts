@@ -23,5 +23,5 @@ export { tagChanges } from "./process/tag";
 
 export { FileManager, type FileState, type IFileManager } from "./files/file-manager";
 
-export { Logger } from "./utils/logger";
-export { Git } from "./utils/git";
+export { Logger } from "./services/logger";
+export { Git } from "./services/git";

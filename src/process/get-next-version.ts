@@ -2,7 +2,7 @@ import semver, { type ReleaseType } from "semver";
 
 import { getReleaseType } from "../utils/release-type";
 import type { ForkConfig } from "../config/types";
-import type { Logger } from "../utils/logger";
+import type { Logger } from "../services/logger";
 import type { Commit } from "../commit-parser/types";
 
 export interface NextVersion {

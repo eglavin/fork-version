@@ -2,8 +2,8 @@ import semver from "semver";
 
 import type { ForkConfig } from "../config/types";
 import type { FileManager, FileState } from "../files/file-manager";
-import type { Logger } from "../utils/logger";
-import type { Git } from "../utils/git";
+import type { Logger } from "../services/logger";
+import type { Git } from "../services/git";
 
 export interface CurrentVersion {
 	version: string;

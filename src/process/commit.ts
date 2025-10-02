@@ -3,8 +3,8 @@ import { formatCommitMessage } from "../utils/format-commit-message";
 import { fileExists } from "../utils/file-state";
 import type { ForkConfig } from "../config/types";
 import type { FileState } from "../files/file-manager";
-import type { Logger } from "../utils/logger";
-import type { Git } from "../utils/git";
+import type { Logger } from "../services/logger";
+import type { Git } from "../services/git";
 
 export async function commitChanges(
 	config: ForkConfig,

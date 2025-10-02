@@ -3,7 +3,7 @@ import { readFileSync, writeFileSync } from "node:fs";
 
 import { fileExists } from "../utils/file-state";
 import type { ForkConfig } from "../config/types";
-import type { Logger } from "../utils/logger";
+import type { Logger } from "../services/logger";
 import type { FileState, IFileManager } from "./file-manager";
 
 /**

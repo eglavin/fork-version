@@ -1,7 +1,7 @@
 import type { MockInstance } from "vitest";
 import { setupTest } from "../../../tests/setup-tests";
-import { Git } from "../../utils/git";
-import { Logger } from "../../utils/logger";
+import { Git } from "../../services/git";
+import { Logger } from "../../services/logger";
 import { CommitParser } from "../commit-parser";
 import { type Commit } from "../types";
 

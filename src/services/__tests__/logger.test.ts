@@ -1,5 +1,5 @@
 import type { MockInstance } from "vitest";
-import { Logger } from "../logger";
+import { Logger } from "../../services/logger";
 
 describe("logger", () => {
 	let logSpy: MockInstance;

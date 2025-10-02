@@ -1,8 +1,8 @@
 import { CommitParser } from "../commit-parser/commit-parser";
 import { filterRevertedCommits } from "../commit-parser/filter-reverted-commits";
 import type { ForkConfig } from "../config/types";
-import type { Logger } from "../utils/logger";
-import type { Git } from "../utils/git";
+import type { Logger } from "../services/logger";
+import type { Git } from "../services/git";
 import type { Commit } from "../commit-parser/types";
 
 export interface CommitsSinceTag {

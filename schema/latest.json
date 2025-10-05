@@ -2,6 +2,16 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
   "properties": {
+    "command": {
+      "description": "The command to run. Can be one of: main, inspect-version, inspect-tag, validate-config. Defaults to main.",
+      "type": "string",
+      "enum": [
+        "main",
+        "inspect-version",
+        "inspect-tag",
+        "validate-config"
+      ]
+    },
     "inspectVersion": {
       "description": "If set, Fork-Version will print the current version and exit.",
       "type": "boolean"

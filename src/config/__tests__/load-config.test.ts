@@ -11,23 +11,23 @@ describe("load-config", async () => {
 	it("should load fork.config.ts", async () => {
 		const { create, testFolder } = await setupTest("load-config");
 
-		create.file(`export default { inspectVersion: true };`, "fork.config.ts");
+		create.file(`export default { commitAll: true };`, "fork.config.ts");
 
-		await expect(loadConfigFile(testFolder)).resolves.toStrictEqual({ inspectVersion: true });
+		await expect(loadConfigFile(testFolder)).resolves.toStrictEqual({ commitAll: true });
 	});
 
 	it("should load fork.config.cjs", async () => {
 		const { create, testFolder } = await setupTest("load-config");
 
-		create.file(`module.exports = { inspectVersion: true };`, "fork.config.cjs");
+		create.file(`module.exports = { commitAll: true };`, "fork.config.cjs");
 
-		await expect(loadConfigFile(testFolder)).resolves.toStrictEqual({ inspectVersion: true });
+		await expect(loadConfigFile(testFolder)).resolves.toStrictEqual({ commitAll: true });
 	});
 
 	it("should validate fork.config.ts", async () => {
 		const { create, testFolder } = await setupTest("load-config");
 
-		create.file(`export default { inspectVersion: "true" };`, "fork.config.ts");
+		create.file(`export default { commitAll: "true" };`, "fork.config.ts");
 
 		await expect(loadConfigFile(testFolder)).rejects.toThrow(/^Validation error in: /);
 	});
@@ -35,15 +35,15 @@ describe("load-config", async () => {
 	it("should load fork.config.json", async () => {
 		const { create, testFolder } = await setupTest("load-config");
 
-		create.json({ inspectVersion: true }, "fork.config.json");
+		create.json({ commitAll: true }, "fork.config.json");
 
-		await expect(loadConfigFile(testFolder)).resolves.toStrictEqual({ inspectVersion: true });
+		await expect(loadConfigFile(testFolder)).resolves.toStrictEqual({ commitAll: true });
 	});
 
 	it("should validate fork.config.json", async () => {
 		const { create, testFolder } = await setupTest("load-config");
 
-		create.json({ inspectVersion: "true" }, "fork.config.json");
+		create.json({ commitAll: "true" }, "fork.config.json");
 
 		await expect(loadConfigFile(testFolder)).rejects.toThrow(/^Validation error in: /);
 	});
@@ -59,9 +59,9 @@ describe("load-config", async () => {
 	it("should load package.json", async () => {
 		const { create, testFolder } = await setupTest("load-config");
 
-		create.json({ "fork-version": { inspectVersion: true } }, "package.json");
+		create.json({ "fork-version": { commitAll: true } }, "package.json");
 
-		await expect(loadConfigFile(testFolder)).resolves.toStrictEqual({ inspectVersion: true });
+		await expect(loadConfigFile(testFolder)).resolves.toStrictEqual({ commitAll: true });
 	});
 
 	it("should validate package.json", async () => {
@@ -70,7 +70,7 @@ describe("load-config", async () => {
 		create.json(
 			{
 				"fork-version": {
-					inspectVersion: "true",
+					commitAll: "true",
 				},
 			},
 			"package.json",
@@ -82,13 +82,13 @@ describe("load-config", async () => {
 	it("should load config from a parent directory", async () => {
 		const { create, relativeTo } = await setupTest("load-config");
 
-		create.json({ inspectVersion: true }, "fork.config.json");
+		create.json({ commitAll: true }, "fork.config.json");
 		create.directory("sub-folder");
 		create.directory("sub-folder", "sub-folder-2");
 		create.file(`v1.2.3`, "sub-folder", "sub-folder-2", "my-version.txt");
 
 		await expect(loadConfigFile(relativeTo("sub-folder", "sub-folder-2"))).resolves.toStrictEqual({
-			inspectVersion: true,
+			commitAll: true,
 		});
 	});
 

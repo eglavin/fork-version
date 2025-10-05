@@ -73,11 +73,29 @@ export const ForkConfigSchema = z.object({
 	//
 
 	/**
+	 * The command to run, can be one of the following:
+	 *
+	 * - `main` - Bumps the version, update files, generate changelog, commit, and tag.
+	 * - `inspect-version` - Prints the current version and exits.
+	 * - `inspect-tag` - Prints the current git tag and exits.
+	 * - `validate-config` - Validates the configuration and exits.
+	 *
+	 * @default "main"
+	 */
+	command: z
+		.literal(["main", "inspect-version", "inspect-tag", "validate-config"])
+		.describe(
+			"The command to run. Can be one of: main, inspect-version, inspect-tag, validate-config. Defaults to main.",
+		),
+	/**
 	 * If set, Fork-Version will print the current version and exit.
 	 * @default false
+	 *
+	 * @deprecated Set the `inspect-version` command instead.
 	 */
 	inspectVersion: z
 		.boolean()
+		.optional()
 		.describe("If set, Fork-Version will print the current version and exit."),
 
 	// Options

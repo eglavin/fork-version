@@ -168,25 +168,6 @@ describe("getCurrentVersion", () => {
 		});
 	});
 
-	it("should log the version and exit if inspectVersion set", async () => {
-		const spyOnConsole = vi.spyOn(console, "log").mockImplementation(() => undefined);
-		const spyOnProcess = vi.spyOn(process, "exit").mockImplementation(() => undefined as never);
-
-		const { config, create, execGit, git, logger } = await setupTest("version getCurrentVersion");
-		config.inspectVersion = true;
-		const fileManager = new FileManager(config, logger);
-
-		create.json({ version: "1.2.3" }, "package.json").add();
-		execGit.commits();
-
-		await getCurrentVersion(config, logger, git, fileManager, config.files);
-		expect(spyOnConsole).toHaveBeenCalledWith("1.2.3");
-		expect(spyOnProcess).toHaveBeenCalledWith(0);
-
-		spyOnConsole.mockRestore();
-		spyOnProcess.mockRestore();
-	});
-
 	it("should ignore git ignored files", async () => {
 		const { config, create, execGit, git, logger, relativeTo } = await setupTest(
 			"version getCurrentVersion",

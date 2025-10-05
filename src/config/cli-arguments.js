@@ -5,17 +5,24 @@ import meow from "meow";
 // without the need for a build step, otherwise it would also be typescript...
 
 export const helperText = `Usage:
-  $ fork-version [options]
+  $ fork-version [command?] [options?]
 
 Commands:
-  --help                           Show this help message.
-  --version                        Show the current version of Fork-Version.
-  --inspect-version                If set, Fork-Version will print the current project version and exit.
+  main                             Bumps the version, update files, generate changelog, commit, and tag. [Default when no command is provided]
+  inspect-version                  Prints the current version and exits.
+  inspect-tag                      Prints the current git tag and exits.
+  validate-config                  Validates the configuration and exits.
 
-Options:
+General Options:
+  --version                        Show the current version of Fork-Version and exit.
+  --help                           Show this help message and exit.
+
+Location Options:
   --file, -F                       List of the files to be updated. [Default: ["bower.json", "deno.json", "deno.jsonc", "jsr.json", "jsr.jsonc", "manifest.json", "npm-shrinkwrap.json", "package-lock.json", "package.json"]]
   --glob, -G                       Glob pattern to match files to be updated.
   --path, -P                       The path Fork-Version will run from. [Default: process.cwd()]
+
+Options:
   --changelog                      Name of the changelog file. [Default: "CHANGELOG.md"]
   --header                         The header text for the changelog.
   --tag-prefix                     Specify a prefix for the created tag. [Default: "v"]
@@ -55,6 +62,7 @@ Conventional Changelog Overrides:
 Exit Codes:
   0: Success
   1: General Error
+  2: Unknown Command
   3: Config File Validation Error
 
 Examples:
@@ -68,7 +76,10 @@ Examples:
     Run fork-version and update the "package.json" and "MyApi.csproj" files.
 
   $ fork-version --glob "*/package.json"
-    Run fork-version and update all "package.json" files in subdirectories.`;
+    Run fork-version and update all "package.json" files in subdirectories.
+
+  $ fork-version inspect-version
+    Prints the current version and exits.`;
 
 export function getCliArguments() {
 	return meow(helperText, {
@@ -77,6 +88,7 @@ export function getCliArguments() {
 		helpIndent: 0,
 		flags: {
 			// Commands
+			/** @deprecated Set the `inspect-version` command instead. */
 			inspectVersion: { type: "boolean" },
 
 			// Options
@@ -117,5 +129,5 @@ export function getCliArguments() {
 			releaseCommitMessageFormat: { type: "string" },
 			releaseMessageSuffix: { type: "string" },
 		},
-	}).flags;
+	});
 }

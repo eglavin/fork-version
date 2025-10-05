@@ -2,7 +2,7 @@ import type { ForkConfig } from "./types";
 
 export const DEFAULT_CONFIG: ForkConfig = {
 	// Commands
-	inspectVersion: false,
+	command: "main",
 
 	// Options
 	files: [

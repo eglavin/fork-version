@@ -62,12 +62,6 @@ export async function getCurrentVersion(
 
 	const currentVersion = semver.rsort(Array.from(versions))[0];
 
-	// If we're just inspecting the version, output the version and exit
-	if (config.inspectVersion) {
-		console.log(currentVersion);
-		process.exit(0);
-	}
-
 	logger.log(`Current version: ${currentVersion}`);
 	return {
 		files,

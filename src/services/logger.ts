@@ -5,14 +5,14 @@ import type { ForkConfig } from "../config/types";
 export class Logger {
 	disableLogs = false;
 
-	constructor(private config: Pick<ForkConfig, "silent" | "debug" | "inspectVersion">) {
+	constructor(private config: Pick<ForkConfig, "silent" | "debug">) {
 		this.log = this.log.bind(this);
 		this.warn = this.warn.bind(this);
 		this.error = this.error.bind(this);
 		this.debug = this.debug.bind(this);
 
-		// Disable logs if silent or inspectVersion is set
-		this.disableLogs = this.config.silent || this.config.inspectVersion;
+		// Disable logs if silent
+		this.disableLogs = this.config.silent;
 	}
 
 	public log(...messages: any[]) {

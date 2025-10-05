@@ -70,7 +70,7 @@ export async function setupTest(testName: string, options?: Partial<ISetupTestOp
 	execSync(`git config user.email "${userEmail}"`, execSyncOptions);
 
 	//#region Create default test config, logger and git instances
-	const config = await getUserConfig({});
+	const config = await getUserConfig({ input: [], flags: {} });
 	config.path = testFolder;
 	config.header = "# Test Header\n";
 	config.changelogPresetConfig = {
@@ -88,7 +88,7 @@ export async function setupTest(testName: string, options?: Partial<ISetupTestOp
 	};
 	config.gitTagFallback = false;
 
-	const logger = new Logger({ silent: true, debug: false, inspectVersion: false });
+	const logger = new Logger({ silent: true, debug: false });
 	logger.log = vi.fn();
 	logger.warn = vi.fn();
 	logger.error = vi.fn();

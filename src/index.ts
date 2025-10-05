@@ -1,3 +1,8 @@
+export { inspectTag } from "./commands/inspect-tag";
+export { inspectVersion } from "./commands/inspect-version";
+export { main } from "./commands/main";
+export { validateConfig } from "./commands/validate-config";
+
 export { CommitParser } from "./commit-parser/commit-parser";
 export { filterRevertedCommits } from "./commit-parser/filter-reverted-commits";
 export { createParserOptions, type ParserOptions } from "./commit-parser/options";

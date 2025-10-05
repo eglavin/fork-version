@@ -215,7 +215,7 @@ describe("commit-parser", () => {
 		let logger: Logger;
 
 		beforeAll(() => {
-			logger = new Logger({ silent: false, debug: true, inspectVersion: false });
+			logger = new Logger({ silent: false, debug: true });
 		});
 		beforeEach(() => {
 			debugSpy = vi.spyOn(global.console, "debug").mockImplementation(() => undefined);

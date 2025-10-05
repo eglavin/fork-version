@@ -1,5 +1,13 @@
 # Fork Version
 
+## [3.1.0](https://github.com/eglavin/fork-version/compare/v3.0.2...v3.1.0) (2025-10-05)
+
+
+### Features
+
+* implement new command flow for inspect-* commands ([d89e4e0](https://github.com/eglavin/fork-version/commit/d89e4e07803180c7b79847ed4a5e1241ee19074b))
+
+
 ## [3.0.2](https://github.com/eglavin/fork-version/compare/v3.0.1...v3.0.2) (2025-10-02)
 
 

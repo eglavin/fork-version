@@ -46,3 +46,8 @@ jobs:
       - name: Publish JSR Package
         run: |
           npx jsr publish --allow-slow-types
+
+      - name: Update Summary
+        run: |
+          version=$(node .\dist\cli.js inspect-version)
+          echo "## Released version: $version" >> $GITHUB_STEP_SUMMARY

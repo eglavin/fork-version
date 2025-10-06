@@ -49,5 +49,5 @@ jobs:
 
       - name: Update Summary
         run: |
-          version=$(node .\dist\cli.js inspect-version)
+          version=$(node ./dist/cli.js inspect-version)
           echo "## Released version: $version" >> $GITHUB_STEP_SUMMARY

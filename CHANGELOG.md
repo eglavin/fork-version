@@ -1,5 +1,8 @@
 # Fork Version
 
+## [3.1.2](https://github.com/eglavin/fork-version/compare/v3.1.1...v3.1.2) (2025-10-06)
+
+
 ## [3.1.1](https://github.com/eglavin/fork-version/compare/v3.1.0...v3.1.1) (2025-10-06)
 
 

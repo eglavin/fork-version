@@ -1,5 +1,13 @@
 # Fork Version
 
+## [3.1.4](https://github.com/eglavin/fork-version/compare/v3.1.3...v3.1.4) (2026-01-04)
+
+
+### Refactor
+
+* escape tag prefix before use in regex ([061a1bb](https://github.com/eglavin/fork-version/commit/061a1bbbe85d3759e5f20e26190d8b6bf50daf0c))
+
+
 ## [3.1.3](https://github.com/eglavin/fork-version/compare/v3.1.2...v3.1.3) (2026-01-04)
 
 

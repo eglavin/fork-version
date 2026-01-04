@@ -6,12 +6,21 @@ import { CommitParser } from "../commit-parser";
 import { type Commit } from "../types";
 
 const hash = "4ef2c86d393a9660aa9f753144256b1f200c16bd";
+const refNames = " (HEAD -> main, origin/main, origin/HEAD)";
 const date = "2024-12-22T17:36:50Z";
 const name = "Fork Version";
 const email = "fork-version@example.com";
 
-function createCommit(subject: string, body = "\r\n\n") {
-	return [subject, "\n" + body, hash, date, name, email].join("\n");
+function createCommit(
+	subject: string,
+	body = "\r\n\n",
+	_hash = hash,
+	_refNames = refNames,
+	_date = date,
+	_name = name,
+	_email = email,
+): string {
+	return [subject, "\n" + body, _hash, _refNames, _date, _name, _email].join("\n");
 }
 
 describe("commit-parser", () => {
@@ -36,6 +45,7 @@ describe("commit-parser", () => {
 					"refactor: this is a long commit message with a lot of content in it which I'm wondering how it would be handled by the commit log parsing system so we'll see what happens.",
 				body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
 				hash,
+				refNames: refNames.trim(),
 				date,
 				name,
 				email,
@@ -51,12 +61,14 @@ describe("commit-parser", () => {
 				notes: [],
 				mentions: [],
 				references: [],
+				tags: [],
 			} as Commit);
 			expect(parsedCommits[1]).toStrictEqual({
 				raw: "refactor: add test file",
 				subject: "refactor: add test file",
 				body: "",
 				hash,
+				refNames: refNames.trim(),
 				date,
 				name,
 				email,
@@ -71,12 +83,14 @@ describe("commit-parser", () => {
 				notes: [],
 				mentions: [],
 				references: [],
+				tags: [],
 			} as Commit);
 			expect(parsedCommits[2]).toStrictEqual({
 				raw: "feat: initial commit\nBREAKING CHANGE: this is a breaking change",
 				subject: "feat: initial commit",
 				body: "BREAKING CHANGE: this is a breaking change",
 				hash,
+				refNames: refNames.trim(),
 				date,
 				name,
 				email,
@@ -96,19 +110,21 @@ describe("commit-parser", () => {
 				],
 				mentions: [],
 				references: [],
+				tags: [],
 			} as Commit);
 		});
 
 		it("should parse with no name or email", () => {
 			const parser = new CommitParser();
 
-			const commit = ["feat: create new feature", "", hash, date, "", ""].join("\n");
+			const commit = ["feat: create new feature", "", hash, refNames, date, "", ""].join("\n");
 
 			expect(parser.parse(commit)).toStrictEqual({
 				raw: "feat: create new feature",
 				subject: "feat: create new feature",
 				body: "",
 				hash,
+				refNames: refNames.trim(),
 				date,
 				name: "",
 				email: "",
@@ -123,6 +139,7 @@ describe("commit-parser", () => {
 				notes: [],
 				mentions: [],
 				references: [],
+				tags: [],
 			} as Commit);
 		});
 
@@ -155,6 +172,7 @@ describe("commit-parser", () => {
 					"refactor: this is a long commit message with a lot of content in it which I'm wondering how it would be handled by the commit log parsing system so we'll see what happens.",
 				body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
 				hash: expect.any(String),
+				refNames: "(HEAD -> main)",
 				date: expect.any(String),
 				name,
 				email,
@@ -170,12 +188,14 @@ describe("commit-parser", () => {
 				notes: [],
 				mentions: [],
 				references: [],
+				tags: [],
 			} as Commit);
 			expect(parsedCommits[1]).toStrictEqual({
 				raw: "feat: initial commit\nBREAKING CHANGE: this is a breaking change",
 				subject: "feat: initial commit",
 				body: "BREAKING CHANGE: this is a breaking change",
 				hash: expect.any(String),
+				refNames: "",
 				date: expect.any(String),
 				name,
 				email,
@@ -195,6 +215,7 @@ describe("commit-parser", () => {
 				],
 				mentions: [],
 				references: [],
+				tags: [],
 			} as Commit);
 		});
 
@@ -206,6 +227,24 @@ describe("commit-parser", () => {
 			expect(commit).toMatchObject({
 				type: "FEAT",
 				title: "add test file",
+			});
+		});
+
+		it("should parse tags from ref names", () => {
+			const parser = new CommitParser();
+
+			const commit = parser.parse(
+				createCommit(
+					"feat: add new feature",
+					"",
+					hash,
+					" (HEAD -> main, origin/main, origin/HEAD, tag: v1.2.3, tag: beta-1.0.0)",
+				),
+			);
+
+			expect(commit).toMatchObject({
+				refNames: "(HEAD -> main, origin/main, origin/HEAD, tag: v1.2.3, tag: beta-1.0.0)",
+				tags: ["v1.2.3", "beta-1.0.0"],
 			});
 		});
 	});
@@ -273,6 +312,7 @@ describe("commit-parser", () => {
 				raw: "refactor: add test file",
 				subject: "refactor: add test file",
 				body: "",
+				refNames: refNames.trim(),
 				hash,
 				date,
 				name,
@@ -288,6 +328,7 @@ describe("commit-parser", () => {
 				notes: [],
 				mentions: [],
 				references: [],
+				tags: [],
 			} as Commit);
 		});
 
@@ -301,6 +342,7 @@ describe("commit-parser", () => {
 				subject: "feat(login): new form implemented",
 				body: "",
 				hash,
+				refNames: refNames.trim(),
 				date,
 				name,
 				email,
@@ -315,6 +357,7 @@ describe("commit-parser", () => {
 				notes: [],
 				mentions: [],
 				references: [],
+				tags: [],
 			} as Commit);
 		});
 
@@ -328,6 +371,7 @@ describe("commit-parser", () => {
 				subject: "feat!: new form implemented",
 				body: "",
 				hash,
+				refNames: refNames.trim(),
 				date,
 				name,
 				email,
@@ -342,6 +386,7 @@ describe("commit-parser", () => {
 				notes: [],
 				mentions: [],
 				references: [],
+				tags: [],
 			} as Commit);
 		});
 
@@ -355,6 +400,7 @@ describe("commit-parser", () => {
 				subject: "feat(login:form/register)!: new form implemented",
 				body: "",
 				hash,
+				refNames: refNames.trim(),
 				date,
 				name,
 				email,
@@ -369,6 +415,7 @@ describe("commit-parser", () => {
 				notes: [],
 				mentions: [],
 				references: [],
+				tags: [],
 			} as Commit);
 		});
 
@@ -382,6 +429,7 @@ describe("commit-parser", () => {
 				subject: "feat(): new form implemented",
 				body: "",
 				hash,
+				refNames: refNames.trim(),
 				date,
 				name,
 				email,
@@ -396,6 +444,7 @@ describe("commit-parser", () => {
 				notes: [],
 				mentions: [],
 				references: [],
+				tags: [],
 			} as Commit);
 		});
 
@@ -409,6 +458,7 @@ describe("commit-parser", () => {
 				subject: "feat()!: new form implemented",
 				body: "",
 				hash,
+				refNames: refNames.trim(),
 				date,
 				name,
 				email,
@@ -423,6 +473,7 @@ describe("commit-parser", () => {
 				notes: [],
 				mentions: [],
 				references: [],
+				tags: [],
 			} as Commit);
 		});
 	});
@@ -659,6 +710,7 @@ Content that will be kept
 				subject: "feat: initial commit",
 				body: "Content that will be kept",
 				hash,
+				refNames: refNames.trim(),
 				date,
 				name,
 				email,
@@ -673,6 +725,7 @@ Content that will be kept
 				notes: [],
 				mentions: [],
 				references: [],
+				tags: [],
 			} as Commit);
 		});
 
@@ -697,6 +750,7 @@ Content that will be kept
 				subject: "feat: initial commit",
 				body: "Content that will be kept",
 				hash,
+				refNames: refNames.trim(),
 				date,
 				name,
 				email,
@@ -711,6 +765,7 @@ Content that will be kept
 				notes: [],
 				mentions: [],
 				references: [],
+				tags: [],
 			} as Commit);
 		});
 

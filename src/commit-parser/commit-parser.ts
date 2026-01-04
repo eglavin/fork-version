@@ -36,6 +36,7 @@ export class CommitParser {
 			subject: "",
 			body: "",
 			hash: "",
+			refNames: "",
 			date: "",
 			name: "",
 			email: "",
@@ -50,6 +51,7 @@ export class CommitParser {
 			notes: [],
 			mentions: [],
 			references: [],
+			tags: [],
 		};
 	}
 
@@ -76,11 +78,13 @@ export class CommitParser {
 		// - committer email
 		// - committer name
 		// - committer date
+		// - ref names
 		// - hash
 
 		const email = parts.pop();
 		const name = parts.pop();
 		const date = parts.pop();
+		const refNames = parts.pop();
 		const hash = parts.pop();
 
 		if (email) parsedCommit.email = email.trim();
@@ -91,6 +95,19 @@ export class CommitParser {
 			// Date is one of the only fields we can properly validate, check to ensure its in the correct position
 			if (Number.isNaN(Date.parse(parsedCommit.date))) {
 				throw new ParserError("Unable to parse commit date", rawCommit);
+			}
+		}
+		if (refNames) {
+			parsedCommit.refNames = refNames.trim();
+
+			const TAG_REGEX = /tag:\s*(?<tag>.+?)[,)]/gi;
+			let tagMatch: RegExpExecArray | null = null;
+			while ((tagMatch = TAG_REGEX.exec(refNames))) {
+				const { tag = "" } = tagMatch.groups ?? {};
+
+				if (tag) {
+					parsedCommit.tags.push(tag);
+				}
 			}
 		}
 		if (hash) parsedCommit.hash = hash.trim();

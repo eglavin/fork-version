@@ -27,6 +27,7 @@ export interface Commit {
 	subject: string;
 	body: string;
 	hash: string;
+	refNames: string;
 	/**
 	 * Committer date in ISO 8601 format
 	 * @example
@@ -52,4 +53,5 @@ export interface Commit {
 	mentions: string[];
 	references: CommitReference[];
 	notes: CommitNote[];
+	tags: string[];
 }

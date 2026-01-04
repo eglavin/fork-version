@@ -3,12 +3,13 @@
 import { CommitParser } from "../commit-parser";
 import { filterRevertedCommits } from "../filter-reverted-commits";
 
+const refNames = "HEAD -> main, origin/main, origin/HEAD";
 const date = "2024-12-22T17:36:50Z";
 const name = "Fork Version";
 const email = "fork-version@example.com";
 
 function createCommit({ body, hash }: { body: string; hash: string }) {
-	return [body, "\n", hash, date, name, email].join("\n");
+	return [body, "\n", hash, refNames, date, name, email].join("\n");
 }
 
 describe("filter-reverted-commits", () => {

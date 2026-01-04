@@ -452,10 +452,59 @@ system so we'll see what happens.`,
 		await git.commit("--allow-empty", "-m", "test: test arguments works");
 
 		const commits = await git.getCommits();
-		const [subject, , , , name, email] = commits[0].split("\n");
+		const [subject, , , , , name, email] = commits[0].split("\n");
 
 		expect(subject).toBe("test: test arguments works");
 		expect(name).toBe("Test User");
 		expect(email).toBe("");
+	});
+
+	it("should read commits with and any tags", async () => {
+		const { config, create } = await setupTest("execute-file");
+		const git = new Git(config);
+
+		// Create a commit in the root src folder
+		create.directory("src");
+		create.file("", "src", "file1.txt");
+		await git.add("src/file1.txt");
+		await git.commit("-m", "feat: initial commit");
+		await git.tag("v1.0.0");
+
+		// Create a commit in the src/libs folder
+		create.directory("src", "libs");
+		create.file("", "src", "libs", "file2.txt");
+		await git.add("src/libs/file2.txt");
+		await git.commit("-m", "refactor: add lib file");
+		await git.tag("v1.0.1");
+		await git.tag("v1.0.2");
+		await git.tag("v1.0.2-alpha.0");
+		await git.tag("v1.0.2-alpha.1");
+
+		// Create a commit in the src/utils folder
+		create.directory("src", "utils");
+		create.file("", "src", "utils", "file3.txt");
+		await git.add("src/utils/file3.txt");
+		await git.commit("-m", "refactor: add util file");
+		await git.tag("v1.0.3");
+
+		const commits = await git.getCommits();
+
+		{
+			const [subject, , , ref] = commits[0].split("\n");
+			expect(subject).toBe("refactor: add util file");
+			expect(ref).toBe(" (HEAD -> main, tag: v1.0.3)");
+		}
+
+		{
+			const [subject, , , ref] = commits[1].split("\n");
+			expect(subject).toBe("refactor: add lib file");
+			expect(ref).toBe(" (tag: v1.0.2-alpha.1, tag: v1.0.2-alpha.0, tag: v1.0.2, tag: v1.0.1)");
+		}
+
+		{
+			const [subject, , , ref] = commits[2].split("\n");
+			expect(subject).toBe("feat: initial commit");
+			expect(ref).toBe(" (tag: v1.0.0)");
+		}
 	});
 });

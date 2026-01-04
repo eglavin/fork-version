@@ -300,6 +300,7 @@ export class Git {
 			"%s", // subject
 			"%b", // body
 			"%H", // hash
+			"%d", // ref names
 			"%cI", // committer date
 			"%cN", // committer name
 			"%cE", // committer email

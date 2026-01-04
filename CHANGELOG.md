@@ -1,5 +1,13 @@
 # Fork Version
 
+## [3.1.3](https://github.com/eglavin/fork-version/compare/v3.1.2...v3.1.3) (2026-01-04)
+
+
+### Refactor
+
+* add ref names and tags to commit parser ([8550e66](https://github.com/eglavin/fork-version/commit/8550e664f9c6f51438b6a817b357b8eda639b0a1))
+
+
 ## [3.1.2](https://github.com/eglavin/fork-version/compare/v3.1.1...v3.1.2) (2025-10-06)
 
 

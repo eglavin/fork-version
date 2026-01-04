@@ -289,6 +289,34 @@ test/**
 		await expect(git.getTags("v")).resolves.toStrictEqual(["v1.0.2", "v1.0.1", "v1.0.0"]);
 	});
 
+	it("should return tags with special regex characters in prefix", async () => {
+		const { config } = await setupTest("execute-file");
+		const git = new Git(config);
+
+		await git.commit("--allow-empty", "-m", "test: a commit");
+		await git.tag("fork-version$1.0.0", "-m", "chore: release fork-version$1.0.0");
+
+		await git.commit("--allow-empty", "-m", "test: another commit");
+		await git.tag("fork-version$1.0.1", "-m", "chore: release fork-version$1.0.1");
+
+		await git.commit("--allow-empty", "-m", "test: another another commit");
+		await git.tag("fork-version/lib;1.0.2", "-m", "chore: release fork-version/lib;1.0.2");
+
+		await git.commit("--allow-empty", "-m", "test: another another another commit");
+		await git.tag("fork-version'2.1.0", "-m", "chore: release fork-version'2.1.0");
+
+		await expect(git.getTags("fork-version$")).resolves.toStrictEqual([
+			"fork-version$1.0.1",
+			"fork-version$1.0.0",
+		]);
+
+		await expect(git.getTags("fork-version/lib;")).resolves.toStrictEqual([
+			"fork-version/lib;1.0.2",
+		]);
+
+		await expect(git.getTags("fork-version'")).resolves.toStrictEqual(["fork-version'2.1.0"]);
+	});
+
 	it("should return cleaned tags", async () => {
 		const { config } = await setupTest("execute-file");
 		const git = new Git(config);

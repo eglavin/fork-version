@@ -1,5 +1,6 @@
 import { execFile } from "node:child_process";
 import semver from "semver";
+import { escapeRegex } from "../utils/escape-regex";
 import type { ForkConfig } from "../config/types";
 
 export class Git {
@@ -201,6 +202,7 @@ export class Git {
 		 */
 		const TAG_REGEX = /tag:\s*(?<tag>.+?)[,)]/gi;
 		const tags: string[] = [];
+		const escapedTagPrefix = tagPrefix ? escapeRegex(tagPrefix) : undefined;
 
 		let tagMatch: RegExpExecArray | null = null;
 		while ((tagMatch = TAG_REGEX.exec(logOutput))) {
@@ -208,7 +210,7 @@ export class Git {
 
 			if (tagPrefix) {
 				if (tag.startsWith(tagPrefix)) {
-					const tagWithoutPrefix = tag.replace(new RegExp(`^${tagPrefix}`), "");
+					const tagWithoutPrefix = tag.replace(new RegExp(`^${escapedTagPrefix}`), "");
 					if (semver.valid(tagWithoutPrefix)) {
 						tags.push(tag);
 					}
@@ -246,10 +248,11 @@ export class Git {
 	 */
 	async getCleanedTags(tagPrefix: string | undefined): Promise<string[]> {
 		const tags = await this.getTags(tagPrefix);
+		const escapedTagPrefix = tagPrefix ? escapeRegex(tagPrefix) : undefined;
 
 		const cleanedTags = [];
 		for (const tag of tags) {
-			const tagWithoutPrefix = tag.replace(new RegExp(`^${tagPrefix}`), "");
+			const tagWithoutPrefix = tag.replace(new RegExp(`^${escapedTagPrefix}`), "");
 			const cleanedTag = semver.clean(tagWithoutPrefix);
 			if (cleanedTag) {
 				cleanedTags.push(cleanedTag);

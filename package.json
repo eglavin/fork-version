@@ -87,18 +87,18 @@
   },
   "dependencies": {
     "bundle-require": "5.1.0",
-    "cheerio": "1.1.2",
+    "cheerio": "1.2.0",
     "conventional-changelog": "5.1.0",
     "conventional-changelog-config-spec": "2.1.0",
     "conventional-changelog-conventionalcommits": "7.0.2",
-    "esbuild": "0.25.10",
-    "glob": "11.0.3",
+    "esbuild": "0.27.3",
+    "glob": "13.0.6",
     "joycon": "3.1.1",
     "jsonc-parser": "3.3.1",
-    "meow": "14.0.0",
-    "semver": "7.7.2",
-    "yaml": "2.8.1",
-    "zod": "4.1.11"
+    "meow": "14.1.0",
+    "semver": "7.7.4",
+    "yaml": "2.8.2",
+    "zod": "4.3.6"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",

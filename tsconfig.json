@@ -7,7 +7,7 @@
 		"moduleDetection": "force",
 		"resolveJsonModule": true,
 		"skipLibCheck": true,
-		"target": "es2022",
+		"target": "es2024",
 
 		"forceConsistentCasingInFileNames": true,
 		"strict": true,
@@ -18,7 +18,7 @@
 		"moduleResolution": "Bundler",
 		"noEmit": true,
 
-		"lib": ["es2022"],
+		"lib": ["ES2024"],
 		"types": ["node", "vitest/globals"]
 	},
 	"include": [

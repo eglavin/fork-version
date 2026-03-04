@@ -14,9 +14,9 @@ jobs:
     strategy:
       matrix:
         include:
-          - node: 20
-            os: ubuntu-latest
           - node: 22
+            os: ubuntu-latest
+          - node: 24
             os: windows-latest
 
     name: Test Node.js v${{ matrix.node }} on ${{ matrix.os }}
@@ -56,5 +56,5 @@ jobs:
           pnpm test:ci
 
       - name: Report Coverage
-        if: matrix.node == 20 && matrix.os == 'ubuntu-latest' && github.event_name == 'pull_request' && always()
+        if: matrix.node == 22 && matrix.os == 'ubuntu-latest' && github.event_name == 'pull_request' && always()
         uses:  davelosert/vitest-coverage-report-action@v2

@@ -28,6 +28,7 @@ export default defineConfig(
 			"no-console": 0,
 			"no-undef": 0,
 			"no-unused-vars": 0,
+			"no-useless-assignment": 0,
 
 			"@typescript-eslint/no-empty-function": 0,
 			"@typescript-eslint/no-explicit-any": 1,

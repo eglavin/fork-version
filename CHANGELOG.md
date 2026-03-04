@@ -1,5 +1,22 @@
 # Fork Version
 
+## [4.0.0](https://github.com/eglavin/fork-version/compare/v3.1.4...v4.0.0) (2026-03-04)
+
+
+### ⚠ BREAKING CHANGES
+
+* bump minimum node version + dev & build node versions
+
+### Refactor
+
+* bump @types/node ([54f3ccc](https://github.com/eglavin/fork-version/commit/54f3ccc9c42c705ab033b7823305339ce4099088))
+* bump eslint ([7c8ebe6](https://github.com/eglavin/fork-version/commit/7c8ebe6ced4414520df7431497552d87dce3fa89))
+* bump minimum node version + dev & build node versions ([5715ab0](https://github.com/eglavin/fork-version/commit/5715ab01bfc13b110bf8c06cc6aa164663000232))
+* bump rimraf + tsup ([894d511](https://github.com/eglavin/fork-version/commit/894d5114228616935961fe06a28e5dd930ea32f1))
+* bump runtime dependncies ([ac0e0d8](https://github.com/eglavin/fork-version/commit/ac0e0d814457437ed89b0d65a81d712f4b295849))
+* bump vitest ([9726b50](https://github.com/eglavin/fork-version/commit/9726b509be4ac4a71cde91d103088ed2e19b918d))
+
+
 ## [3.1.4](https://github.com/eglavin/fork-version/compare/v3.1.3...v3.1.4) (2026-01-04)
 
 

@@ -434,6 +434,7 @@ Adds a suffix to the end of the release message, useful to add a `[skip ci]` mes
 - [Plain Text](#plain-text)
 - [MS Build](#ms-build)
 - [ARM Bicep](#arm-bicep)
+- [Install Shield ISM](#install-shield-ism)
 
 #### Json Package
 
@@ -490,6 +491,23 @@ An ARM bicep file with metadata and variable called contentVersion.
 ```bicep
 metadata contentVersion = '1.2.3.4'
 var contentVersion string = '1.2.3.4'
+```
+
+#### Install Shield ISM
+
+An Install Shield `*.ism` file can be either binary or an xml file. Fork-Version only supports the xml version.
+
+```xml
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<?xml-stylesheet type="text/xsl" href="is.xsl" ?>
+<!DOCTYPE msi [...]>
+<msi version="2.0" xmlns:dt="urn:schemas-microsoft-com:datatypes">
+
+  <table name="Property">
+    <row><td>ProductVersion</td><td>1.2.3</td><td/></row>
+  </table>
+
+</msi>
 ```
 
 #### Custom File Updater's

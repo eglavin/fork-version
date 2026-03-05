@@ -1,5 +1,18 @@
 # Fork Version
 
+## [4.1.0](https://github.com/eglavin/fork-version/compare/v4.0.0...v4.1.0) (2026-03-05)
+
+
+### Features
+
+* add support for xml install shield product versions ([cd78383](https://github.com/eglavin/fork-version/commit/cd7838358bccb091dd593fe3edd363e8edcf21fc))
+
+
+### Docs
+
+* update readme ([71d7a15](https://github.com/eglavin/fork-version/commit/71d7a15f63503aa7e90fbb89a45ea5555080bef5))
+
+
 ## [4.0.0](https://github.com/eglavin/fork-version/compare/v3.1.4...v4.0.0) (2026-03-04)
 
 

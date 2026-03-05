@@ -3,6 +3,7 @@ import { YAMLPackage } from "./yaml-package";
 import { PlainText } from "./plain-text";
 import { MSBuildProject } from "./ms-build-project";
 import { ARMBicep } from "./arm-bicep";
+import { InstallShieldISM } from "./install-shield-ism";
 
 import type { ForkConfig } from "../config/types";
 import type { Logger } from "../services/logger";
@@ -27,6 +28,7 @@ export class FileManager {
 	private PlainText: PlainText;
 	private MSBuildProject: MSBuildProject;
 	private ARMBicep: ARMBicep;
+	private InstallShieldISM: InstallShieldISM;
 
 	constructor(
 		private config: ForkConfig,
@@ -37,6 +39,7 @@ export class FileManager {
 		this.PlainText = new PlainText(config, logger);
 		this.MSBuildProject = new MSBuildProject(config, logger);
 		this.ARMBicep = new ARMBicep(config, logger);
+		this.InstallShieldISM = new InstallShieldISM(config, logger);
 	}
 
 	/**
@@ -73,6 +76,10 @@ export class FileManager {
 
 		if (this.ARMBicep.isSupportedFile(_fileName)) {
 			return this.ARMBicep.read(fileName);
+		}
+
+		if (this.InstallShieldISM.isSupportedFile(_fileName)) {
+			return this.InstallShieldISM.read(fileName);
 		}
 
 		this.logger.error(`[File Manager] Unsupported file: ${fileName}`);
@@ -113,6 +120,10 @@ export class FileManager {
 
 		if (this.ARMBicep.isSupportedFile(_fileName)) {
 			return this.ARMBicep.write(fileState, newVersion);
+		}
+
+		if (this.InstallShieldISM.isSupportedFile(_fileName)) {
+			return this.InstallShieldISM.write(fileState, newVersion);
 		}
 
 		this.logger.error(`[File Manager] Unsupported file: ${fileState.path}`);

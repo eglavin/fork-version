@@ -45,6 +45,8 @@ export class Logger {
 	}
 
 	public skipping(message: string) {
-		console.log(styleText("magenta", message));
+		if (!this.disableLogs) {
+			console.log(styleText("magenta", message));
+		}
 	}
 }

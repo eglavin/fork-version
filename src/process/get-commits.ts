@@ -24,8 +24,6 @@ export async function getCommitsSinceTag(
 	}
 
 	const foundCommits = await git.getCommits(latestTag, "HEAD");
-	logger.debug(`Found ${foundCommits.length} commits since last tag (${latestTag ?? "none"})`);
-
 	const commits = foundCommits.reduce((acc, commit) => {
 		const parsed = commitParser.parse(commit);
 		if (parsed) {
@@ -33,10 +31,11 @@ export async function getCommitsSinceTag(
 		}
 		return acc;
 	}, [] as Commit[]);
-	logger.debug(`Parsed ${commits.length} commits after applying commit parser`);
-
 	const filteredCommits = filterRevertedCommits(commits);
-	logger.debug(`Filtered to ${filteredCommits.length} commits after removing reverts`);
+
+	logger.debug(
+		`Found ${foundCommits.length} commits since tag: ${latestTag ?? "none"} (${commits.length} parsed, ${filteredCommits.length} after filtering reverts)`,
+	);
 
 	return {
 		latestTag,

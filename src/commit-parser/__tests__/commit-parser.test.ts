@@ -269,7 +269,7 @@ describe("commit-parser", () => {
 			const commit = ["refactor: add test file", "", hash, name, email, date, ""].join("\n");
 
 			expect(parser.parse(commit)).toBe(undefined);
-			expect(debugSpy).toHaveBeenCalledOnce();
+			expect(debugSpy).toHaveBeenCalledTimes(2);
 		});
 
 		it("should throw if unknown extra content", () => {
@@ -280,7 +280,7 @@ describe("commit-parser", () => {
 			);
 
 			expect(parser.parse(commit)).toBe(undefined);
-			expect(debugSpy).toHaveBeenCalledOnce();
+			expect(debugSpy).toHaveBeenCalledTimes(2);
 		});
 
 		it("should throw if missing data", () => {
@@ -289,7 +289,7 @@ describe("commit-parser", () => {
 			const commit = ["refactor: add test file", "", hash, date, name].join("\n");
 
 			expect(parser.parse(commit)).toBe(undefined);
-			expect(debugSpy).toHaveBeenCalledOnce();
+			expect(debugSpy).toHaveBeenCalledTimes(2);
 		});
 
 		it("should not log if not passed a logger instance", () => {

@@ -77,7 +77,7 @@ export async function updateChangelog(
 	nextVersion: string,
 ): Promise<void> {
 	if (config.skipChangelog) {
-		logger.warn("Skip changelog update");
+		logger.skipping("Skipping changelog update");
 		return;
 	}
 

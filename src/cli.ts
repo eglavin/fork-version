@@ -70,7 +70,7 @@ async function runFork() {
 		}
 
 		default: {
-			console.error(`Unknown command: ${config.command}`);
+			logger.error(`Unknown command: ${config.command}`);
 			process.exit(2);
 		}
 	}

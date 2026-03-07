@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
+import { styleText } from "node:util";
 import type { ForkConfig } from "../config/types";
 
 export class Logger {
@@ -10,32 +11,40 @@ export class Logger {
 		this.warn = this.warn.bind(this);
 		this.error = this.error.bind(this);
 		this.debug = this.debug.bind(this);
+		this.skipping = this.skipping.bind(this);
 
 		// Disable logs if silent
 		this.disableLogs = this.config.silent;
 	}
 
-	public log(...messages: any[]) {
+	public log(message: string) {
 		if (!this.disableLogs) {
-			console.log(...messages);
+			console.log(message);
 		}
 	}
 
-	public warn(...messages: any[]) {
+	public warn(message: string) {
 		if (!this.disableLogs) {
-			console.warn(...messages);
+			console.warn(styleText("yellowBright", message));
 		}
 	}
 
-	public error(...messages: any[]) {
+	public error(message: string) {
 		if (!this.disableLogs) {
-			console.error(...messages);
+			console.error(styleText("redBright", message));
 		}
 	}
 
-	public debug(...messages: any[]) {
+	public debug(message: string, ...optionalParams: any[]) {
 		if (this.config.debug && !this.disableLogs) {
-			console.debug(...messages);
+			console.debug(styleText("cyanBright", message));
+			if (optionalParams.length > 0) {
+				console.debug(...optionalParams);
+			}
 		}
+	}
+
+	public skipping(message: string) {
+		console.log(styleText("magenta", message));
 	}
 }

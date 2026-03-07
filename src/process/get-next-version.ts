@@ -25,7 +25,7 @@ export async function getNextVersion(
 	currentVersion: string,
 ): Promise<NextVersion> {
 	if (config.skipBump) {
-		logger.warn(`Skip bump, using ${currentVersion} as the next version`);
+		logger.skipping(`Skipping bump, using ${currentVersion} as the next version`);
 		return {
 			version: currentVersion,
 		};

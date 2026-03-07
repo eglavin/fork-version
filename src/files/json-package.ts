@@ -71,12 +71,8 @@ export class JSONPackage implements IFileManager {
 
 			const parseErrors: ParseError[] = [];
 			const parsedJson: PackageJsonish = parse(fileContents, parseErrors, this.PARSE_OPTIONS);
-			if (parseErrors.length) {
-				this.logger.warn(`[File Manager] Unable to parse JSON: ${fileName}`, parseErrors);
-				return undefined;
-			}
 
-			if (parsedJson?.version) {
+			if (parsedJson?.version && parseErrors.length === 0) {
 				return {
 					name: fileName,
 					path: filePath,
@@ -95,10 +91,6 @@ export class JSONPackage implements IFileManager {
 
 		const parseErrors: ParseError[] = [];
 		const parsedJson: PackageJsonish = parse(fileContents, parseErrors, this.PARSE_OPTIONS);
-		if (parseErrors.length) {
-			this.logger.warn(`[File Manager] Unable to parse JSON: ${fileState.path}`, parseErrors);
-			return;
-		}
 
 		fileContents = this.setStringInJsonc(fileContents, ["version"], newVersion);
 		if (parsedJson?.packages?.[""]) {

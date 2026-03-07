@@ -1,5 +1,18 @@
 # Fork Version
 
+## [4.1.2](https://github.com/eglavin/fork-version/compare/v4.1.1...v4.1.2) (2026-03-07)
+
+
+### Bug Fixes
+
+* dont log when skipping ([0e83519](https://github.com/eglavin/fork-version/commit/0e83519480fcf0739fbefdbf8423e35927f7d5ce))
+
+
+### Refactor
+
+* add colour to non standard output ([809f7ab](https://github.com/eglavin/fork-version/commit/809f7ab8a464eb861511c137c510d60986c5b941))
+
+
 ## [4.1.1](https://github.com/eglavin/fork-version/compare/v4.1.0...v4.1.1) (2026-03-07)
 
 

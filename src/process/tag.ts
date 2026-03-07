@@ -10,7 +10,7 @@ export async function tagChanges(
 	nextVersion: string,
 ): Promise<void> {
 	if (config.skipTag) {
-		logger.warn("Skip tag creation");
+		logger.skipping("Skipping tag creation");
 		return;
 	}
 

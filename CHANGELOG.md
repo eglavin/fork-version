@@ -1,5 +1,13 @@
 # Fork Version
 
+## [4.1.1](https://github.com/eglavin/fork-version/compare/v4.1.0...v4.1.1) (2026-03-07)
+
+
+### Refactor
+
+* log count of reverts and merges and change labels of changes ([02f6fb0](https://github.com/eglavin/fork-version/commit/02f6fb0373b566fdb96380c6e6f233538584e504))
+
+
 ## [4.1.0](https://github.com/eglavin/fork-version/compare/v4.0.0...v4.1.0) (2026-03-05)
 
 

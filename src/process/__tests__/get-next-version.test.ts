@@ -15,6 +15,8 @@ describe("getNextVersion", () => {
 				major: 0,
 				minor: 0,
 				patch: 0,
+				merges: 0,
+				reverts: 0,
 			},
 		});
 	});
@@ -37,6 +39,8 @@ describe("getNextVersion", () => {
 				major: 0,
 				minor: 0,
 				patch: 1,
+				merges: 0,
+				reverts: 0,
 			},
 		});
 	});
@@ -59,6 +63,8 @@ describe("getNextVersion", () => {
 				major: 0,
 				minor: 1,
 				patch: 0,
+				merges: 0,
+				reverts: 0,
 			},
 		});
 	});
@@ -81,6 +87,8 @@ describe("getNextVersion", () => {
 				major: 1,
 				minor: 0,
 				patch: 0,
+				merges: 0,
+				reverts: 0,
 			},
 		});
 	});
@@ -108,6 +116,8 @@ describe("getNextVersion", () => {
 				major: 1,
 				minor: 0,
 				patch: 0,
+				merges: 0,
+				reverts: 0,
 			},
 		});
 	});
@@ -130,6 +140,8 @@ describe("getNextVersion", () => {
 				major: 0,
 				minor: 0,
 				patch: 1,
+				merges: 0,
+				reverts: 0,
 			},
 		});
 	});
@@ -152,6 +164,8 @@ describe("getNextVersion", () => {
 				major: 0,
 				minor: 1,
 				patch: 0,
+				merges: 0,
+				reverts: 0,
 			},
 		});
 	});
@@ -179,6 +193,8 @@ describe("getNextVersion", () => {
 				major: 0,
 				minor: 1,
 				patch: 0,
+				merges: 0,
+				reverts: 0,
 			},
 		});
 	});
@@ -196,6 +212,8 @@ describe("getNextVersion", () => {
 				major: 0,
 				minor: 0,
 				patch: 0,
+				merges: 0,
+				reverts: 0,
 			},
 		});
 	});
@@ -213,6 +231,8 @@ describe("getNextVersion", () => {
 				major: 0,
 				minor: 0,
 				patch: 0,
+				merges: 0,
+				reverts: 0,
 			},
 		});
 	});
@@ -230,6 +250,8 @@ describe("getNextVersion", () => {
 				major: 0,
 				minor: 0,
 				patch: 0,
+				merges: 0,
+				reverts: 0,
 			},
 		});
 	});
@@ -248,6 +270,8 @@ describe("getNextVersion", () => {
 				major: 0,
 				minor: 0,
 				patch: 0,
+				merges: 0,
+				reverts: 0,
 			},
 		});
 
@@ -260,6 +284,8 @@ describe("getNextVersion", () => {
 				major: 0,
 				minor: 0,
 				patch: 0,
+				merges: 0,
+				reverts: 0,
 			},
 		});
 	});
@@ -315,6 +341,8 @@ describe("getNextVersion", () => {
 				major: 0,
 				minor: 1,
 				patch: 0,
+				merges: 0,
+				reverts: 0,
 			},
 		});
 	});
@@ -352,6 +380,8 @@ describe("getNextVersion", () => {
 				major: 0,
 				minor: 0,
 				patch: 0,
+				merges: 1,
+				reverts: 1,
 			},
 		});
 	});

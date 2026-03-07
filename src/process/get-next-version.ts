@@ -13,6 +13,8 @@ export interface NextVersion {
 		major: number;
 		minor: number;
 		patch: number;
+		merges: number;
+		reverts: number;
 	};
 }
 
@@ -42,7 +44,13 @@ export async function getNextVersion(
 
 	const isPreMajor = semver.lt(currentVersion, "1.0.0");
 	let releaseType: "major" | "minor" | "patch" = "patch";
-	const changes = { major: 0, minor: 0, patch: 0 } satisfies NextVersion["changes"];
+	const changes = {
+		major: 0,
+		minor: 0,
+		patch: 0,
+		merges: 0,
+		reverts: 0,
+	} satisfies NextVersion["changes"];
 
 	if (config.releaseAs) {
 		releaseType = config.releaseAs;
@@ -57,7 +65,12 @@ export async function getNextVersion(
 
 		for (const commit of commits) {
 			// We shouldn't consider merge commits or reverts as changes.
-			if (commit.merge || commit.revert) {
+			if (commit.merge) {
+				changes.merges += 1;
+				continue;
+			}
+			if (commit.revert) {
+				changes.reverts += 1;
 				continue;
 			}
 
@@ -105,9 +118,11 @@ export async function getNextVersion(
 	if (commits.length > 0) {
 		logger.log(
 			`  - Commits: ${commits.length}` +
-				(changes.major > 0 ? `, Breaking Changes: ${changes.major}` : "") +
-				(changes.minor > 0 ? `, New Features: ${changes.minor}` : "") +
-				(changes.patch > 0 ? `, Bug Fixes: ${changes.patch}` : ""),
+				(changes.major > 0 ? `, Majors: ${changes.major}` : "") +
+				(changes.minor > 0 ? `, Minors: ${changes.minor}` : "") +
+				(changes.patch > 0 ? `, Patches: ${changes.patch}` : "") +
+				(changes.reverts > 0 ? `, Reverts: ${changes.reverts}` : "") +
+				(changes.merges > 0 ? `, Merges: ${changes.merges}` : ""),
 		);
 	} else {
 		logger.log("  - No commits found.");

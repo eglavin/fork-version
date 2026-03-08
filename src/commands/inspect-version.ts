@@ -1,3 +1,4 @@
+import { getCommitsSinceTag } from "../process/get-commits";
 import { getCurrentVersion } from "../process/get-current-version";
 
 import type { ForkConfig } from "../config/types";
@@ -14,7 +15,15 @@ export async function inspectVersion(
 	let foundVersion = "";
 
 	try {
-		const currentVersion = await getCurrentVersion(config, logger, git, fileManager, config.files);
+		const commits = await getCommitsSinceTag(config, logger, git);
+		const currentVersion = await getCurrentVersion(
+			config,
+			logger,
+			git,
+			fileManager,
+			config.files,
+			commits.latestTagVersion,
+		);
 		if (currentVersion) foundVersion = currentVersion.version;
 	} catch {
 		// No version found

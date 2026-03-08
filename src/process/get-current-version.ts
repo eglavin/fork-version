@@ -16,6 +16,7 @@ export async function getCurrentVersion(
 	git: Git,
 	fileManager: FileManager,
 	filesToUpdate: string[],
+	latestTagVersion: string | undefined,
 ): Promise<CurrentVersion> {
 	const files: FileState[] = [];
 	const versions = new Set<string>();
@@ -41,12 +42,9 @@ export async function getCurrentVersion(
 	}
 
 	// If we still don't have a version, try to get the highest version from git tags
-	if (versions.size === 0 && config.gitTagFallback) {
-		const version = await git.getHighestSemverVersionFromTags(config.tagPrefix);
-		if (version) {
-			logger.warn(`Using latest git tag as fallback`);
-			versions.add(version);
-		}
+	if (versions.size === 0 && config.gitTagFallback && latestTagVersion) {
+		logger.warn(`Using latest git tag as fallback`);
+		versions.add(latestTagVersion);
 	}
 
 	if (versions.size === 0) {

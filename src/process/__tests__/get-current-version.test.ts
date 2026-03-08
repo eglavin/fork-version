@@ -1,4 +1,5 @@
 import { setupTest } from "../../../tests/setup-tests";
+import { getCommitsSinceTag } from "../get-commits";
 import { getCurrentVersion } from "../get-current-version";
 import { FileManager } from "../../files/file-manager";
 
@@ -12,7 +13,14 @@ describe("getCurrentVersion", () => {
 		create.json({ version: "1.2.3" }, "package.json").add();
 		execGit.commits();
 
-		const result = await getCurrentVersion(config, logger, git, fileManager, config.files);
+		const result = await getCurrentVersion(
+			config,
+			logger,
+			git,
+			fileManager,
+			config.files,
+			undefined,
+		);
 		expect(result).toStrictEqual({
 			files: [
 				{
@@ -35,7 +43,14 @@ describe("getCurrentVersion", () => {
 		create.json({ version: "1.2.3", private: true }, "package.json").add();
 		execGit.commits();
 
-		const result = await getCurrentVersion(config, logger, git, fileManager, config.files);
+		const result = await getCurrentVersion(
+			config,
+			logger,
+			git,
+			fileManager,
+			config.files,
+			undefined,
+		);
 		expect(result).toStrictEqual({
 			files: [
 				{
@@ -68,7 +83,14 @@ describe("getCurrentVersion", () => {
 			.add();
 		execGit.commits();
 
-		const result = await getCurrentVersion(config, logger, git, fileManager, config.files);
+		const result = await getCurrentVersion(
+			config,
+			logger,
+			git,
+			fileManager,
+			config.files,
+			undefined,
+		);
 		expect(result).toStrictEqual({
 			files: [
 				{
@@ -95,13 +117,21 @@ describe("getCurrentVersion", () => {
 		await git.commit("--allow-empty", "-m", "test: a commit");
 		await git.tag("v1.2.3", "-m", "chore: release 1.2.3");
 
-		await expect(getCurrentVersion(config, logger, git, fileManager, config.files)).rejects.toThrow(
-			"Unable to find current version",
-		);
+		await expect(
+			getCurrentVersion(config, logger, git, fileManager, config.files, undefined),
+		).rejects.toThrow("Unable to find current version");
 
 		config.gitTagFallback = true;
 
-		const taggedResult = await getCurrentVersion(config, logger, git, fileManager, config.files);
+		const commits = await getCommitsSinceTag(config, logger, git);
+		const taggedResult = await getCurrentVersion(
+			config,
+			logger,
+			git,
+			fileManager,
+			config.files,
+			commits.latestTagVersion,
+		);
 		expect(taggedResult).toStrictEqual({
 			files: [],
 			version: "1.2.3",
@@ -117,18 +147,18 @@ describe("getCurrentVersion", () => {
 		create.json({ version: "3.2.1" }, "package-lock.json").add();
 		execGit.commits();
 
-		await expect(getCurrentVersion(config, logger, git, fileManager, config.files)).rejects.toThrow(
-			"Found multiple versions",
-		);
+		await expect(
+			getCurrentVersion(config, logger, git, fileManager, config.files, undefined),
+		).rejects.toThrow("Found multiple versions");
 	});
 
 	it("should throw an error if no version found", async () => {
 		const { config, git, logger } = await setupTest("getCurrentVersion");
 		const fileManager = new FileManager(config, logger);
 
-		await expect(getCurrentVersion(config, logger, git, fileManager, config.files)).rejects.toThrow(
-			"Unable to find current version",
-		);
+		await expect(
+			getCurrentVersion(config, logger, git, fileManager, config.files, undefined),
+		).rejects.toThrow("Unable to find current version");
 	});
 
 	it("should take the latest version if multiple found", async () => {
@@ -139,7 +169,14 @@ describe("getCurrentVersion", () => {
 		create.json({ version: "3.2.1" }, "package-lock.json").add();
 		execGit.commits();
 
-		const result = await getCurrentVersion(config, logger, git, fileManager, config.files);
+		const result = await getCurrentVersion(
+			config,
+			logger,
+			git,
+			fileManager,
+			config.files,
+			undefined,
+		);
 		expect(result.files.map((f) => f.version)).toStrictEqual(["1.2.3", "3.2.1"]);
 		expect(result.version).toStrictEqual("3.2.1");
 	});
@@ -154,7 +191,14 @@ describe("getCurrentVersion", () => {
 		create.json({ version: "1.2.3" }, "package.json").add();
 		execGit.commits();
 
-		const result = await getCurrentVersion(config, logger, git, fileManager, config.files);
+		const result = await getCurrentVersion(
+			config,
+			logger,
+			git,
+			fileManager,
+			config.files,
+			undefined,
+		);
 		expect(result).toStrictEqual({
 			files: [
 				{
@@ -181,7 +225,14 @@ describe("getCurrentVersion", () => {
 		create.file("ignored.json", ".gitignore").add();
 		execGit.commits();
 
-		const result = await getCurrentVersion(config, logger, git, fileManager, config.files);
+		const result = await getCurrentVersion(
+			config,
+			logger,
+			git,
+			fileManager,
+			config.files,
+			undefined,
+		);
 		expect(result).toStrictEqual({
 			files: [
 				{

@@ -3,8 +3,19 @@ import semver from "semver";
 import { escapeRegex } from "../utils/escape-regex";
 import type { ForkConfig } from "../config/types";
 
+interface GitConfig {
+	path: ForkConfig["path"];
+	dryRun?: ForkConfig["dryRun"];
+}
+
 export class Git {
-	constructor(private config: Pick<ForkConfig, "path" | "dryRun">) {
+	#path: string;
+	#dryRun: boolean;
+
+	constructor(config: GitConfig) {
+		this.#path = config.path;
+		this.#dryRun = config.dryRun ?? false;
+
 		this.add = this.add.bind(this);
 		this.commit = this.commit.bind(this);
 		this.tag = this.tag.bind(this);
@@ -25,7 +36,7 @@ export class Git {
 				"git",
 				[command, ...args],
 				{
-					cwd: this.config.path,
+					cwd: this.#path,
 					maxBuffer: Infinity,
 				},
 				(error, stdout, stderr) => {
@@ -50,7 +61,7 @@ export class Git {
 	 * ```
 	 */
 	async add(...args: (string | undefined)[]): Promise<string> {
-		if (this.config.dryRun) {
+		if (this.#dryRun) {
 			return "";
 		}
 
@@ -68,7 +79,7 @@ export class Git {
 	 * ```
 	 */
 	async commit(...args: (string | undefined)[]): Promise<string> {
-		if (this.config.dryRun) {
+		if (this.#dryRun) {
 			return "";
 		}
 
@@ -86,7 +97,7 @@ export class Git {
 	 * ```
 	 */
 	async tag(...args: (string | undefined)[]): Promise<string> {
-		if (this.config.dryRun) {
+		if (this.#dryRun) {
 			return "";
 		}
 

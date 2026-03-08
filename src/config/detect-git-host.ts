@@ -17,11 +17,8 @@ export interface DetectedGitHost {
  * if so we need to create the correct URLs so the changelog is generated
  * correctly.
  */
-export async function detectGitHost(cwd: string): Promise<DetectedGitHost | null> {
-	const remoteUrl = await new Git({
-		path: cwd,
-		dryRun: false,
-	}).getRemoteUrl();
+export async function detectGitHost(path: string): Promise<DetectedGitHost | null> {
+	const remoteUrl = await new Git({ path }).getRemoteUrl();
 
 	// A checked out Azure DevOps remote URL looks like one of these:
 	//

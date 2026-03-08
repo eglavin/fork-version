@@ -3,40 +3,46 @@
 import { styleText } from "node:util";
 import type { ForkConfig } from "../config/types";
 
-export class Logger {
-	disableLogs = false;
+interface LoggerConfig {
+	silent?: ForkConfig["silent"];
+	debug?: ForkConfig["debug"];
+}
 
-	constructor(private config: Pick<ForkConfig, "silent" | "debug">) {
+export class Logger {
+	#silent: boolean;
+	#debug: boolean;
+
+	constructor(config: LoggerConfig) {
+		this.#silent = config.silent ?? false;
+		this.#debug = config.debug ?? false;
+
 		this.log = this.log.bind(this);
 		this.warn = this.warn.bind(this);
 		this.error = this.error.bind(this);
 		this.debug = this.debug.bind(this);
 		this.skipping = this.skipping.bind(this);
-
-		// Disable logs if silent
-		this.disableLogs = this.config.silent;
 	}
 
-	public log(message: string) {
-		if (!this.disableLogs) {
+	log(message: string) {
+		if (!this.#silent) {
 			console.log(message);
 		}
 	}
 
-	public warn(message: string) {
-		if (!this.disableLogs) {
+	warn(message: string) {
+		if (!this.#silent) {
 			console.warn(styleText("yellowBright", message));
 		}
 	}
 
-	public error(message: string) {
-		if (!this.disableLogs) {
+	error(message: string) {
+		if (!this.#silent) {
 			console.error(styleText("redBright", message));
 		}
 	}
 
-	public debug(message: string, ...optionalParams: any[]) {
-		if (this.config.debug && !this.disableLogs) {
+	debug(message: string, ...optionalParams: any[]) {
+		if (!this.#silent && this.#debug) {
 			console.debug(styleText("cyanBright", message));
 			if (optionalParams.length > 0) {
 				console.debug(...optionalParams);
@@ -44,8 +50,8 @@ export class Logger {
 		}
 	}
 
-	public skipping(message: string) {
-		if (!this.disableLogs) {
+	skipping(message: string) {
+		if (!this.#silent) {
 			console.log(styleText("magenta", message));
 		}
 	}

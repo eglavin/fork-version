@@ -1,5 +1,13 @@
 # Fork Version
 
+## [4.1.7](https://github.com/eglavin/fork-version/compare/v4.1.6...v4.1.7) (2026-03-08)
+
+
+### Refactor
+
+* improve inspect command ([0b78aab](https://github.com/eglavin/fork-version/commit/0b78aab5dd9be49ffccba173fdb99e13eac52fbd))
+
+
 ## [4.1.6](https://github.com/eglavin/fork-version/compare/v4.1.5...v4.1.6) (2026-03-08)
 
 

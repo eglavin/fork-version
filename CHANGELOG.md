@@ -1,5 +1,13 @@
 # Fork Version
 
+## [4.1.6](https://github.com/eglavin/fork-version/compare/v4.1.5...v4.1.6) (2026-03-08)
+
+
+### Refactor
+
+* remove duplicate get tags function ([ec2962a](https://github.com/eglavin/fork-version/commit/ec2962a99f0da0335079ef6fa677f3023325cdcf))
+
+
 ## [4.1.5](https://github.com/eglavin/fork-version/compare/v4.1.4...v4.1.5) (2026-03-08)
 
 

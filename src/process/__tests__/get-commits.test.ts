@@ -16,9 +16,10 @@ describe("get-commits", () => {
 
 		execGit.commit("feat: an amazing new feature");
 
-		const { latestTag, commits } = await getCommitsSinceTag(config, logger, git);
+		const { latestTag, latestTagVersion, commits } = await getCommitsSinceTag(config, logger, git);
 
 		expect(latestTag).toBe("v0.0.1");
+		expect(latestTagVersion).toBe("0.0.1");
 
 		expect(commits).toHaveLength(1);
 		expect(commits[0]?.subject).toBe("feat: an amazing new feature");
@@ -40,9 +41,10 @@ describe("get-commits", () => {
 		create.file("", "packages/package-2/package.json").add();
 		execGit.commit("feat: package-2 feat");
 
-		const { latestTag, commits } = await getCommitsSinceTag(config, logger, git);
+		const { latestTag, latestTagVersion, commits } = await getCommitsSinceTag(config, logger, git);
 
 		expect(latestTag).toBe("v0.0.0");
+		expect(latestTagVersion).toBe("0.0.0");
 
 		expect(commits).toHaveLength(2);
 		expect(commits[0]?.subject).toBe("feat: package-2 feat");
@@ -57,9 +59,11 @@ describe("get-commits", () => {
 		execGit.commit("chore: init");
 		execGit.commit("feat: an amazing new feature");
 
-		const { latestTag, commits } = await getCommitsSinceTag(config, logger, git);
+		const { latestTag, latestTagVersion, commits } = await getCommitsSinceTag(config, logger, git);
 
 		expect(latestTag).toBeUndefined();
+		expect(latestTagVersion).toBeUndefined();
+
 		expect(commits).toHaveLength(2);
 		expect(commits[0]?.subject).toBe("feat: an amazing new feature");
 		expect(commits[1]?.subject).toBe("chore: init");

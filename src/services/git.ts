@@ -25,8 +25,6 @@ export class Git {
 		this.getRemoteUrl = this.getRemoteUrl.bind(this);
 		this.getTags = this.getTags.bind(this);
 		this.getMostRecentTag = this.getMostRecentTag.bind(this);
-		this.getCleanedTags = this.getCleanedTags.bind(this);
-		this.getHighestSemverVersionFromTags = this.getHighestSemverVersionFromTags.bind(this);
 		this.getCommits = this.getCommits.bind(this);
 	}
 
@@ -237,7 +235,7 @@ export class Git {
 	}
 
 	/**
-	 * Returns the latest git tag based on commit date
+	 * Returns the most recent tag from the commit history, or `undefined` if no valid semver tags are found
 	 *
 	 * @example
 	 * ```ts
@@ -247,46 +245,6 @@ export class Git {
 	async getMostRecentTag(tagPrefix: string | undefined): Promise<string | undefined> {
 		const tags = await this.getTags(tagPrefix);
 		return tags[0] || undefined;
-	}
-
-	/**
-	 * Get cleaned semver tags, with any tag prefix's removed
-	 *
-	 * @example
-	 * ```ts
-	 * await git.getCleanedTags("v"); // ["1.2.3", "1.2.2", "1.2.1"]
-	 * ```
-	 */
-	async getCleanedTags(tagPrefix: string | undefined): Promise<string[]> {
-		const tags = await this.getTags(tagPrefix);
-		const escapedTagPrefix = tagPrefix ? escapeRegex(tagPrefix) : undefined;
-
-		const cleanedTags = [];
-		for (const tag of tags) {
-			const tagWithoutPrefix = tag.replace(new RegExp(`^${escapedTagPrefix}`), "");
-			const cleanedTag = semver.clean(tagWithoutPrefix);
-			if (cleanedTag) {
-				cleanedTags.push(cleanedTag);
-			}
-		}
-
-		return cleanedTags;
-	}
-
-	/**
-	 * Get the highest semver version from git tags. This will return the highest
-	 * semver version found for the given tag prefix, regardless of the commit date.
-	 *
-	 * @example
-	 * ```ts
-	 * await git.getHighestSemverVersionFromTags("v"); // "1.2.3"
-	 * ```
-	 */
-	async getHighestSemverVersionFromTags(
-		tagPrefix: string | undefined,
-	): Promise<string | undefined> {
-		const cleanedTags = await this.getCleanedTags(tagPrefix);
-		return cleanedTags.sort(semver.rcompare)[0] || undefined;
 	}
 
 	/**

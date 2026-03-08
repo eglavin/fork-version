@@ -15,7 +15,14 @@ export async function main(config: ForkConfig, logger: Logger, fileManager: File
 	logger.warn(config.dryRun ? "[Dry Run] No changes will be written to disk.\n" : "");
 
 	const commits = await getCommitsSinceTag(config, logger, git);
-	const current = await getCurrentVersion(config, logger, git, fileManager, config.files);
+	const current = await getCurrentVersion(
+		config,
+		logger,
+		git,
+		fileManager,
+		config.files,
+		commits.latestTagVersion,
+	);
 	const next = await getNextVersion(config, logger, commits.commits, current.version);
 
 	logger.log("Updating files: ");

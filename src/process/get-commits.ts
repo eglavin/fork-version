@@ -1,5 +1,6 @@
 import { CommitParser } from "../commit-parser/commit-parser";
 import { filterRevertedCommits } from "../commit-parser/filter-reverted-commits";
+import { cleanTag } from "../utils/clean-tag";
 import type { ForkConfig } from "../config/types";
 import type { Logger } from "../services/logger";
 import type { Git } from "../services/git";
@@ -7,6 +8,7 @@ import type { Commit } from "../commit-parser/types";
 
 export interface CommitsSinceTag {
 	latestTag: string | undefined;
+	latestTagVersion: string | undefined;
 	commits: Commit[];
 }
 
@@ -39,6 +41,7 @@ export async function getCommitsSinceTag(
 
 	return {
 		latestTag,
+		latestTagVersion: cleanTag(latestTag, config.tagPrefix),
 		commits: filteredCommits,
 	};
 }

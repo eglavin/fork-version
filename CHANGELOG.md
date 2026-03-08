@@ -1,5 +1,13 @@
 # Fork Version
 
+## [4.1.5](https://github.com/eglavin/fork-version/compare/v4.1.4...v4.1.5) (2026-03-08)
+
+
+### Refactor
+
+* remove typescript member visibility modifiers in favour of private fields ([c2e0749](https://github.com/eglavin/fork-version/commit/c2e07494bb2af69f04c0ecfc13eb342705c904aa))
+
+
 ## [4.1.4](https://github.com/eglavin/fork-version/compare/v4.1.3...v4.1.4) (2026-03-08)
 
 

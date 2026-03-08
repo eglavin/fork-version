@@ -1,5 +1,13 @@
 # Fork Version
 
+## [4.1.3](https://github.com/eglavin/fork-version/compare/v4.1.2...v4.1.3) (2026-03-08)
+
+
+### Bug Fixes
+
+* mock out styleText for testing logger class ([40b06f6](https://github.com/eglavin/fork-version/commit/40b06f6339a857b5ab28839f2451445684bdd91e))
+
+
 ## [4.1.2](https://github.com/eglavin/fork-version/compare/v4.1.1...v4.1.2) (2026-03-07)
 
 

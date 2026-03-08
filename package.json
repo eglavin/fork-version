@@ -92,7 +92,6 @@
     "conventional-changelog-config-spec": "2.1.0",
     "conventional-changelog-conventionalcommits": "7.0.2",
     "esbuild": "0.27.3",
-    "glob": "13.0.6",
     "joycon": "3.1.1",
     "jsonc-parser": "3.3.1",
     "meow": "14.1.0",

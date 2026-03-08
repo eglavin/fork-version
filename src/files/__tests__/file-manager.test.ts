@@ -73,6 +73,25 @@ environment:
 		expect(logger.error).toHaveBeenCalledWith("[File Manager] Unsupported file: version.unknown");
 	});
 
+	it("should handle absolute file paths", async () => {
+		const { config, create, logger, relativeTo } = await setupTest("files file-manager");
+		const fileManager = new FileManager(config, logger);
+
+		create.file(
+			`name: wordionary
+description: "A new Flutter project."
+publish_to: 'none'
+version: 1.2.3+55 # Comment about the version number
+environment:
+  sdk: ^3.5.4
+`,
+			"pubspec.yaml",
+		);
+
+		const file = fileManager.read(relativeTo("pubspec.yaml"));
+		expect(file?.version).toBe("1.2.3");
+	});
+
 	it("should not write to file if dry run is enabled", async () => {
 		const { config, logger, relativeTo } = await setupTest("files file-manager");
 		config.dryRun = true;

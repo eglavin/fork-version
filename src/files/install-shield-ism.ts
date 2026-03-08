@@ -1,9 +1,7 @@
-import { resolve } from "node:path";
+import { basename } from "node:path";
 import { readFileSync, writeFileSync } from "node:fs";
 import * as cheerio from "cheerio/slim";
 
-import { fileExists } from "../utils/file-state";
-import type { ForkConfig } from "../config/types";
 import type { Logger } from "../services/logger";
 import type { FileState, IFileManager } from "./file-manager";
 
@@ -29,44 +27,41 @@ import type { FileState, IFileManager } from "./file-manager";
  * ```
  */
 export class InstallShieldISM implements IFileManager {
-	constructor(
-		private config: ForkConfig,
-		private logger: Logger,
-	) {}
+	#logger: Logger;
 
-	read(fileName: string): FileState | undefined {
-		const filePath = resolve(this.config.path, fileName);
+	constructor(logger: Logger) {
+		this.#logger = logger;
+	}
 
-		if (fileExists(filePath)) {
-			const fileContents = readFileSync(filePath, "utf8");
-			const $ = cheerio.load(fileContents, {
-				xmlMode: true,
-				xml: { decodeEntities: false },
-			});
+	#cheerioOptions: cheerio.CheerioOptions = {
+		xmlMode: true,
+		xml: { decodeEntities: false },
+	};
 
-			const version = $('msi > table[name="Property"] > row > td:contains("ProductVersion")')
-				.next()
-				.text()
-				.trim();
-			if (version) {
-				return {
-					name: fileName,
-					path: filePath,
-					version: version,
-				};
-			}
+	read(filePath: string): FileState | undefined {
+		const fileName = basename(filePath);
+		const fileContents = readFileSync(filePath, "utf8");
 
-			this.logger.warn(`[File Manager] Unable to determine InstallShield ISM version: ${fileName}`);
+		const $ = cheerio.load(fileContents, this.#cheerioOptions);
+		const version = $('msi > table[name="Property"] > row > td:contains("ProductVersion")')
+			.next()
+			.text()
+			.trim();
+		if (version) {
+			return {
+				name: fileName,
+				path: filePath,
+				version: version,
+			};
 		}
+
+		this.#logger.warn(`[File Manager] Unable to determine InstallShield ISM version: ${fileName}`);
 	}
 
 	write(fileState: FileState, newVersion: string): void {
 		const fileContents = readFileSync(fileState.path, "utf8");
-		const $ = cheerio.load(fileContents, {
-			xmlMode: true,
-			xml: { decodeEntities: false },
-		});
 
+		const $ = cheerio.load(fileContents, this.#cheerioOptions);
 		const versionCell = $(
 			'msi > table[name="Property"] > row > td:contains("ProductVersion")',
 		).next();

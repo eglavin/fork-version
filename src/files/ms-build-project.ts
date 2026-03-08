@@ -1,9 +1,7 @@
-import { resolve } from "node:path";
+import { basename } from "node:path";
 import { readFileSync, writeFileSync } from "node:fs";
 import * as cheerio from "cheerio/slim";
 
-import { fileExists } from "../utils/file-state";
-import type { ForkConfig } from "../config/types";
 import type { Logger } from "../services/logger";
 import type { FileState, IFileManager } from "./file-manager";
 
@@ -22,41 +20,38 @@ import type { FileState, IFileManager } from "./file-manager";
  * ```
  */
 export class MSBuildProject implements IFileManager {
-	constructor(
-		private config: ForkConfig,
-		private logger: Logger,
-	) {}
+	#logger: Logger;
 
-	public read(fileName: string): FileState | undefined {
-		const filePath = resolve(this.config.path, fileName);
-
-		if (fileExists(filePath)) {
-			const fileContents = readFileSync(filePath, "utf8");
-			const $ = cheerio.load(fileContents, {
-				xmlMode: true,
-				xml: { decodeEntities: false },
-			});
-
-			const version = $("Project > PropertyGroup > Version").text();
-			if (version) {
-				return {
-					name: fileName,
-					path: filePath,
-					version: version,
-				};
-			}
-
-			this.logger.warn(`[File Manager] Unable to determine ms-build version: ${fileName}`);
-		}
+	constructor(logger: Logger) {
+		this.#logger = logger;
 	}
 
-	public write(fileState: FileState, newVersion: string) {
-		const fileContents = readFileSync(fileState.path, "utf8");
-		const $ = cheerio.load(fileContents, {
-			xmlMode: true,
-			xml: { decodeEntities: false },
-		});
+	#cheerioOptions: cheerio.CheerioOptions = {
+		xmlMode: true,
+		xml: { decodeEntities: false },
+	};
 
+	read(filePath: string): FileState | undefined {
+		const fileName = basename(filePath);
+		const fileContents = readFileSync(filePath, "utf8");
+
+		const $ = cheerio.load(fileContents, this.#cheerioOptions);
+		const version = $("Project > PropertyGroup > Version").text();
+		if (version) {
+			return {
+				name: fileName,
+				path: filePath,
+				version: version,
+			};
+		}
+
+		this.#logger.warn(`[File Manager] Unable to determine ms-build version: ${fileName}`);
+	}
+
+	write(fileState: FileState, newVersion: string) {
+		const fileContents = readFileSync(fileState.path, "utf8");
+
+		const $ = cheerio.load(fileContents, this.#cheerioOptions);
 		$("Project > PropertyGroup > Version").text(newVersion);
 
 		// Cheerio doesn't handle self-closing tags well,
@@ -66,7 +61,7 @@ export class MSBuildProject implements IFileManager {
 		writeFileSync(fileState.path, updatedContent, "utf8");
 	}
 
-	public isSupportedFile(fileName: string): boolean {
+	isSupportedFile(fileName: string): boolean {
 		// List of known ms-build project file extensions.
 		// https://stackoverflow.com/questions/2007689/is-there-a-standard-file-extension-for-msbuild-files
 		return (

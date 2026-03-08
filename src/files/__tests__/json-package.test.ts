@@ -5,18 +5,18 @@ import { JSONPackage } from "../json-package";
 
 describe("files json-package", () => {
 	it("should read a package.json file", async () => {
-		const { config, create, logger } = await setupTest("files json-package");
-		const fileManager = new JSONPackage(config, logger);
+		const { create, logger, relativeTo } = await setupTest("files json-package");
+		const fileManager = new JSONPackage(logger);
 
 		create.json({ version: "1.2.3" }, "package.json");
 
-		const file = fileManager.read("package.json");
+		const file = fileManager.read(relativeTo("package.json"));
 		expect(file?.version).toBe("1.2.3");
 	});
 
 	it("should read a deno.jsonc file", async () => {
-		const { config, logger, create } = await setupTest("files json-package");
-		const fileManager = new JSONPackage(config, logger);
+		const { logger, create, relativeTo } = await setupTest("files json-package");
+		const fileManager = new JSONPackage(logger);
 		create.file(
 			`{
 			    // This is a comment about the version
@@ -25,17 +25,17 @@ describe("files json-package", () => {
 			}`,
 			"deno.jsonc",
 		);
-		const file = fileManager.read("deno.jsonc");
+		const file = fileManager.read(relativeTo("deno.jsonc"));
 		expect(file?.version).toBe("1.2.3");
 	});
 
 	it("should log a message if unable to read version", async () => {
-		const { config, create, logger } = await setupTest("files json-package");
-		const fileManager = new JSONPackage(config, logger);
+		const { create, logger, relativeTo } = await setupTest("files json-package");
+		const fileManager = new JSONPackage(logger);
 
 		create.json({ version: "" }, "package.json");
 
-		const file = fileManager.read("package.json");
+		const file = fileManager.read(relativeTo("package.json"));
 		expect(file).toBeUndefined();
 		expect(logger.warn).toBeCalledWith(
 			"[File Manager] Unable to determine json version: package.json",
@@ -43,18 +43,18 @@ describe("files json-package", () => {
 	});
 
 	it("should read private property", async () => {
-		const { config, create, logger } = await setupTest("files json-package");
-		const fileManager = new JSONPackage(config, logger);
+		const { create, logger, relativeTo } = await setupTest("files json-package");
+		const fileManager = new JSONPackage(logger);
 
 		create.json({ version: "1.2.3", private: true }, "package.json");
 
-		const file = fileManager.read("package.json");
+		const file = fileManager.read(relativeTo("package.json"));
 		expect(file?.isPrivate).toBe(true);
 	});
 
 	it("should write a package.json file", async () => {
-		const { config, create, logger, relativeTo } = await setupTest("files json-package");
-		const fileManager = new JSONPackage(config, logger);
+		const { create, logger, relativeTo } = await setupTest("files json-package");
+		const fileManager = new JSONPackage(logger);
 
 		create.json({ version: "1.2.3" }, "package.json");
 
@@ -72,8 +72,8 @@ describe("files json-package", () => {
 	});
 
 	it("should write a package-lock.json file", async () => {
-		const { config, create, logger, relativeTo } = await setupTest("files json-package");
-		const fileManager = new JSONPackage(config, logger);
+		const { create, logger, relativeTo } = await setupTest("files json-package");
+		const fileManager = new JSONPackage(logger);
 
 		create.json(
 			{
@@ -99,8 +99,8 @@ describe("files json-package", () => {
 	});
 
 	it("should write a deno.jsonc file", async () => {
-		const { config, create, logger, relativeTo } = await setupTest("files json-package");
-		const fileManager = new JSONPackage(config, logger);
+		const { create, logger, relativeTo } = await setupTest("files json-package");
+		const fileManager = new JSONPackage(logger);
 		create.file(
 			`{
 			    // This is a comment about the version
@@ -129,8 +129,8 @@ describe("files json-package", () => {
 	});
 
 	it("should write output with tabs if input file is using tabs", async () => {
-		const { config, create, logger, relativeTo } = await setupTest("files json-package");
-		const fileManager = new JSONPackage(config, logger);
+		const { create, logger, relativeTo } = await setupTest("files json-package");
+		const fileManager = new JSONPackage(logger);
 
 		create.file('{\n\t"version": "1.2.3"\n}', "package.json");
 
@@ -148,8 +148,8 @@ describe("files json-package", () => {
 	});
 
 	it("should match json files", async () => {
-		const { config, logger } = await setupTest("files json-package");
-		const fileManager = new JSONPackage(config, logger);
+		const { logger } = await setupTest("files json-package");
+		const fileManager = new JSONPackage(logger);
 
 		// Supported
 		expect(fileManager.isSupportedFile("package.json")).toBe(true);

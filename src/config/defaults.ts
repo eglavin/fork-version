@@ -34,6 +34,7 @@ All notable changes to this project will be documented in this file. See [fork-v
 	gitTagFallback: true,
 	sign: false,
 	verify: false,
+	asJson: false,
 
 	// Skip Steps
 	skipBump: false,

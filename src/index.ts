@@ -1,5 +1,4 @@
-export { inspectTag } from "./commands/inspect-tag";
-export { inspectVersion } from "./commands/inspect-version";
+export { inspect } from "./commands/inspect";
 export { main } from "./commands/main";
 export { validateConfig } from "./commands/validate-config";
 

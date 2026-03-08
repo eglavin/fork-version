@@ -78,14 +78,15 @@ export const ForkConfigSchema = z.object({
 	 * - `main` - Bumps the version, update files, generate changelog, commit, and tag.
 	 * - `inspect-version` - Prints the current version and exits.
 	 * - `inspect-tag` - Prints the current git tag and exits.
+	 * - `inspect` - Prints the current version and git tag and exits.
 	 * - `validate-config` - Validates the configuration and exits.
 	 *
 	 * @default "main"
 	 */
 	command: z
-		.literal(["main", "inspect-version", "inspect-tag", "validate-config"])
+		.literal(["main", "inspect", "inspect-version", "inspect-tag", "validate-config"])
 		.describe(
-			"The command to run. Can be one of: main, inspect-version, inspect-tag, validate-config. Defaults to main.",
+			"The command to run. Can be one of: main, inspect, inspect-version, inspect-tag, validate-config. Defaults to main.",
 		),
 	/**
 	 * If set, Fork-Version will print the current version and exit.
@@ -274,6 +275,11 @@ export const ForkConfigSchema = z.object({
 	 * @default false
 	 */
 	verify: z.boolean().describe("If true, git will run user defined git hooks before committing."),
+	/**
+	 * Output result as JSON.
+	 * @default false
+	 */
+	asJson: z.boolean().describe("Output the result as JSON."),
 
 	// Skip Steps
 	//

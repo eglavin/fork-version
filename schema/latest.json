@@ -3,45 +3,46 @@
   "type": "object",
   "properties": {
     "command": {
-      "description": "The command to run. Can be one of: main, inspect-version, inspect-tag, validate-config. Defaults to main.",
       "type": "string",
       "enum": [
         "main",
+        "inspect",
         "inspect-version",
         "inspect-tag",
         "validate-config"
-      ]
+      ],
+      "description": "The command to run. Can be one of: main, inspect, inspect-version, inspect-tag, validate-config. Defaults to main."
     },
     "inspectVersion": {
       "description": "If set, Fork-Version will print the current version and exit.",
       "type": "boolean"
     },
     "files": {
-      "description": "List of the files to be updated.",
       "type": "array",
       "items": {
         "type": "string"
-      }
+      },
+      "description": "List of the files to be updated."
     },
     "glob": {
       "description": "Glob pattern to match files to be updated.",
       "type": "string"
     },
     "path": {
-      "description": "The path Fork-Version will run from. Defaults to \"process.cwd()\".",
-      "type": "string"
+      "type": "string",
+      "description": "The path Fork-Version will run from. Defaults to \"process.cwd()\"."
     },
     "changelog": {
-      "description": "Name of the changelog file. Defaults to \"CHANGELOG.md\".",
-      "type": "string"
+      "type": "string",
+      "description": "Name of the changelog file. Defaults to \"CHANGELOG.md\"."
     },
     "header": {
-      "description": "The header text for the changelog.",
-      "type": "string"
+      "type": "string",
+      "description": "The header text for the changelog."
     },
     "tagPrefix": {
-      "description": "Specify a prefix for the created tag. Defaults to \"v\".",
-      "type": "string"
+      "type": "string",
+      "description": "Specify a prefix for the created tag. Defaults to \"v\"."
     },
     "preRelease": {
       "description": "Make a pre-release with optional label if given value is a string.",
@@ -80,70 +81,72 @@
       ]
     },
     "allowMultipleVersions": {
-      "description": "Don't throw an error if multiple versions are found in the given files.",
-      "type": "boolean"
+      "type": "boolean",
+      "description": "Don't throw an error if multiple versions are found in the given files."
     },
     "commitAll": {
-      "description": "Commit all changes, not just files updated by Fork-Version.",
-      "type": "boolean"
+      "type": "boolean",
+      "description": "Commit all changes, not just files updated by Fork-Version."
     },
     "changelogAll": {
-      "description": "If this flag is set, all default commit types will be added to the changelog, not just `feat` and `fix`.",
-      "type": "boolean"
+      "type": "boolean",
+      "description": "If this flag is set, all default commit types will be added to the changelog, not just `feat` and `fix`."
     },
     "debug": {
-      "description": "Output debug information.",
-      "type": "boolean"
+      "type": "boolean",
+      "description": "Output debug information."
     },
     "dryRun": {
-      "description": "No output will be written to disk or committed.",
-      "type": "boolean"
+      "type": "boolean",
+      "description": "No output will be written to disk or committed."
     },
     "silent": {
-      "description": "Run without logging to the terminal.",
-      "type": "boolean"
+      "type": "boolean",
+      "description": "Run without logging to the terminal."
     },
     "gitTagFallback": {
-      "description": "If unable to find a version in the given files, fallback and attempt to use the latest git tag. Defaults to true.",
-      "type": "boolean"
+      "type": "boolean",
+      "description": "If unable to find a version in the given files, fallback and attempt to use the latest git tag. Defaults to true."
     },
     "sign": {
-      "description": "If true, git will sign the commit with the systems GPG key.",
-      "type": "boolean"
+      "type": "boolean",
+      "description": "If true, git will sign the commit with the systems GPG key."
     },
     "verify": {
-      "description": "If true, git will run user defined git hooks before committing.",
-      "type": "boolean"
+      "type": "boolean",
+      "description": "If true, git will run user defined git hooks before committing."
+    },
+    "asJson": {
+      "type": "boolean",
+      "description": "Output the result as JSON."
     },
     "skipBump": {
-      "description": "Skip the bump step.",
-      "type": "boolean"
+      "type": "boolean",
+      "description": "Skip the bump step."
     },
     "skipChangelog": {
-      "description": "Skip the changelog step.",
-      "type": "boolean"
+      "type": "boolean",
+      "description": "Skip the changelog step."
     },
     "skipCommit": {
-      "description": "Skip the commit step.",
-      "type": "boolean"
+      "type": "boolean",
+      "description": "Skip the commit step."
     },
     "skipTag": {
-      "description": "Skip the tag step.",
-      "type": "boolean"
+      "type": "boolean",
+      "description": "Skip the tag step."
     },
     "changelogPresetConfig": {
-      "description": "Override the default \"conventional-changelog-conventionalcommits\" preset configuration.",
       "type": "object",
       "properties": {
         "types": {
-          "description": "List of explicitly supported commit message types.",
           "type": "array",
           "items": {
             "type": "object",
             "properties": {
               "type": {
-                "description": "The type of commit message, such as \"feat\", \"fix\", \"chore\".",
-                "type": "string"
+                "type": "string",
+                "description": "The type of commit message, such as \"feat\", \"fix\", \"chore\"."
               },
               "scope": {
                 "description": "The scope of the commit message.",
@@ -162,37 +165,39 @@
               "type"
             ],
             "additionalProperties": false
-          }
+          },
+          "description": "List of explicitly supported commit message types."
         },
         "commitUrlFormat": {
-          "description": "A URL representing a specific commit at a hash.",
-          "type": "string"
+          "type": "string",
+          "description": "A URL representing a specific commit at a hash."
         },
         "compareUrlFormat": {
-          "description": "A URL representing the comparison between two git SHAs.",
-          "type": "string"
+          "type": "string",
+          "description": "A URL representing the comparison between two git SHAs."
         },
         "issueUrlFormat": {
-          "description": "A URL representing the issue format.",
-          "type": "string"
+          "type": "string",
+          "description": "A URL representing the issue format."
         },
         "userUrlFormat": {
-          "description": "A URL representing a user's profile on GitHub, Gitlab, etc.",
-          "type": "string"
+          "type": "string",
+          "description": "A URL representing a user's profile on GitHub, Gitlab, etc."
         },
         "releaseCommitMessageFormat": {
-          "description": "A string to be used to format the auto-generated release commit message.",
-          "type": "string"
+          "type": "string",
+          "description": "A string to be used to format the auto-generated release commit message."
         },
         "issuePrefixes": {
-          "description": "List of prefixes used to detect references to issues.",
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "description": "List of prefixes used to detect references to issues."
         }
       },
-      "additionalProperties": false
+      "additionalProperties": false,
+      "description": "Override the default \"conventional-changelog-conventionalcommits\" preset configuration."
     },
     "releaseMessageSuffix": {
       "description": "Add a suffix to the release commit message.",

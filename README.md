@@ -94,8 +94,9 @@ Fork-Version has a number of command modes which will make the program behave di
 | Command             | Description                                                            |
 | ------------------- | ---------------------------------------------------------------------- |
 | `main`              | Bumps the version, update files, generate changelog, commits, and tag. |
-| `inspect-version`   | Prints the current version and exit.                                   |
-| `inspect-tag`       | Prints the current git tag and exit.                                   |
+| `inspect`           | Print the current version and git tag, then exit.                       |
+| `inspect-version`   | Print the current version then exit.                                   |
+| `inspect-tag`       | Print the current git tag then exit.                                   |
 | `validate-config`   | Validates the configuration and exit.                                  |
 
 ### Exit Codes
@@ -121,8 +122,9 @@ Usage:
 
 Commands:
   main                             Bumps the version, update files, generate changelog, commit, and tag. [Default when no command is provided]
-  inspect-version                  Prints the current version and exits.
-  inspect-tag                      Prints the current git tag and exits.
+  inspect                          Print the current version and git tag, then exits.
+  inspect-version                  Print the current version then exits.
+  inspect-tag                      Print the current git tag then exits.
   validate-config                  Validates the configuration and exits.
 
 General Options:
@@ -154,6 +156,7 @@ Flags:
   --git-tag-fallback               If unable to find a version in the given files, fallback and attempt to use the latest git tag. [Default: true]
   --sign                           If true, git will sign the commit with the systems GPG key.
   --verify                         If true, git will run user defined git hooks before committing.
+  --as-json                        Output the result as JSON.
 
   To negate a flag you can prefix it with "no-", for example "--no-git-tag-fallback" will not fallback to the latest git tag.
 

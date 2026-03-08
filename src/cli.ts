@@ -11,8 +11,7 @@ import { FileManager } from "./files/file-manager";
 import { Git } from "./services/git";
 
 import { validateConfig } from "./commands/validate-config";
-import { inspectVersion } from "./commands/inspect-version";
-import { inspectTag } from "./commands/inspect-tag";
+import { inspect } from "./commands/inspect";
 import { main } from "./commands/main";
 
 async function runFork() {
@@ -30,13 +29,10 @@ async function runFork() {
 			break;
 		}
 
-		case "inspect-version": {
-			await inspectVersion(config, logger, fileManager, git);
-			break;
-		}
-
-		case "inspect-tag": {
-			await inspectTag(config, git);
+		case "inspect-version":
+		case "inspect-tag":
+		case "inspect": {
+			await inspect(config, logger, fileManager, git);
 			break;
 		}
 

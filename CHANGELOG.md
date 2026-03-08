@@ -1,5 +1,13 @@
 # Fork Version
 
+## [4.1.4](https://github.com/eglavin/fork-version/compare/v4.1.3...v4.1.4) (2026-03-08)
+
+
+### Refactor
+
+* remove glob package in favour of builtin node fs glob ([011bced](https://github.com/eglavin/fork-version/commit/011bced7f8a35f9a61a0abfe42d0034ee25d5945))
+
+
 ## [4.1.3](https://github.com/eglavin/fork-version/compare/v4.1.2...v4.1.3) (2026-03-08)
 
 

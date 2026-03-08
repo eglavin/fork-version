@@ -1,6 +1,11 @@
 import type { MockInstance } from "vitest";
 import { Logger } from "../../services/logger";
 
+vi.mock("node:util", () => ({
+	...vi.importActual("node:util"),
+	styleText: vi.fn((_format, text: string) => text),
+}));
+
 describe("logger", () => {
 	let logSpy: MockInstance;
 	let warnSpy: MockInstance;

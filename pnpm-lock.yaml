@@ -26,9 +26,6 @@ importers:
       esbuild:
         specifier: 0.27.3
         version: 0.27.3
-      glob:
-        specifier: 13.0.6
-        version: 13.0.6
       joycon:
         specifier: 3.1.1
         version: 3.1.1
@@ -1014,7 +1011,6 @@ packages:
   glob@13.0.6:
     resolution: {integrity: sha512-Wjlyrolmm8uDpm/ogGyXZXb1Z+Ca2B8NbJwqBVg0axK9GbBeoS7yGV6vjXnYdGm6X53iehEuxxbyiKp8QmN4Vw==}
     engines: {node: 18 || 20 || >=22}
-    hasBin: true
 
   globals@17.4.0:
     resolution: {integrity: sha512-hjrNztw/VajQwOLsMNT1cbJiH2muO3OROCHnbehc8eY5JyD2gqz4AcMHPqgaOR59DjgUjYAYLeH699g/eWi2jw==}

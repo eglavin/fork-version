@@ -5,8 +5,8 @@ import { MSBuildProject } from "../ms-build-project";
 
 describe("files ms-build-project", () => {
 	it("should read version from csproj file", async () => {
-		const { config, create, logger } = await setupTest("files ms-build-project");
-		const fileManager = new MSBuildProject(config, logger);
+		const { create, logger, relativeTo } = await setupTest("files ms-build-project");
+		const fileManager = new MSBuildProject(logger);
 
 		create.file(
 			`<Project Sdk="Microsoft.NET.Sdk">
@@ -18,13 +18,13 @@ describe("files ms-build-project", () => {
 			"API.csproj",
 		);
 
-		const file = fileManager.read("API.csproj");
+		const file = fileManager.read(relativeTo("API.csproj"));
 		expect(file?.version).toBe("1.2.3");
 	});
 
 	it("should log a message if unable to read version", async () => {
-		const { config, create, logger } = await setupTest("files ms-build-project");
-		const fileManager = new MSBuildProject(config, logger);
+		const { create, logger, relativeTo } = await setupTest("files ms-build-project");
+		const fileManager = new MSBuildProject(logger);
 
 		create.file(
 			`<Project Sdk="Microsoft.NET.Sdk">
@@ -36,7 +36,7 @@ describe("files ms-build-project", () => {
 			"API.csproj",
 		);
 
-		const file = fileManager.read("API.csproj");
+		const file = fileManager.read(relativeTo("API.csproj"));
 		expect(file).toBeUndefined();
 		expect(logger.warn).toBeCalledWith(
 			"[File Manager] Unable to determine ms-build version: API.csproj",
@@ -44,8 +44,8 @@ describe("files ms-build-project", () => {
 	});
 
 	it("should write a csproj file", async () => {
-		const { config, create, logger, relativeTo } = await setupTest("files ms-build-project");
-		const fileManager = new MSBuildProject(config, logger);
+		const { create, logger, relativeTo } = await setupTest("files ms-build-project");
+		const fileManager = new MSBuildProject(logger);
 
 		create.file(
 			`<Project Sdk="Microsoft.NET.Sdk">
@@ -71,8 +71,8 @@ describe("files ms-build-project", () => {
 	});
 
 	it("should keep the same property ordering", async () => {
-		const { config, create, logger, relativeTo } = await setupTest("files ms-build-project");
-		const fileManager = new MSBuildProject(config, logger);
+		const { create, logger, relativeTo } = await setupTest("files ms-build-project");
+		const fileManager = new MSBuildProject(logger);
 
 		create.file(
 			`<Project Sdk="Microsoft.NET.Sdk">
@@ -136,8 +136,8 @@ describe("files ms-build-project", () => {
 	});
 
 	it("should match known ms-build project file extensions", async () => {
-		const { config, logger } = await setupTest("files ms-build-project");
-		const fileManager = new MSBuildProject(config, logger);
+		const { logger } = await setupTest("files ms-build-project");
+		const fileManager = new MSBuildProject(logger);
 
 		// Supported
 		expect(fileManager.isSupportedFile("API.csproj")).toBe(true);

@@ -1,5 +1,5 @@
-import { resolve } from "node:path";
-import { glob } from "glob";
+import { join, resolve } from "node:path";
+import { glob } from "node:fs/promises";
 
 import { getChangelogPresetConfig } from "./changelog-preset-config";
 import { DEFAULT_CONFIG } from "./defaults";
@@ -19,13 +19,21 @@ export async function getUserConfig(cliArguments: ForkVersionCLIArgs): Promise<F
 		...cliArguments.flags,
 	} as ForkConfig;
 
-	let globResults: string[] = [];
+	const globResults: string[] = [];
 	if (mergedConfig.glob) {
-		globResults = await glob(mergedConfig.glob, {
+		const IGNORE_LIST = new Set(["node_modules", ".git"]);
+
+		const entries = glob(mergedConfig.glob, {
 			cwd,
-			ignore: ["node_modules/**"],
-			nodir: true,
+			withFileTypes: true,
+			exclude: (entry) => IGNORE_LIST.has(entry.name),
 		});
+
+		for await (const entry of entries) {
+			if (entry.isFile()) {
+				globResults.push(join(entry.parentPath, entry.name));
+			}
+		}
 	}
 
 	const files = mergeFiles(configFile?.files, cliArguments.flags.files, globResults);

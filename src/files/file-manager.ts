@@ -1,3 +1,6 @@
+import { isAbsolute, resolve } from "node:path";
+
+import { fileExists } from "../utils/file-state";
 import { JSONPackage } from "./json-package";
 import { YAMLPackage } from "./yaml-package";
 import { PlainText } from "./plain-text";
@@ -23,23 +26,21 @@ export interface IFileManager {
 }
 
 export class FileManager {
-	private JSONPackage: JSONPackage;
-	private YAMLPackage: YAMLPackage;
-	private PlainText: PlainText;
-	private MSBuildProject: MSBuildProject;
-	private ARMBicep: ARMBicep;
-	private InstallShieldISM: InstallShieldISM;
+	#config: ForkConfig;
+	#logger: Logger;
+	#fileManagers: IFileManager[] = [];
 
-	constructor(
-		private config: ForkConfig,
-		private logger: Logger,
-	) {
-		this.JSONPackage = new JSONPackage(config, logger);
-		this.YAMLPackage = new YAMLPackage(config, logger);
-		this.PlainText = new PlainText(config, logger);
-		this.MSBuildProject = new MSBuildProject(config, logger);
-		this.ARMBicep = new ARMBicep(config, logger);
-		this.InstallShieldISM = new InstallShieldISM(config, logger);
+	constructor(config: ForkConfig, logger: Logger) {
+		this.#config = config;
+		this.#logger = logger;
+		this.#fileManagers = [
+			new JSONPackage(logger),
+			new YAMLPackage(logger),
+			new PlainText(logger),
+			new MSBuildProject(logger),
+			new ARMBicep(logger),
+			new InstallShieldISM(logger),
+		];
 	}
 
 	/**
@@ -55,34 +56,19 @@ export class FileManager {
 	 * { "name": "package.json", "path": "/path/to/package.json", "version": "1.2.3", "isPrivate": true }
 	 * ```
 	 */
-	public read(fileName: string): FileState | undefined {
-		const _fileName = fileName.toLowerCase();
+	read(pathOrName: string): FileState | undefined {
+		const _fileName = pathOrName.toLowerCase();
+		const filePath = isAbsolute(pathOrName) ? pathOrName : resolve(this.#config.path, pathOrName);
 
-		if (this.JSONPackage.isSupportedFile(_fileName)) {
-			return this.JSONPackage.read(fileName);
+		if (!fileExists(filePath)) return;
+
+		for (const fileManager of this.#fileManagers) {
+			if (fileManager.isSupportedFile(_fileName)) {
+				return fileManager.read(filePath);
+			}
 		}
 
-		if (this.YAMLPackage.isSupportedFile(_fileName)) {
-			return this.YAMLPackage.read(fileName);
-		}
-
-		if (this.PlainText.isSupportedFile(_fileName)) {
-			return this.PlainText.read(fileName);
-		}
-
-		if (this.MSBuildProject.isSupportedFile(_fileName)) {
-			return this.MSBuildProject.read(fileName);
-		}
-
-		if (this.ARMBicep.isSupportedFile(_fileName)) {
-			return this.ARMBicep.read(fileName);
-		}
-
-		if (this.InstallShieldISM.isSupportedFile(_fileName)) {
-			return this.InstallShieldISM.read(fileName);
-		}
-
-		this.logger.error(`[File Manager] Unsupported file: ${fileName}`);
+		this.#logger.error(`[File Manager] Unsupported file: ${pathOrName}`);
 	}
 
 	/**
@@ -96,36 +82,18 @@ export class FileManager {
 	 * );
 	 * ```
 	 */
-	public write(fileState: FileState, newVersion: string): void {
-		if (this.config.dryRun) {
+	write(fileState: FileState, newVersion: string): void {
+		if (this.#config.dryRun) {
 			return;
 		}
 		const _fileName = fileState.name.toLowerCase();
 
-		if (this.JSONPackage.isSupportedFile(_fileName)) {
-			return this.JSONPackage.write(fileState, newVersion);
+		for (const fileManager of this.#fileManagers) {
+			if (fileManager.isSupportedFile(_fileName)) {
+				return fileManager.write(fileState, newVersion);
+			}
 		}
 
-		if (this.YAMLPackage.isSupportedFile(_fileName)) {
-			return this.YAMLPackage.write(fileState, newVersion);
-		}
-
-		if (this.PlainText.isSupportedFile(_fileName)) {
-			return this.PlainText.write(fileState, newVersion);
-		}
-
-		if (this.MSBuildProject.isSupportedFile(_fileName)) {
-			return this.MSBuildProject.write(fileState, newVersion);
-		}
-
-		if (this.ARMBicep.isSupportedFile(_fileName)) {
-			return this.ARMBicep.write(fileState, newVersion);
-		}
-
-		if (this.InstallShieldISM.isSupportedFile(_fileName)) {
-			return this.InstallShieldISM.write(fileState, newVersion);
-		}
-
-		this.logger.error(`[File Manager] Unsupported file: ${fileState.path}`);
+		this.#logger.error(`[File Manager] Unsupported file: ${fileState.path}`);
 	}
 }

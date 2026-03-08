@@ -1,4 +1,4 @@
-import { resolve } from "node:path";
+import { basename } from "node:path";
 import { readFileSync, writeFileSync } from "node:fs";
 import {
 	applyEdits,
@@ -9,8 +9,6 @@ import {
 	type ParseOptions,
 } from "jsonc-parser";
 
-import { fileExists } from "../utils/file-state";
-import type { ForkConfig } from "../config/types";
 import type { Logger } from "../services/logger";
 import type { FileState, IFileManager } from "./file-manager";
 
@@ -39,13 +37,14 @@ interface PackageJsonish {
  * ```
  */
 export class JSONPackage implements IFileManager {
-	constructor(
-		private config: ForkConfig,
-		private logger: Logger,
-	) {}
+	#logger: Logger;
+
+	constructor(logger: Logger) {
+		this.#logger = logger;
+	}
 
 	/** Options for parsing JSON and JSONC files. */
-	private PARSE_OPTIONS: ParseOptions = {
+	#jsoncOptions: ParseOptions = {
 		allowEmptyContent: false,
 		allowTrailingComma: true,
 		disallowComments: false,
@@ -58,50 +57,46 @@ export class JSONPackage implements IFileManager {
 	 * @param newString string to set the value to
 	 * @returns the JSON or JSONC string with the value set
 	 */
-	private setStringInJsonc(jsonc: string, jsonPath: JSONPath, newString: string): string {
+	#setStringInJsonc(jsonc: string, jsonPath: JSONPath, newString: string): string {
 		const edits = modify(jsonc, jsonPath, newString, {});
 		return applyEdits(jsonc, edits);
 	}
 
-	public read(fileName: string): FileState | undefined {
-		const filePath = resolve(this.config.path, fileName);
+	read(filePath: string): FileState | undefined {
+		const fileName = basename(filePath);
+		const fileContents = readFileSync(filePath, "utf8");
 
-		if (fileExists(filePath)) {
-			const fileContents = readFileSync(filePath, "utf8");
+		const parseErrors: ParseError[] = [];
+		const parsedJson: PackageJsonish = parse(fileContents, parseErrors, this.#jsoncOptions);
+		if (parsedJson?.version && parseErrors.length === 0) {
+			return {
+				name: fileName,
+				path: filePath,
+				version: parsedJson.version,
 
-			const parseErrors: ParseError[] = [];
-			const parsedJson: PackageJsonish = parse(fileContents, parseErrors, this.PARSE_OPTIONS);
-
-			if (parsedJson?.version && parseErrors.length === 0) {
-				return {
-					name: fileName,
-					path: filePath,
-					version: parsedJson.version,
-
-					isPrivate: typeof parsedJson?.private === "boolean" ? parsedJson.private : true,
-				};
-			}
-
-			this.logger.warn(`[File Manager] Unable to determine json version: ${fileName}`);
+				isPrivate: typeof parsedJson?.private === "boolean" ? parsedJson.private : true,
+			};
 		}
+
+		this.#logger.warn(`[File Manager] Unable to determine json version: ${fileName}`);
 	}
 
-	public write(fileState: FileState, newVersion: string) {
+	write(fileState: FileState, newVersion: string) {
 		let fileContents = readFileSync(fileState.path, "utf8");
 
 		const parseErrors: ParseError[] = [];
-		const parsedJson: PackageJsonish = parse(fileContents, parseErrors, this.PARSE_OPTIONS);
+		const parsedJson: PackageJsonish = parse(fileContents, parseErrors, this.#jsoncOptions);
 
-		fileContents = this.setStringInJsonc(fileContents, ["version"], newVersion);
+		fileContents = this.#setStringInJsonc(fileContents, ["version"], newVersion);
 		if (parsedJson?.packages?.[""]) {
 			// package-lock v2 stores version here too.
-			fileContents = this.setStringInJsonc(fileContents, ["packages", "", "version"], newVersion);
+			fileContents = this.#setStringInJsonc(fileContents, ["packages", "", "version"], newVersion);
 		}
 
 		writeFileSync(fileState.path, fileContents, "utf8");
 	}
 
-	public isSupportedFile(fileName: string): boolean {
+	isSupportedFile(fileName: string): boolean {
 		return fileName.endsWith(".json") || fileName.endsWith(".jsonc");
 	}
 }

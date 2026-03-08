@@ -1,8 +1,6 @@
-import { resolve } from "node:path";
+import { basename } from "node:path";
 import { readFileSync, writeFileSync } from "node:fs";
 
-import { fileExists } from "../utils/file-state";
-import type { ForkConfig } from "../config/types";
 import type { Logger } from "../services/logger";
 import type { FileState, IFileManager } from "./file-manager";
 
@@ -15,32 +13,32 @@ import type { FileState, IFileManager } from "./file-manager";
  * ```
  */
 export class PlainText implements IFileManager {
-	constructor(
-		private config: ForkConfig,
-		private logger: Logger,
-	) {}
+	#logger: Logger;
 
-	public read(fileName: string): FileState | undefined {
-		const filePath = resolve(this.config.path, fileName);
+	constructor(logger: Logger) {
+		this.#logger = logger;
+	}
 
-		if (fileExists(filePath)) {
-			const fileContents = readFileSync(filePath, "utf8");
+	read(filePath: string): FileState | undefined {
+		const fileName = basename(filePath);
+		const fileContents = readFileSync(filePath, "utf8").trim();
 
+		if (fileContents) {
 			return {
 				name: fileName,
 				path: filePath,
-				version: fileContents || "",
+				version: fileContents,
 			};
 		}
 
-		this.logger.warn(`[File Manager] Unable to determine plain text version: ${fileName}`);
+		this.#logger.warn(`[File Manager] Unable to determine plain text version: ${fileName}`);
 	}
 
-	public write(fileState: FileState, newVersion: string) {
+	write(fileState: FileState, newVersion: string) {
 		writeFileSync(fileState.path, newVersion, "utf8");
 	}
 
-	public isSupportedFile(fileName: string): boolean {
+	isSupportedFile(fileName: string): boolean {
 		return fileName.endsWith("version.txt");
 	}
 }

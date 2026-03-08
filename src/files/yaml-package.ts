@@ -1,9 +1,7 @@
-import { resolve } from "node:path";
+import { basename } from "node:path";
 import { readFileSync, writeFileSync } from "node:fs";
 import { parse, parseDocument } from "yaml";
 
-import { fileExists } from "../utils/file-state";
-import type { ForkConfig } from "../config/types";
 import type { Logger } from "../services/logger";
 import type { FileState, IFileManager } from "./file-manager";
 
@@ -20,17 +18,18 @@ import type { FileState, IFileManager } from "./file-manager";
  * ```
  */
 export class YAMLPackage implements IFileManager {
-	constructor(
-		private config: ForkConfig,
-		private logger: Logger,
-	) {}
+	#logger: Logger;
+
+	constructor(logger: Logger) {
+		this.#logger = logger;
+	}
 
 	/**
 	 * If the version is returned with a "+" symbol in the value then the version might be from a
 	 * flutter `pubspec.yaml` file, if so we want to retain the input builderNumber by splitting it
 	 * and joining it again later.
 	 */
-	private handleBuildNumber(fileVersion: string): {
+	#handleBuildNumber(fileVersion: string): {
 		version: string;
 		builderNumber?: string;
 	} {
@@ -49,29 +48,26 @@ export class YAMLPackage implements IFileManager {
 		};
 	}
 
-	public read(fileName: string): FileState | undefined {
-		const filePath = resolve(this.config.path, fileName);
+	read(filePath: string): FileState | undefined {
+		const fileName = basename(filePath);
+		const fileContents = readFileSync(filePath, "utf-8");
 
-		if (fileExists(filePath)) {
-			const fileContents = readFileSync(filePath, "utf-8");
+		const fileVersion = parse(fileContents)?.version;
+		if (fileVersion) {
+			const parsedVersion = this.#handleBuildNumber(fileVersion);
 
-			const fileVersion = parse(fileContents)?.version;
-			if (fileVersion) {
-				const parsedVersion = this.handleBuildNumber(fileVersion);
-
-				return {
-					name: fileName,
-					path: filePath,
-					version: parsedVersion.version || "",
-					builderNumber: parsedVersion.builderNumber ?? undefined,
-				};
-			}
+			return {
+				name: fileName,
+				path: filePath,
+				version: parsedVersion.version || "",
+				builderNumber: parsedVersion.builderNumber ?? undefined,
+			};
 		}
 
-		this.logger.warn(`[File Manager] Unable to determine yaml version: ${fileName}`);
+		this.#logger.warn(`[File Manager] Unable to determine yaml version: ${fileName}`);
 	}
 
-	public write(fileState: FileState, newVersion: string): void {
+	write(fileState: FileState, newVersion: string): void {
 		const fileContents = readFileSync(fileState.path, "utf8");
 		const yamlDocument = parseDocument(fileContents);
 
@@ -85,7 +81,7 @@ export class YAMLPackage implements IFileManager {
 		writeFileSync(fileState.path, yamlDocument.toString(), "utf8");
 	}
 
-	public isSupportedFile(fileName: string): boolean {
+	isSupportedFile(fileName: string): boolean {
 		return fileName.endsWith(".yaml") || fileName.endsWith(".yml");
 	}
 }

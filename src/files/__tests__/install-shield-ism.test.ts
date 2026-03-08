@@ -3,8 +3,8 @@ import { InstallShieldISM } from "../install-shield-ism";
 
 describe("files install-shield-ism", () => {
 	it("should read version from an InstallShield ISM file", async () => {
-		const { config, create, logger } = await setupTest("files install-shield-ism");
-		const fileManager = new InstallShieldISM(config, logger);
+		const { create, logger, relativeTo } = await setupTest("files install-shield-ism");
+		const fileManager = new InstallShieldISM(logger);
 
 		create.file(
 			`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
@@ -24,13 +24,13 @@ describe("files install-shield-ism", () => {
 			"setup.ism",
 		);
 
-		const file = fileManager.read("setup.ism");
+		const file = fileManager.read(relativeTo("setup.ism"));
 		expect(file?.version).toBe("1.2.3");
 	});
 
 	it("should log a message if unable to read version", async () => {
-		const { config, create, logger } = await setupTest("files install-shield-ism");
-		const fileManager = new InstallShieldISM(config, logger);
+		const { create, logger, relativeTo } = await setupTest("files install-shield-ism");
+		const fileManager = new InstallShieldISM(logger);
 
 		create.file(
 			`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
@@ -50,7 +50,7 @@ describe("files install-shield-ism", () => {
 			"setup.ism",
 		);
 
-		const file = fileManager.read("setup.ism");
+		const file = fileManager.read(relativeTo("setup.ism"));
 		expect(file).toBeUndefined();
 		expect(logger.warn).toBeCalledWith(
 			"[File Manager] Unable to determine InstallShield ISM version: setup.ism",
@@ -58,8 +58,8 @@ describe("files install-shield-ism", () => {
 	});
 
 	it("should write an InstallShield ISM file", async () => {
-		const { config, create, logger, relativeTo } = await setupTest("files install-shield-ism");
-		const fileManager = new InstallShieldISM(config, logger);
+		const { create, logger, relativeTo } = await setupTest("files install-shield-ism");
+		const fileManager = new InstallShieldISM(logger);
 
 		create.file(
 			`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
@@ -88,13 +88,13 @@ describe("files install-shield-ism", () => {
 			"4.5.6",
 		);
 
-		const file = fileManager.read("setup.ism");
+		const file = fileManager.read(relativeTo("setup.ism"));
 		expect(file?.version).toBe("4.5.6");
 	});
 
 	it("should match supported files correctly", async () => {
-		const { config, logger } = await setupTest("files install-shield-ism");
-		const fileManager = new InstallShieldISM(config, logger);
+		const { logger } = await setupTest("files install-shield-ism");
+		const fileManager = new InstallShieldISM(logger);
 
 		expect(fileManager.isSupportedFile("setup.ism")).toBe(true);
 		expect(fileManager.isSupportedFile("setup.msi")).toBe(false);

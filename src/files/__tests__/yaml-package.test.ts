@@ -3,8 +3,8 @@ import { YAMLPackage } from "../yaml-package";
 
 describe("files yaml-package", () => {
 	it("should read a flutter pubspec.yaml file", async () => {
-		const { config, create, logger } = await setupTest("files yaml-package");
-		const fileManager = new YAMLPackage(config, logger);
+		const { create, logger, relativeTo } = await setupTest("files yaml-package");
+		const fileManager = new YAMLPackage(logger);
 
 		create.file(
 			`name: wordionary
@@ -18,14 +18,14 @@ environment:
 			"pubspec.yaml",
 		);
 
-		const file = fileManager.read("pubspec.yaml");
+		const file = fileManager.read(relativeTo("pubspec.yaml"));
 		expect(file?.version).toBe("1.2.3");
 		expect(file?.builderNumber).toBe("55");
 	});
 
 	it("should read a regular yaml file", async () => {
-		const { config, create, logger } = await setupTest("files yaml-package");
-		const fileManager = new YAMLPackage(config, logger);
+		const { create, logger, relativeTo } = await setupTest("files yaml-package");
+		const fileManager = new YAMLPackage(logger);
 
 		create.file(
 			`name: My Project
@@ -34,14 +34,14 @@ version: 1.2.3 # Comment about the version number
 			"my-project.yaml",
 		);
 
-		const file = fileManager.read("my-project.yaml");
+		const file = fileManager.read(relativeTo("my-project.yaml"));
 		expect(file?.version).toBe("1.2.3");
 		expect(file?.builderNumber).toBeUndefined();
 	});
 
 	it("should log a message if unable to read version", async () => {
-		const { config, create, logger } = await setupTest("files yaml-package");
-		const fileManager = new YAMLPackage(config, logger);
+		const { create, logger, relativeTo } = await setupTest("files yaml-package");
+		const fileManager = new YAMLPackage(logger);
 
 		create.file(
 			`name: wordionary
@@ -53,14 +53,14 @@ environment:
 			"pubspec.yaml",
 		);
 
-		const file = fileManager.read("pubspec.yaml");
+		const file = fileManager.read(relativeTo("pubspec.yaml"));
 		expect(file?.version).toBeUndefined();
 		expect(file?.builderNumber).toBeUndefined();
 	});
 
 	it("should write a flutter pubspec.yaml file", async () => {
-		const { config, create, logger, relativeTo } = await setupTest("files yaml-package");
-		const fileManager = new YAMLPackage(config, logger);
+		const { create, logger, relativeTo } = await setupTest("files yaml-package");
+		const fileManager = new YAMLPackage(logger);
 
 		create.file(
 			`name: wordionary
@@ -89,8 +89,8 @@ environment:
 	});
 
 	it("should write a regular yaml file", async () => {
-		const { config, create, logger, relativeTo } = await setupTest("files yaml-package");
-		const fileManager = new YAMLPackage(config, logger);
+		const { create, logger, relativeTo } = await setupTest("files yaml-package");
+		const fileManager = new YAMLPackage(logger);
 
 		create.file(
 			`name: My Project
@@ -115,8 +115,8 @@ version: 1.2.3 # Comment about the version number
 	});
 
 	it("should match known yaml files", async () => {
-		const { config, logger } = await setupTest("files yaml-package");
-		const fileManager = new YAMLPackage(config, logger);
+		const { logger } = await setupTest("files yaml-package");
+		const fileManager = new YAMLPackage(logger);
 
 		// Supported
 		expect(fileManager.isSupportedFile("pubspec.yaml")).toBe(true);

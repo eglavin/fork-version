@@ -5,42 +5,33 @@ import { PlainText } from "../plain-text";
 
 describe("files plain-text", () => {
 	it("should be able to read version from version.txt file", async () => {
-		const { config, create, logger } = await setupTest("files plain-text");
-		const fileManager = new PlainText(config, logger);
+		const { create, logger, relativeTo } = await setupTest("files plain-text");
+		const fileManager = new PlainText(logger);
 
 		create.file("1.2.3", "version.txt");
 
-		const file = fileManager.read("version.txt");
+		const file = fileManager.read(relativeTo("version.txt"));
 
 		expect(file?.version).toBe("1.2.3");
 	});
 
-	it('should log a warning when "version.txt" file is not found', async () => {
-		const { config, logger } = await setupTest("files plain-text");
-		const fileManager = new PlainText(config, logger);
-
-		const file = fileManager.read("version.txt");
-
-		expect(file).toBeUndefined();
-		expect(logger.warn).toHaveBeenCalledWith(
-			"[File Manager] Unable to determine plain text version: version.txt",
-		);
-	});
-
-	it("should return empty string when version.txt is empty", async () => {
-		const { config, create, logger, relativeTo } = await setupTest("files plain-text");
-		const fileManager = new PlainText(config, logger);
+	it("should return undefined when version.txt is empty", async () => {
+		const { create, logger, relativeTo } = await setupTest("files plain-text");
+		const fileManager = new PlainText(logger);
 
 		create.file("", "version.txt");
 
 		const file = fileManager.read(relativeTo("version.txt"));
 
-		expect(file?.version).toBe("");
+		expect(file?.version).toBe(undefined);
+		expect(logger.warn).toHaveBeenCalledWith(
+			"[File Manager] Unable to determine plain text version: version.txt",
+		);
 	});
 
 	it("should be able to write version to version.txt file", async () => {
-		const { config, create, logger, relativeTo } = await setupTest("files plain-text");
-		const fileManager = new PlainText(config, logger);
+		const { create, logger, relativeTo } = await setupTest("files plain-text");
+		const fileManager = new PlainText(logger);
 
 		create.file("1.2.3", "version.txt");
 
@@ -58,8 +49,8 @@ describe("files plain-text", () => {
 	});
 
 	it('should match "version.txt" file name', async () => {
-		const { config, logger } = await setupTest("files plain-text");
-		const fileManager = new PlainText(config, logger);
+		const { logger } = await setupTest("files plain-text");
+		const fileManager = new PlainText(logger);
 
 		// Supported
 		expect(fileManager.isSupportedFile("version.txt")).toBe(true);

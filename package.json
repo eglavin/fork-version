@@ -35,29 +35,17 @@
   },
   "private": false,
   "type": "module",
-  "main": "dist/index.cjs",
+  "main": "dist/index.js",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
     ".": {
-      "import": {
-        "types": "./dist/index.d.ts",
-        "default": "./dist/index.js"
-      },
-      "require": {
-        "types": "./dist/index.d.cts",
-        "default": "./dist/index.cjs"
-      }
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
     },
     "./cli": {
-      "import": {
-        "types": "./dist/cli.d.ts",
-        "default": "./dist/cli.js"
-      },
-      "require": {
-        "types": "./dist/cli.d.cts",
-        "default": "./dist/cli.cjs"
-      }
+      "types": "./dist/cli.d.ts",
+      "default": "./dist/cli.js"
     },
     "./package.json": "./package.json"
   },
@@ -71,8 +59,8 @@
   ],
   "scripts": {
     "fork-version": "node dist/cli.js",
-    "dev": "tsup --watch",
-    "build": "tsup",
+    "dev": "vite build --watch",
+    "build": "vite build",
     "update-json-schema": "node scripts/update-json-schema.js",
     "update-readme-cli-options": "node scripts/update-readme-cli-options.js",
     "lint": "eslint --fix \"src/**/*.{js,ts}\"",
@@ -112,9 +100,10 @@
     "globals": "17.4.0",
     "prettier": "3.8.1",
     "rimraf": "6.1.3",
-    "tsup": "8.5.1",
     "typescript": "5.9.3",
     "typescript-eslint": "8.56.1",
+    "vite": "7.3.1",
+    "vite-plugin-dts": "4.5.4",
     "vitest": "4.0.18"
   }
 }

@@ -3,7 +3,7 @@ import { glob } from "node:fs/promises";
 
 import { getChangelogPresetConfig } from "./changelog-preset-config";
 import { DEFAULT_CONFIG } from "./defaults";
-import { detectGitHost } from "./detect-git-host";
+import { detectGitHost } from "../detect-git-host/detect-git-host";
 import { loadConfigFile } from "./load-config";
 import { mergeFiles } from "./merge-files";
 import type { ForkVersionCLIArgs, ForkConfig } from "./types";

@@ -41,7 +41,7 @@ export async function getUserConfig(cliArguments: ForkVersionCLIArgs): Promise<F
 	const changelogPresetConfig = getChangelogPresetConfig(
 		mergedConfig,
 		cliArguments.flags,
-		detectedGitHost,
+		detectedGitHost?.changelogOptions,
 	);
 
 	let command: ForkConfig["command"] = DEFAULT_CONFIG.command;
@@ -70,5 +70,9 @@ export async function getUserConfig(cliArguments: ForkVersionCLIArgs): Promise<F
 			cliArguments.flags.preReleaseTag ?? cliArguments.flags.preRelease ?? configFile.preRelease,
 		silent: shouldBeSilent || mergedConfig.silent,
 		changelogPresetConfig,
+		commitParserOptions: {
+			...detectedGitHost?.commitParserOptions,
+			...mergedConfig.commitParserOptions,
+		},
 	};
 }

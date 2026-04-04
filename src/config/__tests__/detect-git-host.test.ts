@@ -14,14 +14,21 @@ describe("detect-git-host", () => {
 
 		const gitHost = await detectGitHost(testFolder);
 
-		expect(gitHost?.detectedGitHost).toBe("Azure");
-		expect(gitHost?.commitUrlFormat).toBe(
+		expect(gitHost?.host).toBe("Azure");
+		expect(gitHost?.changelogOptions.commitUrlFormat).toBe(
 			"{{host}}/ORGANISATION/PROJECT/_git/REPOSITORY/commit/{{hash}}",
 		);
-		expect(gitHost?.compareUrlFormat).toBe(
+		expect(gitHost?.changelogOptions.compareUrlFormat).toBe(
 			"{{host}}/ORGANISATION/PROJECT/_git/REPOSITORY/branchCompare?baseVersion=GT{{previousTag}}&targetVersion=GT{{currentTag}}",
 		);
-		expect(gitHost?.issueUrlFormat).toBe("{{host}}/ORGANISATION/PROJECT/_workitems/edit/{{id}}");
+		expect(gitHost?.changelogOptions.issueUrlFormat).toBe(
+			"{{host}}/ORGANISATION/PROJECT/_workitems/edit/{{id}}",
+		);
+
+		expect(gitHost?.commitParserOptions?.mergePattern).toBeDefined();
+		const parsed = gitHost?.commitParserOptions?.mergePattern?.exec("Merged PR 123: some-branch");
+		expect(parsed?.groups?.id).toBe("123");
+		expect(parsed?.groups?.source).toBe("some-branch");
 	});
 
 	it("should detect a ssh azure git host", async () => {
@@ -36,14 +43,21 @@ describe("detect-git-host", () => {
 
 		const gitHost = await detectGitHost(testFolder);
 
-		expect(gitHost?.detectedGitHost).toBe("Azure");
-		expect(gitHost?.commitUrlFormat).toBe(
+		expect(gitHost?.host).toBe("Azure");
+		expect(gitHost?.changelogOptions.commitUrlFormat).toBe(
 			"{{host}}/ORGANISATION/PROJECT/_git/REPOSITORY/commit/{{hash}}",
 		);
-		expect(gitHost?.compareUrlFormat).toBe(
+		expect(gitHost?.changelogOptions.compareUrlFormat).toBe(
 			"{{host}}/ORGANISATION/PROJECT/_git/REPOSITORY/branchCompare?baseVersion=GT{{previousTag}}&targetVersion=GT{{currentTag}}",
 		);
-		expect(gitHost?.issueUrlFormat).toBe("{{host}}/ORGANISATION/PROJECT/_workitems/edit/{{id}}");
+		expect(gitHost?.changelogOptions.issueUrlFormat).toBe(
+			"{{host}}/ORGANISATION/PROJECT/_workitems/edit/{{id}}",
+		);
+
+		expect(gitHost?.commitParserOptions?.mergePattern).toBeDefined();
+		const parsed = gitHost?.commitParserOptions?.mergePattern?.exec("Merged PR 123: some-branch");
+		expect(parsed?.groups?.id).toBe("123");
+		expect(parsed?.groups?.source).toBe("some-branch");
 	});
 
 	it("should not throw when no remote defined", async () => {

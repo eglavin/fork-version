@@ -1,10 +1,10 @@
 import { Git } from "../services/git";
+import type { ForkConfig } from "./types";
 
 export interface DetectedGitHost {
-	detectedGitHost: string;
-	commitUrlFormat: string;
-	compareUrlFormat: string;
-	issueUrlFormat: string;
+	host: string;
+	changelogOptions: ForkConfig["changelogPresetConfig"];
+	commitParserOptions: ForkConfig["commitParserOptions"];
 }
 
 /**
@@ -40,10 +40,15 @@ export async function detectGitHost(path: string): Promise<DetectedGitHost | nul
 			const { organisation = "", project = "", repository = "" } = match.groups;
 
 			return {
-				detectedGitHost: "Azure",
-				commitUrlFormat: `{{host}}/${organisation}/${project}/_git/${repository}/commit/{{hash}}`,
-				compareUrlFormat: `{{host}}/${organisation}/${project}/_git/${repository}/branchCompare?baseVersion=GT{{previousTag}}&targetVersion=GT{{currentTag}}`,
-				issueUrlFormat: `{{host}}/${organisation}/${project}/_workitems/edit/{{id}}`,
+				host: "Azure",
+				changelogOptions: {
+					commitUrlFormat: `{{host}}/${organisation}/${project}/_git/${repository}/commit/{{hash}}`,
+					compareUrlFormat: `{{host}}/${organisation}/${project}/_git/${repository}/branchCompare?baseVersion=GT{{previousTag}}&targetVersion=GT{{currentTag}}`,
+					issueUrlFormat: `{{host}}/${organisation}/${project}/_workitems/edit/{{id}}`,
+				},
+				commitParserOptions: {
+					mergePattern: /^Merged PR (?<id>\d+): (?<source>.*?)\s*$/i,
+				},
 			};
 		}
 	} else if (remoteUrl.startsWith("git@ssh.dev.azure.com:")) {
@@ -59,10 +64,15 @@ export async function detectGitHost(path: string): Promise<DetectedGitHost | nul
 			const { organisation = "", project = "", repository = "" } = match.groups;
 
 			return {
-				detectedGitHost: "Azure",
-				commitUrlFormat: `{{host}}/${organisation}/${project}/_git/${repository}/commit/{{hash}}`,
-				compareUrlFormat: `{{host}}/${organisation}/${project}/_git/${repository}/branchCompare?baseVersion=GT{{previousTag}}&targetVersion=GT{{currentTag}}`,
-				issueUrlFormat: `{{host}}/${organisation}/${project}/_workitems/edit/{{id}}`,
+				host: "Azure",
+				changelogOptions: {
+					commitUrlFormat: `{{host}}/${organisation}/${project}/_git/${repository}/commit/{{hash}}`,
+					compareUrlFormat: `{{host}}/${organisation}/${project}/_git/${repository}/branchCompare?baseVersion=GT{{previousTag}}&targetVersion=GT{{currentTag}}`,
+					issueUrlFormat: `{{host}}/${organisation}/${project}/_workitems/edit/{{id}}`,
+				},
+				commitParserOptions: {
+					mergePattern: /^Merged PR (?<id>\d+): (?<source>.*?)\s*$/i,
+				},
 			};
 		}
 	}

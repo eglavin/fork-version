@@ -1,48 +1,44 @@
+import type { DetectedGitHost } from "./detect-git-host";
+
 /**
- * A checked out Azure DevOps remote URL looks like one of these:
+ * A checked out Azure Devops remote URL looks like one of these:
  *
  * | Checkout Type | Remote URL                                                                                |
- * | ------------- | ----------------------------------------------------------------------------------------- |
+ * |:------------- |:----------------------------------------------------------------------------------------- |
  * | HTTPS         | `https://{{ORGANISATION}}@dev.azure.com/{{ORGANISATION}}/{{PROJECT}}/_git/{{REPOSITORY}}` |
  * | SSH           | `git@ssh.dev.azure.com:v3/{{ORGANISATION}}/{{PROJECT}}/{{REPOSITORY}}`                    |
  */
-export function detectAzureDevopsOptions(remoteUrl: string) {
-	if (remoteUrl.startsWith("https://") && remoteUrl.includes("@dev.azure.com/")) {
-		/**
-		 * [Regex101.com](https://regex101.com/r/fF7HUc/1)
-		 */
-		const match =
-			/^https:\/\/(?<atorganisation>.*?)@dev.azure.com\/(?<organisation>.*?)\/(?<project>.*?)\/_git\/(?<repository>.*?)(?:\.git)?$/.exec(
+export function detectAzureDevopsOptions(remoteUrl: string): DetectedGitHost | undefined {
+	let matches: RegExpExecArray | null = null;
+
+	if (/^https:\/\/(.*)?dev\.azure\.com/.test(remoteUrl)) {
+		// [Regex101.com](https://regex101.com/r/fF7HUc/1)
+		matches =
+			/^https:\/\/(.*)?dev\.azure\.com\/(?<organisation>.*?)\/(?<project>.*?)\/_git\/(?<repository>.*?)(?:\.git)?$/.exec(
 				remoteUrl,
 			);
-
-		if (match?.groups) {
-			const { organisation = "", project = "", repository = "" } = match.groups;
-
-			return {
-				organisation,
-				project,
-				repository,
-			};
-		}
 	} else if (remoteUrl.startsWith("git@ssh.dev.azure.com:")) {
-		/**
-		 * [Regex101.com](https://regex101.com/r/VhNxWr/1)
-		 */
-		const match =
-			/^git@ssh.dev.azure.com:v\d\/(?<organisation>.*?)\/(?<project>.*?)\/(?<repository>.*?)(?:\.git)?$/.exec(
+		// [Regex101.com](https://regex101.com/r/VhNxWr/1)
+		matches =
+			/^git@ssh\.dev\.azure\.com:v\d\/(?<organisation>.*?)\/(?<project>.*?)\/(?<repository>.*?)(?:\.git)?$/.exec(
 				remoteUrl,
 			);
+	}
 
-		if (match?.groups) {
-			const { organisation = "", project = "", repository = "" } = match.groups;
+	if (matches?.groups) {
+		const { organisation = "", project = "", repository = "" } = matches.groups;
 
-			return {
-				organisation,
-				project,
-				repository,
-			};
-		}
+		return {
+			hostName: "Azure Devops",
+			changelogOptions: {
+				commitUrlFormat: `https://dev.azure.com/${organisation}/${project}/_git/${repository}/commit/{{hash}}`,
+				compareUrlFormat: `https://dev.azure.com/${organisation}/${project}/_git/${repository}/branchCompare?baseVersion=GT{{previousTag}}&targetVersion=GT{{currentTag}}`,
+				issueUrlFormat: `https://dev.azure.com/${organisation}/${project}/_workitems/edit/{{id}}`,
+			},
+			commitParserOptions: {
+				mergePattern: /^Merged PR (?<id>\d*): (?<source>.*)/i,
+			},
+		};
 	}
 
 	return undefined;

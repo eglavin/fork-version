@@ -1,6 +1,9 @@
 import { Git } from "../services/git";
 import type { ForkConfig } from "../config/types";
 
+import { detectGitHubOptions } from "./host-github";
+import { detectGitlabOptions } from "./host-gitlab";
+import { detectBitbucketOptions } from "./host-bitbucket";
 import { detectAzureDevopsOptions } from "./host-azure-devops";
 
 export interface DetectedGitHost {
@@ -10,34 +13,43 @@ export interface DetectedGitHost {
 }
 
 /**
- * Conventional-Changelog already supports the following git hosts:
- * - Github
- * - Gitlab
- * - Bitbucket
+ * Detects the Git hosting service based on the remote URL of the Git repository at the given path.
  *
- * We want to detect if the user is using another host such as Azure DevOps,
- * if so we need to create the correct URLs so the changelog is generated
- * correctly.
+ * Supports `GitHub`, `GitLab`, `Bitbucket`, and `Azure DevOps`.
+ *
+ * @param path - The file system path to the Git repository.
+ * @returns A promise that resolves to a DetectedGitHost object if a supported host is detected, or undefined if no supported host is found.
  */
-export async function detectGitHost(path: string): Promise<DetectedGitHost | null> {
+export async function detectGitHost(path: string): Promise<DetectedGitHost | undefined> {
 	const remoteUrl = await new Git({ path }).getRemoteUrl();
 
-	const azureDevopsOptions = detectAzureDevopsOptions(remoteUrl);
-	if (azureDevopsOptions) {
-		const { organisation, project, repository } = azureDevopsOptions;
-
-		return {
-			hostName: "Azure Devops",
-			changelogOptions: {
-				commitUrlFormat: `{{host}}/${organisation}/${project}/_git/${repository}/commit/{{hash}}`,
-				compareUrlFormat: `{{host}}/${organisation}/${project}/_git/${repository}/branchCompare?baseVersion=GT{{previousTag}}&targetVersion=GT{{currentTag}}`,
-				issueUrlFormat: `{{host}}/${organisation}/${project}/_workitems/edit/{{id}}`,
-			},
-			commitParserOptions: {
-				mergePattern: /^Merged PR (?<id>\d+): (?<source>.*?)\s*$/i,
-			},
-		};
+	if (remoteUrl.includes("github.com")) {
+		const githubOptions = detectGitHubOptions(remoteUrl);
+		if (githubOptions) {
+			return githubOptions;
+		}
 	}
 
-	return null;
+	if (remoteUrl.includes("gitlab.com")) {
+		const gitlabOptions = detectGitlabOptions(remoteUrl);
+		if (gitlabOptions) {
+			return gitlabOptions;
+		}
+	}
+
+	if (/bitbucket\.(org|com)/.test(remoteUrl)) {
+		const bitbucketOptions = detectBitbucketOptions(remoteUrl);
+		if (bitbucketOptions) {
+			return bitbucketOptions;
+		}
+	}
+
+	if (remoteUrl.includes("dev.azure.com")) {
+		const azureDevopsOptions = detectAzureDevopsOptions(remoteUrl);
+		if (azureDevopsOptions) {
+			return azureDevopsOptions;
+		}
+	}
+
+	return undefined;
 }

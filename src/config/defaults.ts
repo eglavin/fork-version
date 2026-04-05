@@ -41,6 +41,4 @@ All notable changes to this project will be documented in this file. See [fork-v
 	skipChangelog: false,
 	skipCommit: false,
 	skipTag: false,
-
-	changelogPresetConfig: {},
 };

@@ -38,11 +38,6 @@ export async function getUserConfig(cliArguments: ForkVersionCLIArgs): Promise<F
 
 	const files = mergeFiles(configFile?.files, cliArguments.flags.files, globResults);
 	const detectedGitHost = await detectGitHost(cwd);
-	const changelogPresetConfig = getChangelogPresetConfig(
-		mergedConfig,
-		cliArguments.flags,
-		detectedGitHost?.changelogOptions,
-	);
 
 	let command: ForkConfig["command"] = DEFAULT_CONFIG.command;
 	if (cliArguments.input.length > 0 && cliArguments.input[0].trim()) {
@@ -69,7 +64,13 @@ export async function getUserConfig(cliArguments: ForkVersionCLIArgs): Promise<F
 			// Meow doesn't support multiple flags with the same name, so we need to check both.
 			cliArguments.flags.preReleaseTag ?? cliArguments.flags.preRelease ?? configFile.preRelease,
 		silent: shouldBeSilent || mergedConfig.silent,
-		changelogPresetConfig,
+
+		detectedGitHost: detectedGitHost?.hostName,
+		changelogPresetConfig: getChangelogPresetConfig(
+			mergedConfig,
+			cliArguments.flags,
+			detectedGitHost?.changelogOptions,
+		),
 		commitParserOptions: {
 			...detectedGitHost?.commitParserOptions,
 			...mergedConfig.commitParserOptions,

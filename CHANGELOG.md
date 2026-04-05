@@ -1,5 +1,14 @@
 # Fork Version
 
+## [4.1.9](https://github.com/eglavin/fork-version/compare/v4.1.8...v4.1.9) (2026-04-05)
+
+
+### Chore
+
+* bump yaml and esbuild + dev depens ([8318472](https://github.com/eglavin/fork-version/commit/8318472108d209a3f19b12f2130c3eaa392486c1))
+* downgrade typescript due to tsup compatibility issue ([4e245c0](https://github.com/eglavin/fork-version/commit/4e245c00a9316154aac33ef71e4517cb69aa9274))
+
+
 ## [4.1.8](https://github.com/eglavin/fork-version/compare/v4.1.7...v4.1.8) (2026-04-05)
 
 

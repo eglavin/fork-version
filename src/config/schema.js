@@ -276,10 +276,10 @@ export const ForkConfigSchema = z.object({
 	 */
 	verify: z.boolean().describe("If true, git will run user defined git hooks before committing."),
 	/**
-	 * Output result as JSON.
+	 * Print inspected output as a parsable json string.
 	 * @default false
 	 */
-	asJson: z.boolean().describe("Output the result as JSON."),
+	asJson: z.boolean().describe("Print inspected output as a parsable json string."),
 
 	// Skip Steps
 	//
@@ -341,8 +341,5 @@ export const ForkConfigSchema = z.object({
 	/**
 	 * Options to pass to commits parser.
 	 */
-	commitParserOptions: z
-		.looseObject()
-		.optional()
-		.describe("Options to pass to conventional-commits-parser."),
+	commitParserOptions: z.looseObject().optional().describe("Options to pass to commits parser."),
 });

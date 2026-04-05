@@ -1,5 +1,21 @@
 # Fork Version
 
+## [4.1.8](https://github.com/eglavin/fork-version/compare/v4.1.7...v4.1.8) (2026-04-05)
+
+
+### Docs
+
+* update readme with details on commit parser options ([9a8ba6d](https://github.com/eglavin/fork-version/commit/9a8ba6de3dcccfdb1ae62d12792ffc39122342cd))
+
+
+### Refactor
+
+* add detected git host name to schema ([9728a1e](https://github.com/eglavin/fork-version/commit/9728a1efb813436adef0358310ce24469e36f311))
+* extract detect git host to allow expanding options ([b330727](https://github.com/eglavin/fork-version/commit/b330727d4f9d5dfafae5796c20ff57834e56de49))
+* improve git host detection ([d231e6c](https://github.com/eglavin/fork-version/commit/d231e6ca1bf389869602577f843fbf996e3587e3))
+* set commit parser options from detected git host ([840584f](https://github.com/eglavin/fork-version/commit/840584fefc94868457cf3c77979a795133219d64))
+
+
 ## [4.1.7](https://github.com/eglavin/fork-version/compare/v4.1.6...v4.1.7) (2026-03-08)
 
 

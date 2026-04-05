@@ -17,7 +17,7 @@ export async function getCommitsSinceTag(
 	logger: Logger,
 	git: Git,
 ): Promise<CommitsSinceTag> {
-	const commitParser = new CommitParser();
+	const commitParser = new CommitParser(config.commitParserOptions);
 	if (config.debug) commitParser.setLogger(logger);
 
 	const latestTag = await git.getMostRecentTag(config.tagPrefix);

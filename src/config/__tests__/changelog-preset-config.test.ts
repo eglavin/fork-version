@@ -2,7 +2,7 @@ import { getChangelogPresetConfig } from "../changelog-preset-config";
 
 describe("changelog-preset-config", () => {
 	it("should return the default config", () => {
-		const config = getChangelogPresetConfig({}, {} as never, null);
+		const config = getChangelogPresetConfig({}, {} as never, undefined);
 
 		expect(config).toStrictEqual({
 			commitUrlFormat: "{{host}}/{{owner}}/{{repository}}/commit/{{hash}}",
@@ -69,7 +69,7 @@ describe("changelog-preset-config", () => {
 				},
 			},
 			{} as never,
-			null,
+			undefined,
 		);
 
 		expect(config).toStrictEqual({
@@ -109,7 +109,7 @@ describe("changelog-preset-config", () => {
 				userUrlFormat: "{{host}}/fork-version/user/{{user}}",
 				releaseCommitMessageFormat: "chore(release): {{currentTag}} [skip ci]",
 			} as never,
-			null,
+			undefined,
 		);
 
 		expect(config.commitUrlFormat).toBe("{{host}}/fork-version/commit/{{hash}}");
@@ -127,7 +127,7 @@ describe("changelog-preset-config", () => {
 				releaseMessageSuffix: "[skip ci]",
 			},
 			{} as never,
-			null,
+			undefined,
 		);
 
 		expect(config.releaseCommitMessageFormat).toBe("chore(release): {{currentTag}} [skip ci]");
@@ -139,7 +139,7 @@ describe("changelog-preset-config", () => {
 			{
 				releaseMessageSuffix: "[no ci]",
 			} as never,
-			null,
+			undefined,
 		);
 
 		expect(config.releaseCommitMessageFormat).toBe("chore(release): {{currentTag}} [no ci]");
@@ -147,7 +147,6 @@ describe("changelog-preset-config", () => {
 
 	it("should be able to detect the git host", () => {
 		const config = getChangelogPresetConfig({}, {} as never, {
-			detectedGitHost: "Azure",
 			commitUrlFormat:
 				"{{host}}/ORGANISATION/PROJECT/_git/REPOSITORY/branchCompare?baseVersion=GT{{previousTag}}&targetVersion=GT{{currentTag}}",
 			compareUrlFormat: "{{host}}/ORGANISATION/PROJECT/_git/REPOSITORY/commit/{{hash}}",
@@ -175,7 +174,6 @@ describe("changelog-preset-config", () => {
 					"{{host}}/fork-version/branchCompare?baseVersion=GT{{previousTag}}&targetVersion=GT{{currentTag}}",
 			} as never,
 			{
-				detectedGitHost: "Azure",
 				commitUrlFormat:
 					"{{host}}/ORGANISATION/PROJECT/_git/REPOSITORY/branchCompare?baseVersion=GT{{previousTag}}&targetVersion=GT{{currentTag}}",
 				compareUrlFormat: "{{host}}/ORGANISATION/PROJECT/_git/REPOSITORY/commit/{{hash}}",
@@ -191,7 +189,7 @@ describe("changelog-preset-config", () => {
 	});
 
 	it("should not change log all if not set", () => {
-		const config = getChangelogPresetConfig({}, {} as never, null);
+		const config = getChangelogPresetConfig({}, {} as never, undefined);
 
 		expect(config.types).toStrictEqual([
 			{
@@ -235,7 +233,7 @@ describe("changelog-preset-config", () => {
 				changelogAll: true,
 			},
 			{} as never,
-			null,
+			undefined,
 		);
 
 		expect(config.types).toStrictEqual([

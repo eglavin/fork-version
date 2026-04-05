@@ -314,12 +314,14 @@ Alternatively you can define your config using a key in your `package.json` file
 | gitTagFallback                                        | boolean          | true                    | If unable to find a version in the given files, fallback and attempt to use the latest git tag                      |
 | sign                                                  | boolean          | false                   | Sign the commit with the systems GPG key                                                                            |
 | verify                                                | boolean          | false                   | Run user defined git hooks before committing                                                                        |
+| asJson                                                | boolean          | false                   | Print inspected output as a parsable json string                                                                    |
 | skipBump                                              | boolean          | false                   | Skip the bump step                                                                                                  |
 | skipChangelog                                         | boolean          | false                   | Skip the changelog step                                                                                             |
 | skipCommit                                            | boolean          | false                   | Skip the commit step                                                                                                |
 | skipTag                                               | boolean          | false                   | Skip the tag step                                                                                                   |
 | [changelogPresetConfig](#configchangelogpresetconfig) | object           | {}                      | Override defaults from the "conventional-changelog-conventionalcommits" preset configuration                        |
 | releaseMessageSuffix                                  | string           | -                       | Add a suffix to the end of the release message                                                                      |
+| [commitParserOptions](#configcommitparseroptions)     | object           | {}                      | Options to pass to commits parser                                                                                   |
 
 ##### config.files
 
@@ -429,6 +431,35 @@ Adds a suffix to the end of the release message, useful to add a `[skip ci]` mes
 
 - [GitHub Actions - Skipping workflow runs](https://docs.github.com/en/actions/managing-workflow-runs/skipping-workflow-runs)
 - [Azure Devops - Skipping CI for individual pushes](https://learn.microsoft.com/en-us/azure/devops/pipelines/repos/azure-repos-git?view=azure-devops&tabs=yaml#skipping-ci-for-individual-pushes)
+
+##### config.commitParserOptions
+
+The commit parser options allow you to configure the regex patterns used to parse commits. This is useful if your team has a specific commit message format that doesn't match the default conventional commit format.
+
+| Property               | Type           | Description                                       |
+| :--------------------- | :------------- | :------------------------------------------------ |
+| subjectPattern         | Regex          | Pattern to match commit subjects                  |
+| mergePattern           | Regex          | Pattern to match merge commits                    |
+| revertPattern          | Regex          | Pattern to match revert commits                   |
+| commentPattern         | Regex          | Pattern to match commented out lines              |
+| mentionPattern         | Regex          | Pattern to match mentions                         |
+| referenceActions       | Array\<string> | List of action labels to match reference sections |
+| referenceActionPattern | Regex          | Pattern to match reference sections               |
+| issuePrefixes          | Array\<string> | List of issue prefixes to match issue ids         |
+| issuePattern           | Regex          | Pattern to match issue references                 |
+| noteKeywords           | Array\<string> | List of keywords to match note titles             |
+| notePattern            | Regex          | Pattern to match note sections                    |
+
+[View the commit parser options to see the default patterns used.](./src/commit-parser/options.ts)
+
+If you are using one of the following Git hosts, Fork-Version will automatically use the correct commit parser options for that host:
+
+- GitHub
+- GitLab
+- BitBucket
+- Azure DevOps
+
+[View the `detect-git-host` function to see how Fork-Version detects the git host.](./src/detect-git-host/detect-git-host.ts)
 
 ### Supported File Types
 

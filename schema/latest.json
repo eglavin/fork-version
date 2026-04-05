@@ -136,7 +136,12 @@
       "type": "boolean",
       "description": "Skip the tag step."
     },
+    "detectedGitHost": {
+      "description": "The detected git host, such as GitHub, GitLab, Bitbucket, Azure Devops, or undefined if unknown or not detected.",
+      "type": "string"
+    },
     "changelogPresetConfig": {
+      "description": "Override the default \"conventional-changelog-conventionalcommits\" preset configuration.",
       "type": "object",
       "properties": {
         "types": {
@@ -196,12 +201,17 @@
           "description": "List of prefixes used to detect references to issues."
         }
       },
-      "additionalProperties": false,
-      "description": "Override the default \"conventional-changelog-conventionalcommits\" preset configuration."
+      "additionalProperties": false
     },
     "releaseMessageSuffix": {
       "description": "Add a suffix to the release commit message.",
       "type": "string"
+    },
+    "commitParserOptions": {
+      "description": "Options to pass to conventional-commits-parser.",
+      "type": "object",
+      "properties": {},
+      "additionalProperties": {}
     }
   },
   "required": [],

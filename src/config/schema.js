@@ -276,10 +276,10 @@ export const ForkConfigSchema = z.object({
 	 */
 	verify: z.boolean().describe("If true, git will run user defined git hooks before committing."),
 	/**
-	 * Output result as JSON.
+	 * Print inspected output as a parsable json string.
 	 * @default false
 	 */
-	asJson: z.boolean().describe("Output the result as JSON."),
+	asJson: z.boolean().describe("Print inspected output as a parsable json string."),
 
 	// Skip Steps
 	//
@@ -305,13 +305,31 @@ export const ForkConfigSchema = z.object({
 	 */
 	skipTag: z.boolean().describe("Skip the tag step."),
 
+	// Parser Options
+	//
+
+	/**
+	 * The detected git host:
+	 * - `GitHub`
+	 * - `GitLab`
+	 * - `Bitbucket`
+	 * - `Azure Devops`
+	 * - Or undefined if unknown or not detected.
+	 */
+	detectedGitHost: z
+		.string()
+		.optional()
+		.describe(
+			"The detected git host, such as GitHub, GitLab, Bitbucket, Azure Devops, or undefined if unknown or not detected.",
+		),
 	/**
 	 * Override the default "conventional-changelog-conventionalcommits" preset configuration.
 	 */
-	changelogPresetConfig: ChangelogPresetConfigSchema.partial().describe(
-		'Override the default "conventional-changelog-conventionalcommits" preset configuration.',
-	),
-
+	changelogPresetConfig: ChangelogPresetConfigSchema.partial()
+		.optional()
+		.describe(
+			'Override the default "conventional-changelog-conventionalcommits" preset configuration.',
+		),
 	/**
 	 * Add a suffix to the release commit message.
 	 * @example "[skip ci]"
@@ -320,4 +338,8 @@ export const ForkConfigSchema = z.object({
 		.string()
 		.optional()
 		.describe("Add a suffix to the release commit message."),
+	/**
+	 * Options to pass to commits parser.
+	 */
+	commitParserOptions: z.looseObject().optional().describe("Options to pass to commits parser."),
 });

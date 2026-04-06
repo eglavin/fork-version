@@ -1,5 +1,13 @@
 # Fork Version
 
+## [4.1.10](https://github.com/eglavin/fork-version/compare/v4.1.9...v4.1.10) (2026-04-06)
+
+
+### Refactor
+
+* separate default and user parser options to handle validating user options ([cc27b10](https://github.com/eglavin/fork-version/commit/cc27b10dfb858f9778cc016f4d62f0df1b9ee7e9))
+
+
 ## [4.1.9](https://github.com/eglavin/fork-version/compare/v4.1.8...v4.1.9) (2026-04-05)
 
 

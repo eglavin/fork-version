@@ -24,6 +24,7 @@
 	"include": [
 		"@types/*",
 		"src/**/*",
-		"tests/**/*"
+		"tests/**/*",
+		"tsdown.config.ts"
 	]
 }

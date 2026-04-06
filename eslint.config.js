@@ -11,6 +11,8 @@ export default defineConfig(
 	tsEslint.configs.stylisticTypeChecked,
 	{
 		ignores: ["coverage/**/*", "dist/**/*", "node_modules/**/*"],
+	},
+	{
 		languageOptions: {
 			globals: {
 				...globals.node,

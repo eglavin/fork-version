@@ -149,7 +149,7 @@ export class CommitParser {
 	parseSubject(commit: Commit) {
 		if (!this.#options.subjectPattern) return false;
 
-		const subjectMatch = new RegExp(this.#options.subjectPattern, "i").exec(commit.subject);
+		const subjectMatch = this.#options.subjectPattern.exec(commit.subject);
 
 		if (subjectMatch?.groups) {
 			const { type = "", scope = "", breakingChange = "", title = "" } = subjectMatch.groups;
@@ -179,7 +179,7 @@ export class CommitParser {
 	parseMerge(commit: Commit) {
 		if (!this.#options.mergePattern) return false;
 
-		const mergeMatch = new RegExp(this.#options.mergePattern).exec(commit.subject);
+		const mergeMatch = this.#options.mergePattern.exec(commit.subject);
 
 		if (mergeMatch?.groups) {
 			const { id = "", source = "" } = mergeMatch.groups;
@@ -207,7 +207,7 @@ export class CommitParser {
 	parseRevert(commit: Commit) {
 		if (!this.#options.revertPattern) return false;
 
-		const revertMatch = new RegExp(this.#options.revertPattern).exec(commit.raw);
+		const revertMatch = this.#options.revertPattern.exec(commit.raw);
 
 		if (revertMatch?.groups) {
 			const { hash = "", subject = "" } = revertMatch.groups;

@@ -1,3 +1,5 @@
+import { escapeRegex } from "../utils/escape-regex";
+import { parseRegExpString } from "../utils/parse-regexp-string";
 import { trimStringArray } from "../utils/trim-string-array";
 
 export interface ParserOptions {
@@ -69,8 +71,16 @@ export interface ParserOptions {
 	notePattern: RegExp | undefined;
 }
 
-export function createParserOptions(userOptions?: Partial<ParserOptions>): ParserOptions {
-	const referenceActions = trimStringArray(userOptions?.referenceActions) ?? [
+/**
+ * Creates default parser options with predefined patterns and lists.
+ *
+ * The default expects the user is using Github as their hosting service.
+ *
+ * @param userOptions Optional user-provided options to override the defaults.
+ * @returns A complete set of parser options with defaults applied and user overrides where specified.
+ */
+function createDefaultParserOptions(userOptions?: Partial<ParserOptions>): ParserOptions {
+	const referenceActions = trimStringArray(userOptions?.referenceActions, escapeRegex) ?? [
 		"close",
 		"closes",
 		"closed",
@@ -83,19 +93,19 @@ export function createParserOptions(userOptions?: Partial<ParserOptions>): Parse
 	];
 	const joinedReferenceActions = referenceActions.join("|");
 
-	const issuePrefixes = trimStringArray(userOptions?.issuePrefixes) ?? ["#"];
+	const issuePrefixes = trimStringArray(userOptions?.issuePrefixes, escapeRegex) ?? ["#"];
 	const joinedIssuePrefixes = issuePrefixes.join("|");
 
-	const noteKeywords = trimStringArray(userOptions?.noteKeywords) ?? [
+	const noteKeywords = trimStringArray(userOptions?.noteKeywords, escapeRegex) ?? [
 		"BREAKING CHANGE",
 		"BREAKING-CHANGE",
 	];
 	const joinedNoteKeywords = noteKeywords.join("|");
 
 	return {
-		subjectPattern: /^(?<type>\w+)(?:\((?<scope>.*)\))?(?<breakingChange>!)?:\s+(?<title>.*)/,
+		subjectPattern: /^(?<type>\w+)(?:\((?<scope>.*)\))?(?<breakingChange>!)?:\s+(?<title>.*)/i,
 
-		mergePattern: /^Merge pull request #(?<id>\d*) from (?<source>.*)/,
+		mergePattern: /^Merge pull request #(?<id>\d*) from (?<source>.*)/i,
 
 		revertPattern: /^[Rr]evert "(?<subject>.*)"(\s*This reverts commit (?<hash>[a-zA-Z0-9]*)\.)?/,
 
@@ -121,8 +131,54 @@ export function createParserOptions(userOptions?: Partial<ParserOptions>): Parse
 		notePattern: joinedNoteKeywords
 			? new RegExp(`^(?<title>${joinedNoteKeywords}):(\\s*(?<text>.*))`)
 			: undefined,
-
-		// Override defaults with user options
-		...userOptions,
 	};
+}
+
+/**
+ * Creates parser options by merging user-provided options with default values.
+ *
+ * Additionally, if a user provides a string for a property that expects a RegExp value,
+ * the function will attempt to parse it into a RegExp object.
+ *
+ * @param userOptions Optional user-provided options to override the defaults.
+ * @return A complete set of parser options with defaults applied and user overrides where specified.
+ */
+export function createParserOptions(userOptions?: Partial<ParserOptions>): ParserOptions {
+	const initialOptions = createDefaultParserOptions(userOptions);
+
+	if (userOptions) {
+		for (const key of Object.keys(userOptions) as (keyof ParserOptions)[]) {
+			const userValue = userOptions[key];
+
+			// Skip properties that are not defined in the default options
+			if (!(key in initialOptions)) {
+				continue;
+			}
+
+			// Arrays should get merged in the default parser options function, so we skip them here
+			if (Array.isArray(initialOptions[key])) {
+				continue;
+			}
+
+			if (initialOptions[key] instanceof RegExp) {
+				// User has provided a RegExp, so we can directly assign it
+				if (userValue instanceof RegExp) {
+					(initialOptions[key] as RegExp) = userValue;
+				}
+				// User has provided a string that may represent a RegExp pattern
+				else if (typeof userValue === "string") {
+					const parsed = parseRegExpString(userValue);
+					if (parsed) {
+						(initialOptions[key] as RegExp) = parsed;
+					}
+				}
+				// Explicitly set nullable values to undefined
+				else if (userValue == undefined) {
+					initialOptions[key] = undefined;
+				}
+			}
+		}
+	}
+
+	return initialOptions;
 }

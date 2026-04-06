@@ -20,4 +20,21 @@ describe("trim-string-array", () => {
 
 		expect(trimStringArray([item1, item2, item3])).toStrictEqual([item1.trim(), item2]);
 	});
+
+	it("should apply the transform function to each item", () => {
+		const item1 = "  item1  ";
+		const item2 = "item2";
+		const item3 = "";
+
+		const transformFn = (item: string) => `_${item}_`;
+
+		expect(trimStringArray([item1, item2, item3], transformFn)).toStrictEqual([
+			"_item1_",
+			"_item2_",
+		]);
+	});
+
+	it("should return undefined if the resulting array is empty after trimming", () => {
+		expect(trimStringArray(["", "   ", "\n"])).toBeUndefined();
+	});
 });

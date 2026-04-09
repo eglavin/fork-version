@@ -1,5 +1,16 @@
 # Fork Version
 
+## [5.0.0](https://github.com/eglavin/fork-version/compare/v4.1.10...v5.0.0) (2026-04-09)
+
+
+### Refactor
+
+* migrate scripts to use built in node typescript support ([50c2b0e](https://github.com/eglavin/fork-version/commit/50c2b0e7c6205c5587dd01c0e939b1c113f5f01e))
+* move config definition away from zod schema ([3c8efd3](https://github.com/eglavin/fork-version/commit/3c8efd3584da304f463de19f18014797bd53ab52))
+* pnpm prune ([ad722b5](https://github.com/eglavin/fork-version/commit/ad722b52afa3cb1a1efead53d9e0643a3751eaae))
+* replace tsup with tsdown ([ce4f740](https://github.com/eglavin/fork-version/commit/ce4f740d5edcbbb100f079f004f005f0f16ac860))
+
+
 ## [4.1.10](https://github.com/eglavin/fork-version/compare/v4.1.9...v4.1.10) (2026-04-06)
 
 

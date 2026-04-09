@@ -14,7 +14,12 @@ export type {
 } from "./commit-parser/types";
 
 export { ForkConfigSchema } from "./config/schema";
-export type { ForkConfig, Config } from "./config/types";
+export type {
+	ChangelogPresetConfig,
+	ChangelogPresetConfigType,
+	ForkConfig,
+	Config,
+} from "./config/types";
 export { defineConfig } from "./config/define-config";
 export { getUserConfig } from "./config/user-config";
 

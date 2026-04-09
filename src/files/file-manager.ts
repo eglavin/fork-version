@@ -1,4 +1,4 @@
-import { isAbsolute, resolve } from "node:path";
+import { basename, isAbsolute, resolve } from "node:path";
 
 import { fileExists } from "../utils/file-state";
 import { JSONPackage } from "./json-package";
@@ -84,7 +84,7 @@ export class FileManager {
 				} catch (error) {
 					if (error instanceof MissingPropertyException) {
 						this.#logger.warn(
-							`[File Manager] Missing '${error.propertyName}' property in ${error.fileType} file: ${_fileName}`,
+							`[File Manager] Missing '${error.propertyName}' property in ${error.fileType} file: ${basename(_fileName)}`,
 						);
 					} else {
 						// Rethrow any unexpected errors.

@@ -56,14 +56,13 @@ export class JSONPackage implements IFileManager {
 	}
 
 	read(filePath: string): FileState | undefined {
-		const fileName = basename(filePath);
 		const fileContents = readFileSync(filePath, "utf8");
 
 		const parseErrors: ParseError[] = [];
 		const parsedJson: PackageJsonish = parse(fileContents, parseErrors, this.#jsoncOptions);
 		if (parsedJson?.version && parseErrors.length === 0) {
 			return {
-				name: fileName,
+				name: basename(filePath),
 				path: filePath,
 				version: parsedJson.version,
 

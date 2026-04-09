@@ -13,12 +13,11 @@ import { MissingPropertyException, type FileState, type IFileManager } from "./f
  */
 export class PlainText implements IFileManager {
 	read(filePath: string): FileState | undefined {
-		const fileName = basename(filePath);
 		const fileContents = readFileSync(filePath, "utf8").trim();
 
 		if (fileContents) {
 			return {
-				name: fileName,
+				name: basename(filePath),
 				path: filePath,
 				version: fileContents,
 			};

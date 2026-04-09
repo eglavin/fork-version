@@ -42,7 +42,6 @@ export class YAMLPackage implements IFileManager {
 	}
 
 	read(filePath: string): FileState | undefined {
-		const fileName = basename(filePath);
 		const fileContents = readFileSync(filePath, "utf-8");
 
 		const fileVersion = parse(fileContents)?.version;
@@ -50,7 +49,7 @@ export class YAMLPackage implements IFileManager {
 			const parsedVersion = this.#handleBuildNumber(fileVersion);
 
 			return {
-				name: fileName,
+				name: basename(filePath),
 				path: filePath,
 				version: parsedVersion.version || "",
 				builderNumber: parsedVersion.builderNumber ?? undefined,

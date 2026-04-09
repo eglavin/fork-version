@@ -25,14 +25,13 @@ export class MSBuildProject implements IFileManager {
 	};
 
 	read(filePath: string): FileState | undefined {
-		const fileName = basename(filePath);
 		const fileContents = readFileSync(filePath, "utf8");
 
 		const $ = cheerio.load(fileContents, this.#cheerioOptions);
 		const version = $("Project > PropertyGroup > Version").text();
 		if (version) {
 			return {
-				name: fileName,
+				name: basename(filePath),
 				path: filePath,
 				version: version,
 			};

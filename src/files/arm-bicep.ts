@@ -20,14 +20,12 @@ export class ARMBicep implements IFileManager {
 	#varRegex = /(var contentVersion(?: string)? *= *['"])(?<version>[^'"]+)(['"])/;
 
 	read(filePath: string): FileState | undefined {
-		const fileName = basename(filePath);
 		const fileContents = readFileSync(filePath, "utf8");
 
 		const metadataMatch = this.#metadataRegex.exec(fileContents);
-
 		if (metadataMatch?.groups?.version) {
 			return {
-				name: fileName,
+				name: basename(filePath),
 				path: filePath,
 				version: metadataMatch.groups.version,
 			};

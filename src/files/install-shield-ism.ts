@@ -32,7 +32,6 @@ export class InstallShieldISM implements IFileManager {
 	};
 
 	read(filePath: string): FileState | undefined {
-		const fileName = basename(filePath);
 		const fileContents = readFileSync(filePath, "utf8");
 
 		const $ = cheerio.load(fileContents, this.#cheerioOptions);
@@ -42,7 +41,7 @@ export class InstallShieldISM implements IFileManager {
 			.trim();
 		if (version) {
 			return {
-				name: fileName,
+				name: basename(filePath),
 				path: filePath,
 				version: version,
 			};

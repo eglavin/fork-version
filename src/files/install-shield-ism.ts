@@ -2,8 +2,7 @@ import { basename } from "node:path";
 import { readFileSync, writeFileSync } from "node:fs";
 import * as cheerio from "cheerio/slim";
 
-import type { Logger } from "../services/logger";
-import type { FileState, IFileManager } from "./file-manager";
+import { MissingPropertyException, type FileState, type IFileManager } from "./file-manager";
 
 /**
  * An InstallShield ISM file can be either XML or binary, only the XML format is supported
@@ -27,12 +26,6 @@ import type { FileState, IFileManager } from "./file-manager";
  * ```
  */
 export class InstallShieldISM implements IFileManager {
-	#logger: Logger;
-
-	constructor(logger: Logger) {
-		this.#logger = logger;
-	}
-
 	#cheerioOptions: cheerio.CheerioOptions = {
 		xmlMode: true,
 		xml: { decodeEntities: false },
@@ -55,7 +48,7 @@ export class InstallShieldISM implements IFileManager {
 			};
 		}
 
-		this.#logger.warn(`[File Manager] Unable to determine InstallShield ISM version: ${fileName}`);
+		throw new MissingPropertyException("InstallShield ISM", "ProductVersion");
 	}
 
 	write(fileState: FileState, newVersion: string): void {

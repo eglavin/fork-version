@@ -11,6 +11,21 @@ import { InstallShieldISM } from "./install-shield-ism";
 import type { ForkConfig } from "../config/types";
 import type { Logger } from "../services/logger";
 
+/**
+ * Exception thrown if a file manager encounters a file missing a required property,
+ * such as the "version" property in a JSON package file.
+ */
+export class MissingPropertyException extends Error {
+	fileType: string;
+	propertyName: string;
+	constructor(fileType: string, propertyName: string) {
+		super(`Missing '${propertyName}' property in ${fileType}`);
+		this.name = "MissingPropertyException";
+		this.fileType = fileType;
+		this.propertyName = propertyName;
+	}
+}
+
 export interface FileState {
 	name: string;
 	path: string;
@@ -34,12 +49,12 @@ export class FileManager {
 		this.#config = config;
 		this.#logger = logger;
 		this.#fileManagers = [
-			new JSONPackage(logger),
-			new YAMLPackage(logger),
-			new PlainText(logger),
-			new MSBuildProject(logger),
-			new ARMBicep(logger),
-			new InstallShieldISM(logger),
+			new JSONPackage(),
+			new YAMLPackage(),
+			new PlainText(),
+			new MSBuildProject(),
+			new ARMBicep(),
+			new InstallShieldISM(),
 		];
 	}
 
@@ -64,7 +79,22 @@ export class FileManager {
 
 		for (const fileManager of this.#fileManagers) {
 			if (fileManager.isSupportedFile(_fileName)) {
-				return fileManager.read(filePath);
+				try {
+					return fileManager.read(filePath);
+				} catch (error) {
+					if (error instanceof MissingPropertyException) {
+						this.#logger.warn(
+							`[File Manager] Missing '${error.propertyName}' property in ${error.fileType} file: ${_fileName}`,
+						);
+					} else {
+						// Rethrow any unexpected errors.
+						throw new Error(`An unexpected error occurred while reading file: ${filePath}`, {
+							cause: error,
+						});
+					}
+				}
+
+				return;
 			}
 		}
 

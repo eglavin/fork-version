@@ -30,7 +30,12 @@ export { updateChangelog } from "./process/changelog";
 export { commitChanges } from "./process/commit";
 export { tagChanges } from "./process/tag";
 
-export { FileManager, type FileState, type IFileManager } from "./files/file-manager";
+export {
+	FileManager,
+	MissingPropertyException,
+	type FileState,
+	type IFileManager,
+} from "./files/file-manager";
 
 export { Logger } from "./services/logger";
 export { Git } from "./services/git";

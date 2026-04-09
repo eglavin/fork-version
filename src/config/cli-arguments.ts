@@ -1,8 +1,4 @@
 import meow from "meow";
-//@ts-check
-
-// This file is javascript so the following helper text can be extracted to the readme
-// without the need for a build step, otherwise it would also be typescript...
 
 export const helperText = `Usage:
   $ fork-version [command?] [options?]

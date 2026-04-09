@@ -1,11 +1,10 @@
 #!/usr/bin/env node
-// @ts-check
 
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import { readFileSync, writeFileSync } from "node:fs";
-import { helperText } from "../src/config/cli-arguments.js";
-import { clickableLink } from "./utils/clickable-link.js";
+import { helperText } from "../src/config/cli-arguments.ts";
+import { clickableLink } from "./utils/clickable-link.ts";
 
 const readmeLocation = join(import.meta.dirname, "..", "README.md");
 const readmeContent = readFileSync(readmeLocation, "utf-8");

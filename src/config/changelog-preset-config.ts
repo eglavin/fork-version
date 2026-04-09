@@ -2,13 +2,13 @@ import { z } from "zod";
 import conventionalChangelogConfigSpec from "conventional-changelog-config-spec";
 
 import { ChangelogPresetConfigTypeSchema, ChangelogPresetConfigSchema } from "./schema";
-import type { ForkVersionCLIArgs, ForkConfig } from "./types";
+import type { ForkVersionCLIArgs, ForkConfig, ChangelogPresetConfig } from "./types";
 
 export function getChangelogPresetConfig(
 	mergedConfig: Partial<ForkConfig> | undefined,
 	cliArguments: ForkVersionCLIArgs["flags"],
 	detectedChangelogOptions: ForkConfig["changelogPresetConfig"] | undefined,
-) {
+): ChangelogPresetConfig {
 	const preset: { name: string; [_: string]: unknown } = {
 		name: "conventionalcommits",
 	};

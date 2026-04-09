@@ -1,6 +1,7 @@
 {
 	"compilerOptions": {
 		"allowJs": true,
+		"allowImportingTsExtensions": true,
 		"allowSyntheticDefaultImports": true,
 		"esModuleInterop": true,
 		"isolatedModules": true,
@@ -22,9 +23,10 @@
 		"types": ["node", "vitest/globals"]
 	},
 	"include": [
-		"@types/*",
-		"src/**/*",
-		"tests/**/*",
+		"@types",
+		"scripts",
+		"src",
+		"tests",
 		"tsdown.config.ts"
 	]
 }

@@ -1,5 +1,14 @@
 # Fork Version
 
+## [5.0.1](https://github.com/eglavin/fork-version/compare/v5.0.0...v5.0.1) (2026-04-10)
+
+
+### Refactor
+
+* remove logger from file manager classes ([7800d8b](https://github.com/eglavin/fork-version/commit/7800d8b29fd959f82216ee7061ce5fb44a883368))
+* show file name in the missing property exception log ([f7c80fc](https://github.com/eglavin/fork-version/commit/f7c80fcaeadaba897f637619931562f82cc9a707))
+
+
 ## [5.0.0](https://github.com/eglavin/fork-version/compare/v4.1.10...v5.0.0) (2026-04-09)
 
 

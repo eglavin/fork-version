@@ -1,5 +1,13 @@
 # Fork Version
 
+## [5.0.2](https://github.com/eglavin/fork-version/compare/v5.0.1...v5.0.2) (2026-04-10)
+
+
+### Refactor
+
+* add pnpm settings to help with supply chain attacks when updating + update workflows ([99b2c61](https://github.com/eglavin/fork-version/commit/99b2c61b0036c081e8b8ebcac07ce34c397fa7ee))
+
+
 ## [5.0.1](https://github.com/eglavin/fork-version/compare/v5.0.0...v5.0.1) (2026-04-10)
 
 

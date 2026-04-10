@@ -1,10 +1,11 @@
 import { setupTest } from "../../../tests/setup-tests";
+import { MissingPropertyException } from "../file-manager";
 import { YAMLPackage } from "../yaml-package";
 
 describe("files yaml-package", () => {
 	it("should read a flutter pubspec.yaml file", async () => {
-		const { create, logger, relativeTo } = await setupTest("files yaml-package");
-		const fileManager = new YAMLPackage(logger);
+		const { create, relativeTo } = await setupTest("files yaml-package");
+		const fileManager = new YAMLPackage();
 
 		create.file(
 			`name: wordionary
@@ -24,8 +25,8 @@ environment:
 	});
 
 	it("should read a regular yaml file", async () => {
-		const { create, logger, relativeTo } = await setupTest("files yaml-package");
-		const fileManager = new YAMLPackage(logger);
+		const { create, relativeTo } = await setupTest("files yaml-package");
+		const fileManager = new YAMLPackage();
 
 		create.file(
 			`name: My Project
@@ -39,9 +40,9 @@ version: 1.2.3 # Comment about the version number
 		expect(file?.builderNumber).toBeUndefined();
 	});
 
-	it("should log a message if unable to read version", async () => {
-		const { create, logger, relativeTo } = await setupTest("files yaml-package");
-		const fileManager = new YAMLPackage(logger);
+	it("should throw an error if unable to read version", async () => {
+		const { create, relativeTo } = await setupTest("files yaml-package");
+		const fileManager = new YAMLPackage();
 
 		create.file(
 			`name: wordionary
@@ -53,14 +54,12 @@ environment:
 			"pubspec.yaml",
 		);
 
-		const file = fileManager.read(relativeTo("pubspec.yaml"));
-		expect(file?.version).toBeUndefined();
-		expect(file?.builderNumber).toBeUndefined();
+		expect(() => fileManager.read(relativeTo("pubspec.yaml"))).toThrow(MissingPropertyException);
 	});
 
 	it("should write a flutter pubspec.yaml file", async () => {
-		const { create, logger, relativeTo } = await setupTest("files yaml-package");
-		const fileManager = new YAMLPackage(logger);
+		const { create, relativeTo } = await setupTest("files yaml-package");
+		const fileManager = new YAMLPackage();
 
 		create.file(
 			`name: wordionary
@@ -89,8 +88,8 @@ environment:
 	});
 
 	it("should write a regular yaml file", async () => {
-		const { create, logger, relativeTo } = await setupTest("files yaml-package");
-		const fileManager = new YAMLPackage(logger);
+		const { create, relativeTo } = await setupTest("files yaml-package");
+		const fileManager = new YAMLPackage();
 
 		create.file(
 			`name: My Project
@@ -115,8 +114,7 @@ version: 1.2.3 # Comment about the version number
 	});
 
 	it("should match known yaml files", async () => {
-		const { logger } = await setupTest("files yaml-package");
-		const fileManager = new YAMLPackage(logger);
+		const fileManager = new YAMLPackage();
 
 		// Supported
 		expect(fileManager.isSupportedFile("pubspec.yaml")).toBe(true);

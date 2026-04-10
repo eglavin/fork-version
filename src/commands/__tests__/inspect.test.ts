@@ -35,7 +35,9 @@ Tag: v1.2.3`);
 
 		expect(spyOnConsoleLog).not.toHaveBeenCalled();
 		expect(spyOnConsoleError).toHaveBeenCalledWith(
-			"No version found. Make sure you have at least one tag in your repository.",
+			expect.stringMatching(
+				"No version found. Make sure you have at least one tag in your repository.",
+			),
 		);
 		expect(processExitSpy).toHaveBeenCalledWith(1);
 	});

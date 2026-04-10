@@ -1,10 +1,11 @@
 import { setupTest } from "../../../tests/setup-tests";
+import { MissingPropertyException } from "../file-manager";
 import { InstallShieldISM } from "../install-shield-ism";
 
 describe("files install-shield-ism", () => {
 	it("should read version from an InstallShield ISM file", async () => {
-		const { create, logger, relativeTo } = await setupTest("files install-shield-ism");
-		const fileManager = new InstallShieldISM(logger);
+		const { create, relativeTo } = await setupTest("files install-shield-ism");
+		const fileManager = new InstallShieldISM();
 
 		create.file(
 			`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
@@ -28,9 +29,9 @@ describe("files install-shield-ism", () => {
 		expect(file?.version).toBe("1.2.3");
 	});
 
-	it("should log a message if unable to read version", async () => {
-		const { create, logger, relativeTo } = await setupTest("files install-shield-ism");
-		const fileManager = new InstallShieldISM(logger);
+	it("should throw an error if unable to read version", async () => {
+		const { create, relativeTo } = await setupTest("files install-shield-ism");
+		const fileManager = new InstallShieldISM();
 
 		create.file(
 			`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
@@ -50,16 +51,12 @@ describe("files install-shield-ism", () => {
 			"setup.ism",
 		);
 
-		const file = fileManager.read(relativeTo("setup.ism"));
-		expect(file).toBeUndefined();
-		expect(logger.warn).toBeCalledWith(
-			"[File Manager] Unable to determine InstallShield ISM version: setup.ism",
-		);
+		expect(() => fileManager.read(relativeTo("setup.ism"))).toThrow(MissingPropertyException);
 	});
 
 	it("should write an InstallShield ISM file", async () => {
-		const { create, logger, relativeTo } = await setupTest("files install-shield-ism");
-		const fileManager = new InstallShieldISM(logger);
+		const { create, relativeTo } = await setupTest("files install-shield-ism");
+		const fileManager = new InstallShieldISM();
 
 		create.file(
 			`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
@@ -93,8 +90,7 @@ describe("files install-shield-ism", () => {
 	});
 
 	it("should match supported files correctly", async () => {
-		const { logger } = await setupTest("files install-shield-ism");
-		const fileManager = new InstallShieldISM(logger);
+		const fileManager = new InstallShieldISM();
 
 		expect(fileManager.isSupportedFile("setup.ism")).toBe(true);
 		expect(fileManager.isSupportedFile("setup.msi")).toBe(false);

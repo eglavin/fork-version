@@ -1,8 +1,7 @@
 import { basename } from "node:path";
 import { readFileSync, writeFileSync } from "node:fs";
 
-import type { Logger } from "../services/logger";
-import type { FileState, IFileManager } from "./file-manager";
+import { MissingPropertyException, type FileState, type IFileManager } from "./file-manager";
 
 /**
  * An ARM bicep file with metadata and variable called contentVersion.
@@ -14,12 +13,6 @@ import type { FileState, IFileManager } from "./file-manager";
  * ```
  */
 export class ARMBicep implements IFileManager {
-	#logger: Logger;
-
-	constructor(logger: Logger) {
-		this.#logger = logger;
-	}
-
 	/** https://regex101.com/r/Lriphb/2 */
 	#metadataRegex = /(metadata contentVersion *= *['"])(?<version>[^'"]+)(['"])/;
 
@@ -27,28 +20,18 @@ export class ARMBicep implements IFileManager {
 	#varRegex = /(var contentVersion(?: string)? *= *['"])(?<version>[^'"]+)(['"])/;
 
 	read(filePath: string): FileState | undefined {
-		const fileName = basename(filePath);
 		const fileContents = readFileSync(filePath, "utf8");
 
 		const metadataMatch = this.#metadataRegex.exec(fileContents);
-		const varMatch = this.#varRegex.exec(fileContents);
-
-		if (metadataMatch?.groups?.version && varMatch?.groups?.version) {
+		if (metadataMatch?.groups?.version) {
 			return {
-				name: fileName,
+				name: basename(filePath),
 				path: filePath,
 				version: metadataMatch.groups.version,
 			};
 		}
 
-		if (!metadataMatch) {
-			this.#logger.warn(
-				`[File Manager] Missing 'metadata contentVersion' in bicep file: ${fileName}`,
-			);
-		}
-		if (!varMatch) {
-			this.#logger.warn(`[File Manager] Missing 'var contentVersion' in bicep file: ${fileName}`);
-		}
+		throw new MissingPropertyException("ARM Bicep", "metadata contentVersion");
 	}
 
 	write(fileState: FileState, newVersion: string) {

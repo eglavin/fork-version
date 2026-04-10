@@ -2,8 +2,7 @@ import { basename } from "node:path";
 import { readFileSync, writeFileSync } from "node:fs";
 import { parse, parseDocument } from "yaml";
 
-import type { Logger } from "../services/logger";
-import type { FileState, IFileManager } from "./file-manager";
+import { MissingPropertyException, type FileState, type IFileManager } from "./file-manager";
 
 /**
  * A yaml package file should have a version property on the top level, like what can be seen
@@ -18,12 +17,6 @@ import type { FileState, IFileManager } from "./file-manager";
  * ```
  */
 export class YAMLPackage implements IFileManager {
-	#logger: Logger;
-
-	constructor(logger: Logger) {
-		this.#logger = logger;
-	}
-
 	/**
 	 * If the version is returned with a "+" symbol in the value then the version might be from a
 	 * flutter `pubspec.yaml` file, if so we want to retain the input builderNumber by splitting it
@@ -49,7 +42,6 @@ export class YAMLPackage implements IFileManager {
 	}
 
 	read(filePath: string): FileState | undefined {
-		const fileName = basename(filePath);
 		const fileContents = readFileSync(filePath, "utf-8");
 
 		const fileVersion = parse(fileContents)?.version;
@@ -57,14 +49,14 @@ export class YAMLPackage implements IFileManager {
 			const parsedVersion = this.#handleBuildNumber(fileVersion);
 
 			return {
-				name: fileName,
+				name: basename(filePath),
 				path: filePath,
 				version: parsedVersion.version || "",
 				builderNumber: parsedVersion.builderNumber ?? undefined,
 			};
 		}
 
-		this.#logger.warn(`[File Manager] Unable to determine yaml version: ${fileName}`);
+		throw new MissingPropertyException("YAML", "version");
 	}
 
 	write(fileState: FileState, newVersion: string): void {

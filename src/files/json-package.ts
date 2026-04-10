@@ -9,8 +9,7 @@ import {
 	type ParseOptions,
 } from "jsonc-parser";
 
-import type { Logger } from "../services/logger";
-import type { FileState, IFileManager } from "./file-manager";
+import { MissingPropertyException, type FileState, type IFileManager } from "./file-manager";
 
 /** The things we are interested in, in package.json-like files. */
 interface PackageJsonish {
@@ -37,12 +36,6 @@ interface PackageJsonish {
  * ```
  */
 export class JSONPackage implements IFileManager {
-	#logger: Logger;
-
-	constructor(logger: Logger) {
-		this.#logger = logger;
-	}
-
 	/** Options for parsing JSON and JSONC files. */
 	#jsoncOptions: ParseOptions = {
 		allowEmptyContent: false,
@@ -63,14 +56,13 @@ export class JSONPackage implements IFileManager {
 	}
 
 	read(filePath: string): FileState | undefined {
-		const fileName = basename(filePath);
 		const fileContents = readFileSync(filePath, "utf8");
 
 		const parseErrors: ParseError[] = [];
 		const parsedJson: PackageJsonish = parse(fileContents, parseErrors, this.#jsoncOptions);
 		if (parsedJson?.version && parseErrors.length === 0) {
 			return {
-				name: fileName,
+				name: basename(filePath),
 				path: filePath,
 				version: parsedJson.version,
 
@@ -78,7 +70,7 @@ export class JSONPackage implements IFileManager {
 			};
 		}
 
-		this.#logger.warn(`[File Manager] Unable to determine json version: ${fileName}`);
+		throw new MissingPropertyException("JSON", "version");
 	}
 
 	write(fileState: FileState, newVersion: string) {

@@ -2,8 +2,7 @@ import { basename } from "node:path";
 import { readFileSync, writeFileSync } from "node:fs";
 import * as cheerio from "cheerio/slim";
 
-import type { Logger } from "../services/logger";
-import type { FileState, IFileManager } from "./file-manager";
+import { MissingPropertyException, type FileState, type IFileManager } from "./file-manager";
 
 /**
  * A ms-build file is an xml file with a version property under the Project > PropertyGroup node.
@@ -20,32 +19,25 @@ import type { FileState, IFileManager } from "./file-manager";
  * ```
  */
 export class MSBuildProject implements IFileManager {
-	#logger: Logger;
-
-	constructor(logger: Logger) {
-		this.#logger = logger;
-	}
-
 	#cheerioOptions: cheerio.CheerioOptions = {
 		xmlMode: true,
 		xml: { decodeEntities: false },
 	};
 
 	read(filePath: string): FileState | undefined {
-		const fileName = basename(filePath);
 		const fileContents = readFileSync(filePath, "utf8");
 
 		const $ = cheerio.load(fileContents, this.#cheerioOptions);
 		const version = $("Project > PropertyGroup > Version").text();
 		if (version) {
 			return {
-				name: fileName,
+				name: basename(filePath),
 				path: filePath,
 				version: version,
 			};
 		}
 
-		this.#logger.warn(`[File Manager] Unable to determine ms-build version: ${fileName}`);
+		throw new MissingPropertyException("MSBuild", "Version");
 	}
 
 	write(fileState: FileState, newVersion: string) {

@@ -1,12 +1,13 @@
 import { readFileSync } from "node:fs";
 
 import { setupTest } from "../../../tests/setup-tests";
+import { MissingPropertyException } from "../file-manager";
 import { ARMBicep } from "../arm-bicep";
 
 describe("files arm-bicep", () => {
 	it("should read a bicep file with valid metadata and var contentVersion", async () => {
-		const { create, logger, relativeTo } = await setupTest("files arm-bicep");
-		const fileManager = new ARMBicep(logger);
+		const { create, relativeTo } = await setupTest("files arm-bicep");
+		const fileManager = new ARMBicep();
 
 		create.file(
 			`metadata contentVersion = '1.2.3'
@@ -18,51 +19,18 @@ var contentVersion string = '1.2.3'`,
 		expect(file?.version).toBe("1.2.3");
 	});
 
-	it("should log a warning if metadata contentVersion is missing", async () => {
-		const { create, logger, relativeTo } = await setupTest("files arm-bicep");
-		const fileManager = new ARMBicep(logger);
+	it("should throw an error if metadata contentVersion is missing", async () => {
+		const { create, relativeTo } = await setupTest("files arm-bicep");
+		const fileManager = new ARMBicep();
 
 		create.file(`var contentVersion string = '1.2.3'`, "deploy.bicep");
 
-		const file = fileManager.read(relativeTo("deploy.bicep"));
-		expect(file).toBeUndefined();
-		expect(logger.warn).toBeCalledWith(
-			"[File Manager] Missing 'metadata contentVersion' in bicep file: deploy.bicep",
-		);
-	});
-
-	it("should log a warning if var contentVersion is missing", async () => {
-		const { create, logger, relativeTo } = await setupTest("files arm-bicep");
-		const fileManager = new ARMBicep(logger);
-
-		create.file(`metadata contentVersion = '1.2.3'`, "deploy.bicep");
-
-		const file = fileManager.read(relativeTo("deploy.bicep"));
-		expect(file).toBeUndefined();
-		expect(logger.warn).toBeCalledWith(
-			"[File Manager] Missing 'var contentVersion' in bicep file: deploy.bicep",
-		);
-	});
-
-	it("should log a warning if unable to determine version", async () => {
-		const { create, logger, relativeTo } = await setupTest("files arm-bicep");
-		const fileManager = new ARMBicep(logger);
-
-		create.file(`// This file has no version information`, "deploy.bicep");
-
-		const file = fileManager.read(relativeTo("deploy.bicep"));
-		expect(file).toBeUndefined();
-		expect(logger.warn).toHaveBeenCalledWith(
-			"[File Manager] Missing 'metadata contentVersion' in bicep file: deploy.bicep",
-		);
-		expect(logger.warn).toHaveBeenCalledWith(
-			"[File Manager] Missing 'var contentVersion' in bicep file: deploy.bicep",
-		);
+		expect(() => fileManager.read(relativeTo("deploy.bicep"))).toThrow(MissingPropertyException);
 	});
 
 	it("should write a new version to a bicep file", async () => {
-		const { create, logger, relativeTo } = await setupTest("files arm-bicep");
-		const fileManager = new ARMBicep(logger);
+		const { create, relativeTo } = await setupTest("files arm-bicep");
+		const fileManager = new ARMBicep();
 
 		create.file(
 			`metadata contentVersion = '1.2.3'
@@ -93,8 +61,8 @@ var contentVersion string = '4.5.6'
 	});
 
 	it("should handle spacing around contentVersion", async () => {
-		const { create, logger, relativeTo } = await setupTest("files arm-bicep");
-		const fileManager = new ARMBicep(logger);
+		const { create, relativeTo } = await setupTest("files arm-bicep");
+		const fileManager = new ARMBicep();
 
 		create.file(
 			`metadata contentVersion     ='1.2.3'
@@ -119,12 +87,11 @@ var contentVersion string=         "1.2.3"`,
 			`metadata contentVersion     ='2.3.4'
 var contentVersion string=         "2.3.4"`,
 		);
-		expect(logger.warn).not.toHaveBeenCalled();
 	});
 
 	it("should handle missing type in var declaration", async () => {
-		const { create, logger, relativeTo } = await setupTest("files arm-bicep");
-		const fileManager = new ARMBicep(logger);
+		const { create, relativeTo } = await setupTest("files arm-bicep");
+		const fileManager = new ARMBicep();
 
 		create.file(
 			`metadata contentVersion = '1.2.3'
@@ -152,8 +119,7 @@ var contentVersion = '2.3.4'`,
 	});
 
 	it("should match bicep files", async () => {
-		const { logger } = await setupTest("files arm-bicep");
-		const fileManager = new ARMBicep(logger);
+		const fileManager = new ARMBicep();
 
 		// Supported
 		expect(fileManager.isSupportedFile("deploy.bicep")).toBe(true);

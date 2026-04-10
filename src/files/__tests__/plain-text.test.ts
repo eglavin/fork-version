@@ -1,12 +1,13 @@
 import { readFileSync } from "node:fs";
 
 import { setupTest } from "../../../tests/setup-tests";
+import { MissingPropertyException } from "../file-manager";
 import { PlainText } from "../plain-text";
 
 describe("files plain-text", () => {
 	it("should be able to read version from version.txt file", async () => {
-		const { create, logger, relativeTo } = await setupTest("files plain-text");
-		const fileManager = new PlainText(logger);
+		const { create, relativeTo } = await setupTest("files plain-text");
+		const fileManager = new PlainText();
 
 		create.file("1.2.3", "version.txt");
 
@@ -15,23 +16,18 @@ describe("files plain-text", () => {
 		expect(file?.version).toBe("1.2.3");
 	});
 
-	it("should return undefined when version.txt is empty", async () => {
-		const { create, logger, relativeTo } = await setupTest("files plain-text");
-		const fileManager = new PlainText(logger);
+	it("should throw an error when version.txt is empty", async () => {
+		const { create, relativeTo } = await setupTest("files plain-text");
+		const fileManager = new PlainText();
 
 		create.file("", "version.txt");
 
-		const file = fileManager.read(relativeTo("version.txt"));
-
-		expect(file?.version).toBe(undefined);
-		expect(logger.warn).toHaveBeenCalledWith(
-			"[File Manager] Unable to determine plain text version: version.txt",
-		);
+		expect(() => fileManager.read(relativeTo("version.txt"))).toThrow(MissingPropertyException);
 	});
 
 	it("should be able to write version to version.txt file", async () => {
-		const { create, logger, relativeTo } = await setupTest("files plain-text");
-		const fileManager = new PlainText(logger);
+		const { create, relativeTo } = await setupTest("files plain-text");
+		const fileManager = new PlainText();
 
 		create.file("1.2.3", "version.txt");
 
@@ -49,8 +45,7 @@ describe("files plain-text", () => {
 	});
 
 	it('should match "version.txt" file name', async () => {
-		const { logger } = await setupTest("files plain-text");
-		const fileManager = new PlainText(logger);
+		const fileManager = new PlainText();
 
 		// Supported
 		expect(fileManager.isSupportedFile("version.txt")).toBe(true);

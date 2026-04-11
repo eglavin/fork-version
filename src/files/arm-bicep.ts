@@ -1,5 +1,4 @@
-import { basename } from "node:path";
-import { readFileSync, writeFileSync } from "node:fs";
+import { readFile, writeFile } from "node:fs/promises";
 
 import { MissingPropertyException, type FileState, type IFileManager } from "./file-manager";
 
@@ -19,13 +18,12 @@ export class ARMBicep implements IFileManager {
 	/** https://regex101.com/r/iKCTF9/1 */
 	#varRegex = /(var contentVersion(?: string)? *= *['"])(?<version>[^'"]+)(['"])/;
 
-	read(filePath: string): FileState | undefined {
-		const fileContents = readFileSync(filePath, "utf8");
+	async read(filePath: string): Promise<FileState | undefined> {
+		const fileContents = await readFile(filePath, "utf8");
 
 		const metadataMatch = this.#metadataRegex.exec(fileContents);
 		if (metadataMatch?.groups?.version) {
 			return {
-				name: basename(filePath),
 				path: filePath,
 				version: metadataMatch.groups.version,
 			};
@@ -34,14 +32,14 @@ export class ARMBicep implements IFileManager {
 		throw new MissingPropertyException("ARM Bicep", "metadata contentVersion");
 	}
 
-	write(fileState: FileState, newVersion: string) {
-		const fileContents = readFileSync(fileState.path, "utf8");
+	async write(fileState: FileState, newVersion: string): Promise<void> {
+		const fileContents = await readFile(fileState.path, "utf8");
 
 		const updatedContent = fileContents
 			.replace(this.#metadataRegex, `$1${newVersion}$3`)
 			.replace(this.#varRegex, `$1${newVersion}$3`);
 
-		writeFileSync(fileState.path, updatedContent, "utf8");
+		await writeFile(fileState.path, updatedContent, "utf8");
 	}
 
 	isSupportedFile(fileName: string): boolean {

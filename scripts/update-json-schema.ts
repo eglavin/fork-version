@@ -4,11 +4,11 @@ import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import { writeFileSync } from "node:fs";
 import z from "zod";
-import { ForkConfigSchema } from "../src/config/schema.ts";
+import { ForkConfigJSONSchema } from "../src/config/schema.ts";
 import { clickableLink } from "./utils/clickable-link.ts";
 
 const schemaLocation = join(import.meta.dirname, "..", "schema", `latest.json`);
-const jsonSchema = z.toJSONSchema(ForkConfigSchema);
+const jsonSchema = z.toJSONSchema(ForkConfigJSONSchema);
 
 writeFileSync(
 	schemaLocation,

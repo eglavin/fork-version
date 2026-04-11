@@ -1,5 +1,6 @@
 import type { getCliArguments } from "./cli-arguments";
 import type { ParserOptions } from "../commit-parser/options";
+import type { IFileManager } from "../files/file-manager";
 
 export interface ChangelogPresetConfigType {
 	/**
@@ -95,6 +96,11 @@ export interface ForkConfig {
 	 * ```
 	 */
 	files: string[];
+	/**
+	 * List of custom file managers to use. See documentation for details.
+	 * @default undefined
+	 */
+	customFileManagers?: IFileManager[];
 	/**
 	 * Glob pattern to match files to be updated.
 	 *

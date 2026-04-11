@@ -27,7 +27,7 @@ export async function getCurrentVersion(
 			continue;
 		}
 
-		const fileState = fileManager.read(file);
+		const fileState = await fileManager.read(file);
 		if (fileState) {
 			files.push(fileState);
 

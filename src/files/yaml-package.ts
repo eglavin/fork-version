@@ -1,5 +1,4 @@
-import { basename } from "node:path";
-import { readFileSync, writeFileSync } from "node:fs";
+import { readFile, writeFile } from "node:fs/promises";
 import { parse, parseDocument } from "yaml";
 
 import { MissingPropertyException, type FileState, type IFileManager } from "./file-manager";
@@ -41,15 +40,14 @@ export class YAMLPackage implements IFileManager {
 		};
 	}
 
-	read(filePath: string): FileState | undefined {
-		const fileContents = readFileSync(filePath, "utf-8");
+	async read(filePath: string): Promise<FileState | undefined> {
+		const fileContents = await readFile(filePath, "utf8");
 
 		const fileVersion = parse(fileContents)?.version;
 		if (fileVersion) {
 			const parsedVersion = this.#handleBuildNumber(fileVersion);
 
 			return {
-				name: basename(filePath),
 				path: filePath,
 				version: parsedVersion.version || "",
 				builderNumber: parsedVersion.builderNumber ?? undefined,
@@ -59,8 +57,8 @@ export class YAMLPackage implements IFileManager {
 		throw new MissingPropertyException("YAML", "version");
 	}
 
-	write(fileState: FileState, newVersion: string): void {
-		const fileContents = readFileSync(fileState.path, "utf8");
+	async write(fileState: FileState, newVersion: string): Promise<void> {
+		const fileContents = await readFile(fileState.path, "utf8");
 		const yamlDocument = parseDocument(fileContents);
 
 		let newFileVersion = newVersion;
@@ -70,7 +68,7 @@ export class YAMLPackage implements IFileManager {
 
 		yamlDocument.set("version", newFileVersion);
 
-		writeFileSync(fileState.path, yamlDocument.toString(), "utf8");
+		await writeFile(fileState.path, yamlDocument.toString(), "utf8");
 	}
 
 	isSupportedFile(fileName: string): boolean {

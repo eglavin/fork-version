@@ -1,5 +1,4 @@
-import { basename } from "node:path";
-import { readFileSync, writeFileSync } from "node:fs";
+import { readFile, writeFile } from "node:fs/promises";
 
 import { MissingPropertyException, type FileState, type IFileManager } from "./file-manager";
 
@@ -12,12 +11,11 @@ import { MissingPropertyException, type FileState, type IFileManager } from "./f
  * ```
  */
 export class PlainText implements IFileManager {
-	read(filePath: string): FileState | undefined {
-		const fileContents = readFileSync(filePath, "utf8").trim();
+	async read(filePath: string): Promise<FileState | undefined> {
+		const fileContents = (await readFile(filePath, "utf8")).trim();
 
 		if (fileContents) {
 			return {
-				name: basename(filePath),
 				path: filePath,
 				version: fileContents,
 			};
@@ -26,8 +24,8 @@ export class PlainText implements IFileManager {
 		throw new MissingPropertyException("Plain Text", "version");
 	}
 
-	write(fileState: FileState, newVersion: string) {
-		writeFileSync(fileState.path, newVersion, "utf8");
+	async write(fileState: FileState, newVersion: string): Promise<void> {
+		await writeFile(fileState.path, newVersion, "utf8");
 	}
 
 	isSupportedFile(fileName: string): boolean {

@@ -1,5 +1,4 @@
-import { basename } from "node:path";
-import { readFileSync, writeFileSync } from "node:fs";
+import { readFile, writeFile } from "node:fs/promises";
 import {
 	applyEdits,
 	type JSONPath,
@@ -55,17 +54,15 @@ export class JSONPackage implements IFileManager {
 		return applyEdits(jsonc, edits);
 	}
 
-	read(filePath: string): FileState | undefined {
-		const fileContents = readFileSync(filePath, "utf8");
+	async read(filePath: string): Promise<FileState | undefined> {
+		const fileContents = await readFile(filePath, "utf8");
 
 		const parseErrors: ParseError[] = [];
 		const parsedJson: PackageJsonish = parse(fileContents, parseErrors, this.#jsoncOptions);
 		if (parsedJson?.version && parseErrors.length === 0) {
 			return {
-				name: basename(filePath),
 				path: filePath,
 				version: parsedJson.version,
-
 				isPrivate: typeof parsedJson?.private === "boolean" ? parsedJson.private : true,
 			};
 		}
@@ -73,8 +70,8 @@ export class JSONPackage implements IFileManager {
 		throw new MissingPropertyException("JSON", "version");
 	}
 
-	write(fileState: FileState, newVersion: string) {
-		let fileContents = readFileSync(fileState.path, "utf8");
+	async write(fileState: FileState, newVersion: string): Promise<void> {
+		let fileContents = await readFile(fileState.path, "utf8");
 
 		const parseErrors: ParseError[] = [];
 		const parsedJson: PackageJsonish = parse(fileContents, parseErrors, this.#jsoncOptions);
@@ -85,7 +82,7 @@ export class JSONPackage implements IFileManager {
 			fileContents = this.#setStringInJsonc(fileContents, ["packages", "", "version"], newVersion);
 		}
 
-		writeFileSync(fileState.path, fileContents, "utf8");
+		await writeFile(fileState.path, fileContents, "utf8");
 	}
 
 	isSupportedFile(fileName: string): boolean {

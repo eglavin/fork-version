@@ -11,7 +11,7 @@ describe("files json-package", () => {
 
 		create.json({ version: "1.2.3" }, "package.json");
 
-		const file = fileManager.read(relativeTo("package.json"));
+		const file = await fileManager.read(relativeTo("package.json"));
 		expect(file?.version).toBe("1.2.3");
 	});
 
@@ -26,7 +26,7 @@ describe("files json-package", () => {
 			}`,
 			"deno.jsonc",
 		);
-		const file = fileManager.read(relativeTo("deno.jsonc"));
+		const file = await fileManager.read(relativeTo("deno.jsonc"));
 		expect(file?.version).toBe("1.2.3");
 	});
 
@@ -36,7 +36,9 @@ describe("files json-package", () => {
 
 		create.json({ version: "" }, "package.json");
 
-		expect(() => fileManager.read(relativeTo("package.json"))).toThrow(MissingPropertyException);
+		await expect(async () => await fileManager.read(relativeTo("package.json"))).rejects.toThrow(
+			MissingPropertyException,
+		);
 	});
 
 	it("should read private property", async () => {
@@ -45,7 +47,7 @@ describe("files json-package", () => {
 
 		create.json({ version: "1.2.3", private: true }, "package.json");
 
-		const file = fileManager.read(relativeTo("package.json"));
+		const file = await fileManager.read(relativeTo("package.json"));
 		expect(file?.isPrivate).toBe(true);
 	});
 
@@ -55,16 +57,15 @@ describe("files json-package", () => {
 
 		create.json({ version: "1.2.3" }, "package.json");
 
-		fileManager.write(
+		await fileManager.write(
 			{
-				name: "package.json",
 				path: relativeTo("package.json"),
 				version: "1.2.3",
 			},
 			"4.5.6",
 		);
 
-		const file = fileManager.read(relativeTo("package.json"));
+		const file = await fileManager.read(relativeTo("package.json"));
 		expect(file?.version).toBe("4.5.6");
 	});
 
@@ -81,9 +82,8 @@ describe("files json-package", () => {
 			"package-lock.json",
 		);
 
-		fileManager.write(
+		await fileManager.write(
 			{
-				name: "package-lock.json",
 				path: relativeTo("package-lock.json"),
 				version: "1.2.3",
 			},
@@ -106,9 +106,8 @@ describe("files json-package", () => {
 			}`,
 			"deno.jsonc",
 		);
-		fileManager.write(
+		await fileManager.write(
 			{
-				name: "deno.jsonc",
 				path: relativeTo("deno.jsonc"),
 				version: "1.2.3",
 			},
@@ -131,9 +130,8 @@ describe("files json-package", () => {
 
 		create.file('{\n\t"version": "1.2.3"\n}', "package.json");
 
-		fileManager.write(
+		await fileManager.write(
 			{
-				name: "package.json",
 				path: relativeTo("package.json"),
 				version: "1.2.3",
 			},

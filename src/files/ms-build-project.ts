@@ -1,5 +1,4 @@
-import { basename } from "node:path";
-import { readFileSync, writeFileSync } from "node:fs";
+import { readFile, writeFile } from "node:fs/promises";
 import * as cheerio from "cheerio/slim";
 
 import { MissingPropertyException, type FileState, type IFileManager } from "./file-manager";
@@ -24,14 +23,13 @@ export class MSBuildProject implements IFileManager {
 		xml: { decodeEntities: false },
 	};
 
-	read(filePath: string): FileState | undefined {
-		const fileContents = readFileSync(filePath, "utf8");
+	async read(filePath: string): Promise<FileState | undefined> {
+		const fileContents = await readFile(filePath, "utf8");
 
 		const $ = cheerio.load(fileContents, this.#cheerioOptions);
 		const version = $("Project > PropertyGroup > Version").text();
 		if (version) {
 			return {
-				name: basename(filePath),
 				path: filePath,
 				version: version,
 			};
@@ -40,8 +38,8 @@ export class MSBuildProject implements IFileManager {
 		throw new MissingPropertyException("MSBuild", "Version");
 	}
 
-	write(fileState: FileState, newVersion: string) {
-		const fileContents = readFileSync(fileState.path, "utf8");
+	async write(fileState: FileState, newVersion: string): Promise<void> {
+		const fileContents = await readFile(fileState.path, "utf8");
 
 		const $ = cheerio.load(fileContents, this.#cheerioOptions);
 		$("Project > PropertyGroup > Version").text(newVersion);
@@ -50,7 +48,7 @@ export class MSBuildProject implements IFileManager {
 		// so we're manually adding a space before the closing tag.
 		const updatedContent = $.xml().replaceAll('"/>', '" />');
 
-		writeFileSync(fileState.path, updatedContent, "utf8");
+		await writeFile(fileState.path, updatedContent, "utf8");
 	}
 
 	isSupportedFile(fileName: string): boolean {

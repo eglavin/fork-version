@@ -26,7 +26,7 @@ export const ChangelogPresetConfigSchema = z.object({
 		.describe("List of prefixes used to detect references to issues."),
 });
 
-export const ForkConfigSchema = z.object({
+export const ForkConfigJSONSchema = z.object({
 	// Commands
 	//
 
@@ -122,4 +122,16 @@ export const ForkConfigSchema = z.object({
 		.optional()
 		.describe("Add a suffix to the release commit message."),
 	commitParserOptions: z.looseObject({}).optional().describe("Options to pass to commits parser."),
+});
+
+export const CustomFileManagerSchema = z.looseObject({
+	read: z.function(),
+	write: z.function(),
+	isSupportedFile: z.function(),
+});
+
+export const ForkConfigJSSchema = ForkConfigJSONSchema.partial().extend({
+	customFileManagers: z
+		.array(CustomFileManagerSchema)
+		.describe("List of custom file managers to use. See documentation for details."),
 });

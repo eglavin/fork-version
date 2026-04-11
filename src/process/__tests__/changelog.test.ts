@@ -30,7 +30,7 @@ describe("changelog", () => {
 
 		await updateChangelog(config, logger, "1.2.4");
 
-		const changelog = readFileSync(relativeTo("CHANGELOG.md"), "utf-8");
+		const changelog = readFileSync(relativeTo("CHANGELOG.md"), "utf8");
 		expect(changelog).toContain("## 1.2.3");
 		expect(changelog).toContain("## 1.2.4");
 		expect(changelog).toContain("### Features");
@@ -76,7 +76,7 @@ describe("changelog", () => {
 
 		await updateChangelog(config, logger, "1.2.4");
 
-		const changelog = readFileSync(relativeTo("CHANGELOG.md"), "utf-8");
+		const changelog = readFileSync(relativeTo("CHANGELOG.md"), "utf8");
 		expect(changelog).toContain("## 1.2.3");
 		expect(changelog).not.toContain("## 1.2.4");
 	});
@@ -98,7 +98,7 @@ describe("changelog", () => {
 
 		await updateChangelog(config, logger, "1.2.4");
 
-		const changelog = readFileSync(relativeTo("CHANGELOG.md"), "utf-8");
+		const changelog = readFileSync(relativeTo("CHANGELOG.md"), "utf8");
 		expect(changelog).toContain("## 1.2.3");
 		expect(changelog).not.toContain("## 1.2.4");
 	});

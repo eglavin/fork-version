@@ -1,9 +1,9 @@
 import { parse } from "node:path";
-import { readFileSync } from "node:fs";
+import { readFile } from "node:fs/promises";
 import JoyCon from "joycon";
 import { bundleRequire } from "bundle-require";
 
-import { ForkConfigSchema } from "./schema";
+import { ForkConfigJSONSchema, ForkConfigJSSchema } from "./schema";
 
 /**
  * Name of the key in the package.json file that contains the users configuration.
@@ -31,7 +31,7 @@ export async function loadConfigFile(cwd: string) {
 
 	// Handle json config file.
 	if (configFilePath.endsWith("json")) {
-		const fileContent = JSON.parse(readFileSync(configFilePath).toString());
+		const fileContent = JSON.parse(await readFile(configFilePath, "utf8"));
 
 		// Handle package.json config file.
 		if (configFilePath.endsWith("package.json")) {
@@ -39,7 +39,9 @@ export async function loadConfigFile(cwd: string) {
 				fileContent[PACKAGE_JSON_CONFIG_KEY] &&
 				typeof fileContent[PACKAGE_JSON_CONFIG_KEY] === "object"
 			) {
-				const parsed = ForkConfigSchema.partial().safeParse(fileContent[PACKAGE_JSON_CONFIG_KEY]);
+				const parsed = ForkConfigJSONSchema.partial().safeParse(
+					fileContent[PACKAGE_JSON_CONFIG_KEY],
+				);
 				if (!parsed.success) {
 					throw new Error(`Validation error in: ${configFilePath}`, { cause: parsed.error });
 				}
@@ -49,7 +51,7 @@ export async function loadConfigFile(cwd: string) {
 			return {};
 		}
 
-		const parsed = ForkConfigSchema.partial().safeParse(fileContent);
+		const parsed = ForkConfigJSONSchema.partial().safeParse(fileContent);
 		if (!parsed.success) {
 			throw new Error(`Validation error in: ${configFilePath}`, { cause: parsed.error });
 		}
@@ -59,7 +61,7 @@ export async function loadConfigFile(cwd: string) {
 	// Otherwise expect config file to use js or ts.
 	const fileContent = await bundleRequire({ filepath: configFilePath });
 
-	const parsed = ForkConfigSchema.partial().safeParse(fileContent.mod.default || fileContent.mod);
+	const parsed = ForkConfigJSSchema.partial().safeParse(fileContent.mod.default || fileContent.mod);
 	if (!parsed.success) {
 		throw new Error(`Validation error in: ${configFilePath}`, { cause: parsed.error });
 	}

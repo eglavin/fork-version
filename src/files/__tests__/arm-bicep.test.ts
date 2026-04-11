@@ -15,7 +15,7 @@ var contentVersion string = '1.2.3'`,
 			"deploy.bicep",
 		);
 
-		const file = fileManager.read(relativeTo("deploy.bicep"));
+		const file = await fileManager.read(relativeTo("deploy.bicep"));
 		expect(file?.version).toBe("1.2.3");
 	});
 
@@ -25,7 +25,9 @@ var contentVersion string = '1.2.3'`,
 
 		create.file(`var contentVersion string = '1.2.3'`, "deploy.bicep");
 
-		expect(() => fileManager.read(relativeTo("deploy.bicep"))).toThrow(MissingPropertyException);
+		await expect(async () => await fileManager.read(relativeTo("deploy.bicep"))).rejects.toThrow(
+			MissingPropertyException,
+		);
 	});
 
 	it("should write a new version to a bicep file", async () => {
@@ -41,9 +43,8 @@ var contentVersion string = '1.2.3'
 			"deploy.bicep",
 		);
 
-		fileManager.write(
+		await fileManager.write(
 			{
-				name: "deploy.bicep",
 				path: relativeTo("deploy.bicep"),
 				version: "1.2.3",
 			},
@@ -70,12 +71,11 @@ var contentVersion string=         "1.2.3"`,
 			"deploy.bicep",
 		);
 
-		const file = fileManager.read(relativeTo("deploy.bicep"));
+		const file = await fileManager.read(relativeTo("deploy.bicep"));
 		expect(file?.version).toBe("1.2.3");
 
-		fileManager.write(
+		await fileManager.write(
 			{
-				name: "deploy.bicep",
 				path: relativeTo("deploy.bicep"),
 				version: "1.2.3",
 			},
@@ -99,12 +99,11 @@ var contentVersion = '1.2.3'`,
 			"deploy.bicep",
 		);
 
-		const file = fileManager.read(relativeTo("deploy.bicep"));
+		const file = await fileManager.read(relativeTo("deploy.bicep"));
 		expect(file?.version).toBe("1.2.3");
 
-		fileManager.write(
+		await fileManager.write(
 			{
-				name: "deploy.bicep",
 				path: relativeTo("deploy.bicep"),
 				version: "1.2.3",
 			},

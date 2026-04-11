@@ -13,7 +13,7 @@ export type {
 	CommitNote,
 } from "./commit-parser/types";
 
-export { ForkConfigSchema } from "./config/schema";
+export { ForkConfigJSONSchema, ForkConfigJSSchema } from "./config/schema";
 export type {
 	ChangelogPresetConfig,
 	ChangelogPresetConfigType,

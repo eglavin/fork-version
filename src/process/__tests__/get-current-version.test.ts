@@ -24,7 +24,6 @@ describe("getCurrentVersion", () => {
 		expect(result).toStrictEqual({
 			files: [
 				{
-					name: "package.json",
 					path: relativeTo("package.json"),
 					version: "1.2.3",
 					isPrivate: true,
@@ -54,7 +53,6 @@ describe("getCurrentVersion", () => {
 		expect(result).toStrictEqual({
 			files: [
 				{
-					name: "package.json",
 					path: relativeTo("package.json"),
 					version: "1.2.3",
 					isPrivate: true,
@@ -94,13 +92,11 @@ describe("getCurrentVersion", () => {
 		expect(result).toStrictEqual({
 			files: [
 				{
-					name: "package.json",
 					path: relativeTo("package.json"),
 					version: "1.2.3",
 					isPrivate: true,
 				},
 				{
-					name: "package-lock.json",
 					path: relativeTo("package-lock.json"),
 					version: "1.2.3",
 					isPrivate: true,
@@ -202,7 +198,6 @@ describe("getCurrentVersion", () => {
 		expect(result).toStrictEqual({
 			files: [
 				{
-					name: "package.json",
 					path: relativeTo("package.json"),
 					version: "1.2.3",
 					isPrivate: true,
@@ -237,7 +232,6 @@ describe("getCurrentVersion", () => {
 			files: [
 				{
 					isPrivate: true,
-					name: "package.json",
 					path: relativeTo("package.json"),
 					version: "1.2.3",
 				},

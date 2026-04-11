@@ -29,7 +29,7 @@ export async function main(config: ForkConfig, logger: Logger, fileManager: File
 	for (const outFile of current.files) {
 		logger.log(`  - ${outFile.path}`);
 
-		fileManager.write(outFile, next.version);
+		await fileManager.write(outFile, next.version);
 	}
 
 	await updateChangelog(config, logger, next.version);

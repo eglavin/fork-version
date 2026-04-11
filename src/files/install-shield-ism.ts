@@ -1,5 +1,5 @@
 import { basename } from "node:path";
-import { readFileSync, writeFileSync } from "node:fs";
+import { readFile, writeFile } from "node:fs/promises";
 import * as cheerio from "cheerio/slim";
 
 import { MissingPropertyException, type FileState, type IFileManager } from "./file-manager";
@@ -31,8 +31,8 @@ export class InstallShieldISM implements IFileManager {
 		xml: { decodeEntities: false },
 	};
 
-	read(filePath: string): FileState | undefined {
-		const fileContents = readFileSync(filePath, "utf8");
+	async read(filePath: string): Promise<FileState | undefined> {
+		const fileContents = await readFile(filePath, "utf8");
 
 		const $ = cheerio.load(fileContents, this.#cheerioOptions);
 		const version = $('msi > table[name="Property"] > row > td:contains("ProductVersion")')
@@ -50,8 +50,8 @@ export class InstallShieldISM implements IFileManager {
 		throw new MissingPropertyException("InstallShield ISM", "ProductVersion");
 	}
 
-	write(fileState: FileState, newVersion: string): void {
-		const fileContents = readFileSync(fileState.path, "utf8");
+	async write(fileState: FileState, newVersion: string): Promise<void> {
+		const fileContents = await readFile(fileState.path, "utf8");
 
 		const $ = cheerio.load(fileContents, this.#cheerioOptions);
 		const versionCell = $(
@@ -65,7 +65,7 @@ export class InstallShieldISM implements IFileManager {
 		// so we're manually adding a space before any closing tags.
 		const updatedContent = $.xml().replaceAll('"/>', '" />');
 
-		writeFileSync(fileState.path, updatedContent, "utf8");
+		await writeFile(fileState.path, updatedContent, "utf8");
 	}
 
 	isSupportedFile(fileName: string): boolean {

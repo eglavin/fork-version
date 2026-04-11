@@ -19,7 +19,7 @@ environment:
 			"pubspec.yaml",
 		);
 
-		const file = fileManager.read(relativeTo("pubspec.yaml"));
+		const file = await fileManager.read(relativeTo("pubspec.yaml"));
 		expect(file?.version).toBe("1.2.3");
 		expect(file?.builderNumber).toBe("55");
 	});
@@ -35,7 +35,7 @@ version: 1.2.3 # Comment about the version number
 			"my-project.yaml",
 		);
 
-		const file = fileManager.read(relativeTo("my-project.yaml"));
+		const file = await fileManager.read(relativeTo("my-project.yaml"));
 		expect(file?.version).toBe("1.2.3");
 		expect(file?.builderNumber).toBeUndefined();
 	});
@@ -54,7 +54,9 @@ environment:
 			"pubspec.yaml",
 		);
 
-		expect(() => fileManager.read(relativeTo("pubspec.yaml"))).toThrow(MissingPropertyException);
+		await expect(async () => await fileManager.read(relativeTo("pubspec.yaml"))).rejects.toThrow(
+			MissingPropertyException,
+		);
 	});
 
 	it("should write a flutter pubspec.yaml file", async () => {
@@ -72,7 +74,7 @@ environment:
 			"pubspec.yaml",
 		);
 
-		fileManager.write(
+		await fileManager.write(
 			{
 				name: "pubspec.yaml",
 				path: relativeTo("pubspec.yaml"),
@@ -82,7 +84,7 @@ environment:
 			"2.4.6",
 		);
 
-		const file = fileManager.read(relativeTo("pubspec.yaml"));
+		const file = await fileManager.read(relativeTo("pubspec.yaml"));
 		expect(file?.version).toBe("2.4.6");
 		expect(file?.builderNumber).toBe("55");
 	});
@@ -98,7 +100,7 @@ version: 1.2.3 # Comment about the version number
 			"my-project.yaml",
 		);
 
-		fileManager.write(
+		await fileManager.write(
 			{
 				name: "my-project.yaml",
 				path: relativeTo("my-project.yaml"),
@@ -108,7 +110,7 @@ version: 1.2.3 # Comment about the version number
 			"2.4.6",
 		);
 
-		const file = fileManager.read(relativeTo("my-project.yaml"));
+		const file = await fileManager.read(relativeTo("my-project.yaml"));
 		expect(file?.version).toBe("2.4.6");
 		expect(file?.builderNumber).toBeUndefined();
 	});

@@ -19,7 +19,7 @@ describe("files ms-build-project", () => {
 			"API.csproj",
 		);
 
-		const file = fileManager.read(relativeTo("API.csproj"));
+		const file = await fileManager.read(relativeTo("API.csproj"));
 		expect(file?.version).toBe("1.2.3");
 	});
 
@@ -37,7 +37,9 @@ describe("files ms-build-project", () => {
 			"API.csproj",
 		);
 
-		expect(() => fileManager.read(relativeTo("API.csproj"))).toThrow(MissingPropertyException);
+		await expect(async () => await fileManager.read(relativeTo("API.csproj"))).rejects.toThrow(
+			MissingPropertyException,
+		);
 	});
 
 	it("should write a csproj file", async () => {
@@ -54,7 +56,7 @@ describe("files ms-build-project", () => {
 			"API.csproj",
 		);
 
-		fileManager.write(
+		await fileManager.write(
 			{
 				name: "API.csproj",
 				path: relativeTo("API.csproj"),
@@ -63,7 +65,7 @@ describe("files ms-build-project", () => {
 			"4.5.6",
 		);
 
-		const file = fileManager.read(relativeTo("API.csproj"));
+		const file = await fileManager.read(relativeTo("API.csproj"));
 		expect(file?.version).toBe("4.5.6");
 	});
 
@@ -96,7 +98,7 @@ describe("files ms-build-project", () => {
 			"API.csproj",
 		);
 
-		fileManager.write(
+		await fileManager.write(
 			{
 				name: "API.csproj",
 				path: relativeTo("API.csproj"),

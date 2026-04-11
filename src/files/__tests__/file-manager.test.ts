@@ -11,7 +11,7 @@ describe("files file-manager", () => {
 
 			create.json({ version: "1.2.3" }, "package.json");
 
-			const file = fileManager.read("package.json");
+			const file = await fileManager.read("package.json");
 			expect(file?.version).toBe("1.2.3");
 		});
 
@@ -21,7 +21,7 @@ describe("files file-manager", () => {
 
 			create.json({ version: "1.0.0" }, "package.json");
 
-			fileManager.write(
+			await fileManager.write(
 				{
 					name: "package.json",
 					path: relativeTo("package.json"),
@@ -30,7 +30,7 @@ describe("files file-manager", () => {
 				"1.2.3",
 			);
 
-			const packageJSON = JSON.parse(readFileSync(relativeTo("package.json"), "utf-8"));
+			const packageJSON = JSON.parse(readFileSync(relativeTo("package.json"), "utf8"));
 			expect(packageJSON.version).toBe("1.2.3");
 		});
 	});
@@ -52,7 +52,7 @@ environment:
 				"pubspec.yaml",
 			);
 
-			const file = fileManager.read("pubspec.yaml");
+			const file = await fileManager.read("pubspec.yaml");
 			expect(file?.version).toBe("1.2.3");
 			expect(file?.builderNumber).toBe("55");
 		});
@@ -72,7 +72,7 @@ environment:
 				"pubspec.yaml",
 			);
 
-			fileManager.write(
+			await fileManager.write(
 				{
 					name: "pubspec.yaml",
 					path: relativeTo("pubspec.yaml"),
@@ -82,7 +82,7 @@ environment:
 				"2.4.6",
 			);
 
-			const file = fileManager.read(relativeTo("pubspec.yaml"));
+			const file = await fileManager.read(relativeTo("pubspec.yaml"));
 			expect(file?.version).toBe("2.4.6");
 			expect(file?.builderNumber).toBe("55");
 		});
@@ -95,7 +95,7 @@ environment:
 
 			create.file("1.2.3", "version.txt");
 
-			const file = fileManager.read("version.txt");
+			const file = await fileManager.read("version.txt");
 			expect(file?.version).toBe("1.2.3");
 		});
 
@@ -105,7 +105,7 @@ environment:
 
 			create.file("1.0.0", "version.txt");
 
-			fileManager.write(
+			await fileManager.write(
 				{
 					name: "version.txt",
 					path: relativeTo("version.txt"),
@@ -113,7 +113,7 @@ environment:
 				},
 				"1.2.3",
 			);
-			const version = readFileSync(relativeTo("version.txt"), "utf-8");
+			const version = readFileSync(relativeTo("version.txt"), "utf8");
 			expect(version).toBe("1.2.3");
 		});
 	});
@@ -133,7 +133,7 @@ environment:
 				"API.csproj",
 			);
 
-			const file = fileManager.read("API.csproj");
+			const file = await fileManager.read("API.csproj");
 			expect(file?.version).toBe("1.2.3");
 		});
 
@@ -151,7 +151,7 @@ environment:
 				"API.csproj",
 			);
 
-			fileManager.write(
+			await fileManager.write(
 				{
 					name: "API.csproj",
 					path: relativeTo("API.csproj"),
@@ -160,7 +160,7 @@ environment:
 				"4.5.6",
 			);
 
-			const file = fileManager.read(relativeTo("API.csproj"));
+			const file = await fileManager.read(relativeTo("API.csproj"));
 			expect(file?.version).toBe("4.5.6");
 		});
 	});
@@ -172,7 +172,7 @@ environment:
 
 			create.file("Version: 1.2.3", "version.unknown");
 
-			fileManager.read("version.unknown");
+			await fileManager.read("version.unknown");
 			expect(logger.error).toHaveBeenCalledWith("[File Manager] Unsupported file: version.unknown");
 		});
 
@@ -180,7 +180,7 @@ environment:
 			const { config, logger, relativeTo } = await setupTest("files file-manager");
 			const fileManager = new FileManager(config, logger);
 
-			fileManager.write(
+			await fileManager.write(
 				{
 					name: "version.unknown",
 					path: relativeTo("version.unknown"),
@@ -210,7 +210,7 @@ environment:
 				"pubspec.yaml",
 			);
 
-			const file = fileManager.read(relativeTo("pubspec.yaml"));
+			const file = await fileManager.read(relativeTo("pubspec.yaml"));
 			expect(file?.version).toBe("1.2.3");
 		});
 
@@ -219,7 +219,7 @@ environment:
 			config.dryRun = true;
 			const fileManager = new FileManager(config, logger);
 
-			fileManager.write(
+			await fileManager.write(
 				{
 					name: "package.json",
 					path: relativeTo("package.json"),
@@ -235,7 +235,7 @@ environment:
 			const { config, logger } = await setupTest("files file-manager");
 			const fileManager = new FileManager(config, logger);
 
-			const file = fileManager.read("nonexistent.json");
+			const file = await fileManager.read("nonexistent.json");
 			expect(file).toBeUndefined();
 		});
 
@@ -245,7 +245,7 @@ environment:
 
 			create.json({ name: "test-package" }, "package.json");
 
-			const file = fileManager.read("package.json");
+			const file = await fileManager.read("package.json");
 			expect(file).toBeUndefined();
 			expect(logger.warn).toHaveBeenCalledWith(
 				"[File Manager] Missing 'version' property in JSON file: package.json",

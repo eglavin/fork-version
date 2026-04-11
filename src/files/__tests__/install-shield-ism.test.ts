@@ -25,7 +25,7 @@ describe("files install-shield-ism", () => {
 			"setup.ism",
 		);
 
-		const file = fileManager.read(relativeTo("setup.ism"));
+		const file = await fileManager.read(relativeTo("setup.ism"));
 		expect(file?.version).toBe("1.2.3");
 	});
 
@@ -51,7 +51,9 @@ describe("files install-shield-ism", () => {
 			"setup.ism",
 		);
 
-		expect(() => fileManager.read(relativeTo("setup.ism"))).toThrow(MissingPropertyException);
+		await expect(async () => await fileManager.read(relativeTo("setup.ism"))).rejects.toThrow(
+			MissingPropertyException,
+		);
 	});
 
 	it("should write an InstallShield ISM file", async () => {
@@ -76,7 +78,7 @@ describe("files install-shield-ism", () => {
 			"setup.ism",
 		);
 
-		fileManager.write(
+		await fileManager.write(
 			{
 				name: "setup.ism",
 				path: relativeTo("setup.ism"),
@@ -85,7 +87,7 @@ describe("files install-shield-ism", () => {
 			"4.5.6",
 		);
 
-		const file = fileManager.read(relativeTo("setup.ism"));
+		const file = await fileManager.read(relativeTo("setup.ism"));
 		expect(file?.version).toBe("4.5.6");
 	});
 

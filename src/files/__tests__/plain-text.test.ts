@@ -11,7 +11,7 @@ describe("files plain-text", () => {
 
 		create.file("1.2.3", "version.txt");
 
-		const file = fileManager.read(relativeTo("version.txt"));
+		const file = await fileManager.read(relativeTo("version.txt"));
 
 		expect(file?.version).toBe("1.2.3");
 	});
@@ -22,7 +22,9 @@ describe("files plain-text", () => {
 
 		create.file("", "version.txt");
 
-		expect(() => fileManager.read(relativeTo("version.txt"))).toThrow(MissingPropertyException);
+		await expect(async () => await fileManager.read(relativeTo("version.txt"))).rejects.toThrow(
+			MissingPropertyException,
+		);
 	});
 
 	it("should be able to write version to version.txt file", async () => {
@@ -31,7 +33,7 @@ describe("files plain-text", () => {
 
 		create.file("1.2.3", "version.txt");
 
-		fileManager.write(
+		await fileManager.write(
 			{
 				name: "version.txt",
 				path: relativeTo("version.txt"),
@@ -39,7 +41,7 @@ describe("files plain-text", () => {
 			},
 			"1.2.4",
 		);
-		const newVersion = readFileSync(relativeTo("version.txt"), "utf-8");
+		const newVersion = readFileSync(relativeTo("version.txt"), "utf8");
 
 		expect(newVersion).toBe("1.2.4");
 	});

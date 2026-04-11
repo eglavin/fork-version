@@ -1,5 +1,5 @@
 import { resolve } from "node:path";
-import { writeFileSync, readFileSync } from "node:fs";
+import { writeFile, readFile } from "node:fs/promises";
 import conventionalChangelog from "conventional-changelog";
 
 import { fileExists } from "../utils/file-state";
@@ -17,9 +17,9 @@ const RELEASE_PATTERN = /(^#+ \[?[0-9]+\.[0-9]+\.[0-9]+|<a name=)/m;
  * Get the existing changelog content from the latest release onwards.
  * @see {@link RELEASE_PATTERN}
  */
-function getOldReleaseContent(filePath: string, exists: boolean): string {
+async function getOldReleaseContent(filePath: string, exists: boolean): Promise<string> {
 	if (exists) {
-		const fileContents = readFileSync(filePath, "utf-8");
+		const fileContents = await readFile(filePath, "utf8");
 		const oldContentStart = fileContents.search(RELEASE_PATTERN);
 
 		if (oldContentStart !== -1) {
@@ -91,16 +91,16 @@ export async function updateChangelog(
 
 	if (!config.dryRun && !fileExists(changelogPath)) {
 		logger.log(`Creating changelog: ${changelogPath}`);
-		writeFileSync(changelogPath, "\n", "utf8");
+		await writeFile(changelogPath, "\n", "utf8");
 	} else {
 		logger.log(`Updating changelog: ${changelogPath}`);
 	}
 
-	const oldContent = getOldReleaseContent(changelogPath, fileExists(changelogPath));
+	const oldContent = await getOldReleaseContent(changelogPath, fileExists(changelogPath));
 	const newContent = await getNewReleaseContent(config, logger, nextVersion);
 
 	if (!config.dryRun && newContent) {
-		writeFileSync(
+		await writeFile(
 			changelogPath,
 			`${config.header}
 ${newContent}

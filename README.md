@@ -292,36 +292,37 @@ Alternatively you can define your config using a key in your `package.json` file
 
 #### Config Properties
 
-| Property                                              | Type             | Default                 | Description                                                                                                         |
-| :---------------------------------------------------- | :--------------- | :---------------------- | :------------------------------------------------------------------------------------------------------------------ |
-| command                                               | string           | `main`                  | The command to run. Can be one of: main, inspect-version, inspect-tag, validate-config. Defaults to main.           |
-| [files](#configfiles)                                 | Array\<string>   | `["package.json", ...]` | List of the files to be updated                                                                                     |
-| [glob](#configglob)                                   | string           | -                       | Glob pattern to match files to be updated                                                                           |
-| path                                                  | string           | `process.cwd()`         | The path Fork-Version will run from                                                                                 |
-| changelog                                             | string           | `CHANGELOG.md`          | Name of the changelog file                                                                                          |
-| header                                                | string           | `# Changelog...`        | The header text for the changelog                                                                                   |
-| [tagPrefix](#configtagprefix)                         | string           | `v`                     | Prefix for the created tag                                                                                          |
-| [preRelease](#configprerelease)                       | string / boolean | -                       | Make a pre-release with optional label if given value is a string                                                   |
-| currentVersion                                        | string           | -                       | Use this version instead of trying to determine one                                                                 |
-| nextVersion                                           | string           | -                       | Attempt to update to this version, instead of incrementing using "conventional-commit"                              |
-| [releaseAs](#configreleaseas)                         | string           | -                       | Release as increments the version by the specified level. Overrides the default behaviour of "conventional-commit". |
-| allowMultipleVersions                                 | boolean          | true                    | Don't throw an error if multiple versions are found in the given files.                                             |
-| commitAll                                             | boolean          | false                   | Commit all changes, not just files updated by Fork-Version                                                          |
-| changelogAll                                          | boolean          | false                   | If this flag is set, all default commit types will be added to the changelog, not just `feat` and `fix`.            |
-| debug                                                 | boolean          | false                   | Output debug information                                                                                            |
-| dryRun                                                | boolean          | false                   | No output will be written to disk or committed                                                                      |
-| silent                                                | boolean          | false                   | Run without logging to the terminal                                                                                 |
-| gitTagFallback                                        | boolean          | true                    | If unable to find a version in the given files, fallback and attempt to use the latest git tag                      |
-| sign                                                  | boolean          | false                   | Sign the commit with the systems GPG key                                                                            |
-| verify                                                | boolean          | false                   | Run user defined git hooks before committing                                                                        |
-| asJson                                                | boolean          | false                   | Print inspected output as a parsable json string                                                                    |
-| skipBump                                              | boolean          | false                   | Skip the bump step                                                                                                  |
-| skipChangelog                                         | boolean          | false                   | Skip the changelog step                                                                                             |
-| skipCommit                                            | boolean          | false                   | Skip the commit step                                                                                                |
-| skipTag                                               | boolean          | false                   | Skip the tag step                                                                                                   |
-| [changelogPresetConfig](#configchangelogpresetconfig) | object           | {}                      | Override defaults from the "conventional-changelog-conventionalcommits" preset configuration                        |
-| releaseMessageSuffix                                  | string           | -                       | Add a suffix to the end of the release message                                                                      |
-| [commitParserOptions](#configcommitparseroptions)     | object           | {}                      | Options to pass to commits parser                                                                                   |
+| Property                                              | Type                 | Default                 | Description                                                                                                         |
+| :---------------------------------------------------- | :------------------- | :---------------------- | :------------------------------------------------------------------------------------------------------------------ |
+| command                                               | string               | `main`                  | The command to run. Can be one of: main, inspect-version, inspect-tag, validate-config. Defaults to main.           |
+| [files](#configfiles)                                 | Array\<string>       | `["package.json", ...]` | List of the files to be updated                                                                                     |
+| [customFileManagers](#custom-file-updaters)           | Array\<IFileManager> | -                       | Support for user provided custom file managers                                                                      |
+| [glob](#configglob)                                   | string               | -                       | Glob pattern to match files to be updated                                                                           |
+| path                                                  | string               | `process.cwd()`         | The path Fork-Version will run from                                                                                 |
+| changelog                                             | string               | `CHANGELOG.md`          | Name of the changelog file                                                                                          |
+| header                                                | string               | `# Changelog...`        | The header text for the changelog                                                                                   |
+| [tagPrefix](#configtagprefix)                         | string               | `v`                     | Prefix for the created tag                                                                                          |
+| [preRelease](#configprerelease)                       | string / boolean     | -                       | Make a pre-release with optional label if given value is a string                                                   |
+| currentVersion                                        | string               | -                       | Use this version instead of trying to determine one                                                                 |
+| nextVersion                                           | string               | -                       | Attempt to update to this version, instead of incrementing using "conventional-commit"                              |
+| [releaseAs](#configreleaseas)                         | string               | -                       | Release as increments the version by the specified level. Overrides the default behaviour of "conventional-commit". |
+| allowMultipleVersions                                 | boolean              | true                    | Don't throw an error if multiple versions are found in the given files.                                             |
+| commitAll                                             | boolean              | false                   | Commit all changes, not just files updated by Fork-Version                                                          |
+| changelogAll                                          | boolean              | false                   | If this flag is set, all default commit types will be added to the changelog, not just `feat` and `fix`.            |
+| debug                                                 | boolean              | false                   | Output debug information                                                                                            |
+| dryRun                                                | boolean              | false                   | No output will be written to disk or committed                                                                      |
+| silent                                                | boolean              | false                   | Run without logging to the terminal                                                                                 |
+| gitTagFallback                                        | boolean              | true                    | If unable to find a version in the given files, fallback and attempt to use the latest git tag                      |
+| sign                                                  | boolean              | false                   | Sign the commit with the systems GPG key                                                                            |
+| verify                                                | boolean              | false                   | Run user defined git hooks before committing                                                                        |
+| asJson                                                | boolean              | false                   | Print inspected output as a parsable json string                                                                    |
+| skipBump                                              | boolean              | false                   | Skip the bump step                                                                                                  |
+| skipChangelog                                         | boolean              | false                   | Skip the changelog step                                                                                             |
+| skipCommit                                            | boolean              | false                   | Skip the commit step                                                                                                |
+| skipTag                                               | boolean              | false                   | Skip the tag step                                                                                                   |
+| [changelogPresetConfig](#configchangelogpresetconfig) | object               | {}                      | Override defaults from the "conventional-changelog-conventionalcommits" preset configuration                        |
+| releaseMessageSuffix                                  | string               | -                       | Add a suffix to the end of the release message                                                                      |
+| [commitParserOptions](#configcommitparseroptions)     | object               | {}                      | Options to pass to commits parser                                                                                   |
 
 ##### config.files
 
@@ -337,7 +338,7 @@ By default Fork-Version will attempt to read versions from and update these file
 - "manifest.json"
 - "bower.json"
 
-See the [Supported File Types](#supported-file-types) section below to see the currently supported file types.
+See the [Supported File Types](#supported-file-types) section below to see the currently supported file types and the [Custom File Updater's](#custom-file-updaters) section below to see how to support other file types.
 
 ##### config.glob
 
@@ -469,6 +470,7 @@ If you are using one of the following Git hosts, Fork-Version will automatically
 - [MS Build](#ms-build)
 - [ARM Bicep](#arm-bicep)
 - [Install Shield ISM](#install-shield-ism)
+- [Custom File Updater's](#custom-file-updaters)
 
 #### Json Package
 
@@ -546,7 +548,69 @@ An Install Shield `*.ism` file can be either binary or an xml file. Fork-Version
 
 #### Custom File Updater's
 
-`TODO` [add support for custom file readers and writers through config #5](https://github.com/eglavin/fork-version/issues/5)
+***Released in version 5.1.0***
+
+If you have a file type that isn't supported by default, you can create a custom file manager to read and write the updated version to that file.
+
+To do this you will need to create a class or an object that implements the `IFileManager` interface and add an instance of that class or object to the `customFileManagers` array in your config.
+
+The following example show a custom file manager for a json file with the name of `test.json` with the following structure:
+
+Example `test.json` file:
+
+```json
+{
+  "package": {
+    "version": "1.2.3"
+  }
+}
+```
+
+Example Custom File Manager implementation:
+
+```ts
+// fork.config.ts
+import { readFile, writeFile } from "node:fs/promises";
+import { defineConfig, MissingPropertyException, type FileState, type IFileManager } from "fork-version";
+
+class CustomFileManager implements IFileManager {
+  async read(filePath: string): Promise<FileState | undefined> {
+    const fileContent = await readFile(filePath, "utf-8");
+    if (fileContent) {
+      const parsedContent = JSON.parse(fileContent);
+      if ("package" in parsedContent && "version" in parsedContent.package) {
+        return {
+          path: filePath,
+          version: parsedContent.package.version,
+        };
+      }
+    }
+    throw new MissingPropertyException("My Custom File", "package.version");
+  }
+
+  async write(fileState: FileState, newVersion: string): Promise<void> {
+    const fileContent = await readFile(fileState.path, "utf-8");
+    if (fileContent) {
+      const parsedContent = JSON.parse(fileContent);
+      if ("package" in parsedContent && "version" in parsedContent.package) {
+        parsedContent.package.version = newVersion;
+        const updatedContent = JSON.stringify(parsedContent, null, 2);
+        await writeFile(fileState.path, updatedContent, "utf-8");
+      }
+    }
+  }
+
+  isSupportedFile(fileName: string) {
+    return fileName === "test.json";
+  }
+}
+
+export default defineConfig({
+  customFileManagers: [new CustomFileManager()],
+});
+```
+
+> [See `IFileManager` interface to see the required methods and properties for a custom file manager.](./src/files/file-manager.ts)
 
 ### Code Usage
 

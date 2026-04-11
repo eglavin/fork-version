@@ -1,4 +1,3 @@
-import { basename } from "node:path";
 import { readFile, writeFile } from "node:fs/promises";
 import { parse, parseDocument } from "yaml";
 
@@ -49,7 +48,6 @@ export class YAMLPackage implements IFileManager {
 			const parsedVersion = this.#handleBuildNumber(fileVersion);
 
 			return {
-				name: basename(filePath),
 				path: filePath,
 				version: parsedVersion.version || "",
 				builderNumber: parsedVersion.builderNumber ?? undefined,

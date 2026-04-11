@@ -35,7 +35,6 @@ describe("files plain-text", () => {
 
 		await fileManager.write(
 			{
-				name: "version.txt",
 				path: relativeTo("version.txt"),
 				version: "1.2.3",
 			},

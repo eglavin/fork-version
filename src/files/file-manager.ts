@@ -1,4 +1,4 @@
-import { basename, isAbsolute, resolve } from "node:path";
+import { isAbsolute, relative, resolve } from "node:path";
 
 import { fileExists } from "../utils/file-state";
 import { JSONPackage } from "./json-package";
@@ -27,7 +27,6 @@ export class MissingPropertyException extends Error {
 }
 
 export interface FileState {
-	name: string;
 	path: string;
 	version: string;
 	[other: string]: unknown;
@@ -44,7 +43,9 @@ export interface IFileManager {
 	 * @example
 	 * ```ts
 	 * const fileState = await fileManager.read("package.json");
-	 * // Returns { name: "package.json", path: "/absolute/path/to/package.json", version: "1.2.3" }
+	 *
+	 * // Returns
+	 * { path: "package.json", version: "1.2.3" }
 	 * ```
 	 */
 	read(filePath: string): Promise<FileState | undefined>;
@@ -52,12 +53,11 @@ export interface IFileManager {
 	 * Function to write the new version to the file.
 	 * @param fileState The current state of the file, including its path and current version.
 	 * @param newVersion The new version string to write to the file.
-	 * @throws {Error} If an unexpected error occurs while writing to the file.
 	 *
 	 * @example
 	 * ```ts
 	 * await fileManager.write(
-	 *   { name: "package.json", path: "/absolute/path/to/package.json", version: "1.2.2" },
+	 *   { path: "package.json", version: "1.2.2" },
 	 *   "1.2.3"
 	 * );
 	 * ```
@@ -65,8 +65,9 @@ export interface IFileManager {
 	write(fileState: FileState, newVersion: string): Promise<void>;
 	/**
 	 * Determine if the file manager supports the given file based on its name or path.
+	 * File name will be transformed to lower case before checking for support to allow for case-insensitive file matching.
 	 * @param filePath The name or path of the file to check.
-	 * @return `true` if the file is supported by this file manager, `false` otherwise.
+	 * @returns `true` if the file is supported by this file manager, `false` otherwise.
 	 *
 	 * @example
 	 * ```ts
@@ -104,32 +105,33 @@ export class FileManager {
 	}
 
 	/**
-	 * Get the state from the given file name.
+	 * Get the state from the given file.
 	 *
 	 * @example
 	 * ```ts
 	 * fileManager.read("package.json");
-	 * ```
 	 *
-	 * @returns
-	 * ```json
-	 * { "name": "package.json", "path": "/path/to/package.json", "version": "1.2.3", "isPrivate": true }
+	 * // Returns
+	 * { path: "package.json", version: "1.2.3" }
 	 * ```
 	 */
 	async read(pathOrName: string): Promise<FileState | undefined> {
-		const _fileName = pathOrName.toLowerCase();
 		const filePath = isAbsolute(pathOrName) ? pathOrName : resolve(this.#config.path, pathOrName);
+		const relativePath = relative(this.#config.path, filePath);
+		const fileNameLower = relativePath.toLocaleLowerCase();
 
-		if (!fileExists(filePath)) return;
+		if (!fileExists(filePath)) {
+			return;
+		}
 
 		for (const fileManager of this.#fileManagers) {
-			if (fileManager.isSupportedFile(_fileName)) {
+			if (fileManager.isSupportedFile(fileNameLower)) {
 				try {
 					return await fileManager.read(filePath);
 				} catch (error) {
 					if (error instanceof MissingPropertyException) {
 						this.#logger.warn(
-							`[File Manager] Missing '${error.propertyName}' property in ${error.fileType} file: ${basename(_fileName)}`,
+							`[File Manager] Missing '${error.propertyName}' property in ${error.fileType} file: ${relativePath}`,
 						);
 					} else {
 						// Rethrow any unexpected errors.
@@ -143,16 +145,16 @@ export class FileManager {
 			}
 		}
 
-		this.#logger.error(`[File Manager] Unsupported file: ${pathOrName}`);
+		this.#logger.error(`[File Manager] Unsupported file: ${relativePath}`);
 	}
 
 	/**
-	 * Write the new version to the given file.
+	 * Write new version to the given file.
 	 *
 	 * @example
 	 * ```ts
 	 * fileManager.write(
-	 *   { name: "package.json", path: "/path/to/package.json", version: "1.2.2" },
+	 *   { path: "package.json", version: "1.2.2" },
 	 *   "1.2.3"
 	 * );
 	 * ```
@@ -161,14 +163,15 @@ export class FileManager {
 		if (this.#config.dryRun) {
 			return;
 		}
-		const _fileName = fileState.name.toLowerCase();
+		const relativePath = relative(this.#config.path, fileState.path);
+		const fileNameLower = relativePath.toLocaleLowerCase();
 
 		for (const fileManager of this.#fileManagers) {
-			if (fileManager.isSupportedFile(_fileName)) {
+			if (fileManager.isSupportedFile(fileNameLower)) {
 				return await fileManager.write(fileState, newVersion);
 			}
 		}
 
-		this.#logger.error(`[File Manager] Unsupported file: ${fileState.path}`);
+		this.#logger.error(`[File Manager] Unsupported file: ${relativePath}`);
 	}
 }

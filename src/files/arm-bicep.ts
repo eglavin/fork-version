@@ -1,4 +1,3 @@
-import { basename } from "node:path";
 import { readFile, writeFile } from "node:fs/promises";
 
 import { MissingPropertyException, type FileState, type IFileManager } from "./file-manager";
@@ -25,7 +24,6 @@ export class ARMBicep implements IFileManager {
 		const metadataMatch = this.#metadataRegex.exec(fileContents);
 		if (metadataMatch?.groups?.version) {
 			return {
-				name: basename(filePath),
 				path: filePath,
 				version: metadataMatch.groups.version,
 			};

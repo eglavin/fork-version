@@ -1,4 +1,3 @@
-import { basename } from "node:path";
 import { readFile, writeFile } from "node:fs/promises";
 import * as cheerio from "cheerio/slim";
 
@@ -41,7 +40,6 @@ export class InstallShieldISM implements IFileManager {
 			.trim();
 		if (version) {
 			return {
-				name: basename(filePath),
 				path: filePath,
 				version: version,
 			};

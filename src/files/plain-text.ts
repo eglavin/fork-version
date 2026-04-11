@@ -1,4 +1,3 @@
-import { basename } from "node:path";
 import { readFile, writeFile } from "node:fs/promises";
 
 import { MissingPropertyException, type FileState, type IFileManager } from "./file-manager";
@@ -17,7 +16,6 @@ export class PlainText implements IFileManager {
 
 		if (fileContents) {
 			return {
-				name: basename(filePath),
 				path: filePath,
 				version: fileContents,
 			};

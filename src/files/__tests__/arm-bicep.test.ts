@@ -45,7 +45,6 @@ var contentVersion string = '1.2.3'
 
 		await fileManager.write(
 			{
-				name: "deploy.bicep",
 				path: relativeTo("deploy.bicep"),
 				version: "1.2.3",
 			},
@@ -77,7 +76,6 @@ var contentVersion string=         "1.2.3"`,
 
 		await fileManager.write(
 			{
-				name: "deploy.bicep",
 				path: relativeTo("deploy.bicep"),
 				version: "1.2.3",
 			},
@@ -106,7 +104,6 @@ var contentVersion = '1.2.3'`,
 
 		await fileManager.write(
 			{
-				name: "deploy.bicep",
 				path: relativeTo("deploy.bicep"),
 				version: "1.2.3",
 			},

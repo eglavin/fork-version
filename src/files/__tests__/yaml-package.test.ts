@@ -76,7 +76,6 @@ environment:
 
 		await fileManager.write(
 			{
-				name: "pubspec.yaml",
 				path: relativeTo("pubspec.yaml"),
 				version: "1.2.3",
 				builderNumber: 55,
@@ -102,7 +101,6 @@ version: 1.2.3 # Comment about the version number
 
 		await fileManager.write(
 			{
-				name: "my-project.yaml",
 				path: relativeTo("my-project.yaml"),
 				version: "1.2.3",
 				builderNumber: undefined,

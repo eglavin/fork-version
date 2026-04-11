@@ -45,7 +45,9 @@ async function runFork() {
 				`\nRun \`git push --follow-tags origin ${branchName}\` to push the changes and the tag.`,
 			);
 
-			if (result.current.files.some((file) => file.name === "package.json" && !file.isPrivate)) {
+			if (
+				result.current.files.some((file) => file.path.endsWith("package.json") && !file.isPrivate)
+			) {
 				const npmTag = typeof config.preRelease === "string" ? config.preRelease : "prerelease";
 				logger.log(
 					`${result.next.releaseType}`.startsWith("pre")

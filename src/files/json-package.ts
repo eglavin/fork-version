@@ -1,4 +1,3 @@
-import { basename } from "node:path";
 import { readFile, writeFile } from "node:fs/promises";
 import {
 	applyEdits,
@@ -62,10 +61,8 @@ export class JSONPackage implements IFileManager {
 		const parsedJson: PackageJsonish = parse(fileContents, parseErrors, this.#jsoncOptions);
 		if (parsedJson?.version && parseErrors.length === 0) {
 			return {
-				name: basename(filePath),
 				path: filePath,
 				version: parsedJson.version,
-
 				isPrivate: typeof parsedJson?.private === "boolean" ? parsedJson.private : true,
 			};
 		}

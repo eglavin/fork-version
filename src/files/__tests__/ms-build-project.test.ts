@@ -58,7 +58,6 @@ describe("files ms-build-project", () => {
 
 		await fileManager.write(
 			{
-				name: "API.csproj",
 				path: relativeTo("API.csproj"),
 				version: "1.2.3",
 			},
@@ -100,7 +99,6 @@ describe("files ms-build-project", () => {
 
 		await fileManager.write(
 			{
-				name: "API.csproj",
 				path: relativeTo("API.csproj"),
 				version: "1.2.3",
 			},

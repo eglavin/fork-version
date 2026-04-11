@@ -59,7 +59,6 @@ describe("files json-package", () => {
 
 		await fileManager.write(
 			{
-				name: "package.json",
 				path: relativeTo("package.json"),
 				version: "1.2.3",
 			},
@@ -85,7 +84,6 @@ describe("files json-package", () => {
 
 		await fileManager.write(
 			{
-				name: "package-lock.json",
 				path: relativeTo("package-lock.json"),
 				version: "1.2.3",
 			},
@@ -110,7 +108,6 @@ describe("files json-package", () => {
 		);
 		await fileManager.write(
 			{
-				name: "deno.jsonc",
 				path: relativeTo("deno.jsonc"),
 				version: "1.2.3",
 			},
@@ -135,7 +132,6 @@ describe("files json-package", () => {
 
 		await fileManager.write(
 			{
-				name: "package.json",
 				path: relativeTo("package.json"),
 				version: "1.2.3",
 			},

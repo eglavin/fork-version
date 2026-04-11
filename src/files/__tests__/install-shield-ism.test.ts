@@ -80,7 +80,6 @@ describe("files install-shield-ism", () => {
 
 		await fileManager.write(
 			{
-				name: "setup.ism",
 				path: relativeTo("setup.ism"),
 				version: "1.2.3",
 			},

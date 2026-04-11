@@ -14,8 +14,8 @@ describe("commit", () => {
 			logger,
 			git,
 			[
-				{ name: "CHANGELOG.md", path: relativeTo("CHANGELOG.md"), version: "1.2.4" },
-				{ name: "package.json", path: relativeTo("package.json"), version: "1.2.4" },
+				{ path: relativeTo("CHANGELOG.md"), version: "1.2.4" },
+				{ path: relativeTo("package.json"), version: "1.2.4" },
 			],
 			"1.2.4",
 		);
@@ -46,8 +46,8 @@ describe("commit", () => {
 			logger,
 			git,
 			[
-				{ name: "CHANGELOG.md", path: relativeTo("CHANGELOG.md"), version: "1.2.4" },
-				{ name: "package.json", path: relativeTo("package.json"), version: "1.2.4" },
+				{ path: relativeTo("CHANGELOG.md"), version: "1.2.4" },
+				{ path: relativeTo("package.json"), version: "1.2.4" },
 			],
 			"1.2.4",
 		);
@@ -65,7 +65,7 @@ describe("commit", () => {
 			config,
 			logger,
 			git,
-			[{ name: "package.json", path: relativeTo("package.json"), version: "1.2.4" }],
+			[{ path: relativeTo("package.json"), version: "1.2.4" }],
 			"1.2.4",
 		);
 

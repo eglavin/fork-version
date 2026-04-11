@@ -1,4 +1,3 @@
-import { basename } from "node:path";
 import { readFile, writeFile } from "node:fs/promises";
 import * as cheerio from "cheerio/slim";
 
@@ -31,7 +30,6 @@ export class MSBuildProject implements IFileManager {
 		const version = $("Project > PropertyGroup > Version").text();
 		if (version) {
 			return {
-				name: basename(filePath),
 				path: filePath,
 				version: version,
 			};

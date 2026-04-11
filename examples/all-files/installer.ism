@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<?xml-stylesheet type="text/xsl" href="is.xsl" ?>
+<!DOCTYPE msi>
+<msi version="2.0" xmlns:dt="urn:schemas-microsoft-com:datatypes">
+
+  <table name="Property">
+    <row><td>ProductVersion</td><td>1.2.3</td><td/></row>
+  </table>
+
+</msi>

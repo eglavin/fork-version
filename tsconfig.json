@@ -28,5 +28,8 @@
 		"src",
 		"tests",
 		"tsdown.config.ts"
+	],
+	"exclude": [
+		"example"
 	]
 }

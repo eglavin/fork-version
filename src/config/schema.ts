@@ -124,7 +124,7 @@ export const ForkConfigJSONSchema = z.object({
 	commitParserOptions: z.looseObject({}).optional().describe("Options to pass to commits parser."),
 });
 
-export const CustomFileManagerSchema = z.object({
+export const CustomFileManagerSchema = z.looseObject({
 	read: z.function(),
 	write: z.function(),
 	isSupportedFile: z.function(),

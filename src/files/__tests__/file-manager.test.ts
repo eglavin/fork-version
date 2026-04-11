@@ -200,6 +200,34 @@ environment:
 			}
 		}
 
+		const CustomFileManagerObject: IFileManager = {
+			read: async (filePath: string): Promise<FileState | undefined> => {
+				const fileContent = await readFile(filePath, "utf-8");
+				if (fileContent) {
+					const parsedContent = JSON.parse(fileContent);
+					if ("package" in parsedContent && "version" in parsedContent.package) {
+						return {
+							path: filePath,
+							version: parsedContent.package.version,
+						};
+					}
+				}
+				throw new MissingPropertyException("My Custom File", "package.version");
+			},
+			write: async (fileState: FileState, newVersion: string): Promise<void> => {
+				const fileContent = await readFile(fileState.path, "utf-8");
+				if (fileContent) {
+					const parsedContent = JSON.parse(fileContent);
+					if ("package" in parsedContent && "version" in parsedContent.package) {
+						parsedContent.package.version = newVersion;
+						const updatedContent = JSON.stringify(parsedContent, null, 2);
+						await writeFile(fileState.path, updatedContent, "utf-8");
+					}
+				}
+			},
+			isSupportedFile: (fileName: string) => fileName === "test.json",
+		};
+
 		it("should use custom file manager if it supports the file given file", async () => {
 			const { config, create, logger } = await setupTest("files file-manager");
 
@@ -247,6 +275,32 @@ environment:
 			expect(logger.warn).toHaveBeenCalledWith(
 				"[File Manager] Missing 'package.version' property in My Custom File file: test.json",
 			);
+		});
+
+		it("should use custom file manager object if it supports the file given file", async () => {
+			const { config, create, logger } = await setupTest("files file-manager");
+
+			config.customFileManagers = [CustomFileManagerObject];
+			const fileManager = new FileManager(config, logger);
+
+			create.file(
+				`{
+	"package": {
+		"name": "test-package",
+		"version": "1.2.3"
+	}
+}`,
+				"test.json",
+			);
+
+			const file = await fileManager.read("test.json");
+			expect(file?.version).toBe("1.2.3");
+
+			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+			await fileManager.write(file!, "2.3.4");
+
+			const updatedFile = await fileManager.read("test.json");
+			expect(updatedFile?.version).toBe("2.3.4");
 		});
 	});
 

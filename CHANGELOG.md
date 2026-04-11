@@ -1,5 +1,29 @@
 # Fork Version
 
+## [5.1.0](https://github.com/eglavin/fork-version/compare/v5.0.2...v5.1.0) (2026-04-11)
+
+
+### Features
+
+* implement custom user provided file managers ([9c6ed7c](https://github.com/eglavin/fork-version/commit/9c6ed7ccf39c736dfdb53b959f989c4139892523))
+
+
+### Docs
+
+* update readme with details on using custom file managers ([57a6f17](https://github.com/eglavin/fork-version/commit/57a6f174473992b113c47acee53f24a82db4e56d))
+
+
+### Refactor
+
+* remove name property from file managers ([202fc21](https://github.com/eglavin/fork-version/commit/202fc21c49f13081d352f2e5c549a8ea3c68de7f))
+* use loose object when validating custom file managers ([3b3f8a9](https://github.com/eglavin/fork-version/commit/3b3f8a92d082d9374f6fba8acd39655cc7405e39))
+
+
+### Test
+
+* add custom file manager object test ([6b58f40](https://github.com/eglavin/fork-version/commit/6b58f404ce6c4059ab43dfe2ccc3a189ae098f65))
+
+
 ## [5.0.2](https://github.com/eglavin/fork-version/compare/v5.0.1...v5.0.2) (2026-04-10)
 
 

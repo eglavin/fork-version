@@ -16,41 +16,14 @@ import { MissingPropertyException, type FileState, type IFileManager } from "./f
  * ```
  */
 export class YAMLPackage implements IFileManager {
-	/**
-	 * If the version is returned with a "+" symbol in the value then the version might be from a
-	 * flutter `pubspec.yaml` file, if so we want to retain the input builderNumber by splitting it
-	 * and joining it again later.
-	 */
-	#handleBuildNumber(fileVersion: string): {
-		version: string;
-		builderNumber?: string;
-	} {
-		const [version, builderNumber] = fileVersion.split("+");
-
-		// If the builderNumber is an integer then we'll return the split value.
-		if (/^\d+$/.test(builderNumber)) {
-			return {
-				version,
-				builderNumber,
-			};
-		}
-
-		return {
-			version: fileVersion,
-		};
-	}
-
 	async read(filePath: string): Promise<FileState | undefined> {
 		const fileContents = await readFile(filePath, "utf8");
 
 		const fileVersion = parse(fileContents)?.version;
 		if (fileVersion) {
-			const parsedVersion = this.#handleBuildNumber(fileVersion);
-
 			return {
 				path: filePath,
-				version: parsedVersion.version || "",
-				builderNumber: parsedVersion.builderNumber ?? undefined,
+				version: fileVersion,
 			};
 		}
 
@@ -61,12 +34,7 @@ export class YAMLPackage implements IFileManager {
 		const fileContents = await readFile(fileState.path, "utf8");
 		const yamlDocument = parseDocument(fileContents);
 
-		let newFileVersion = newVersion;
-		if (fileState.builderNumber !== undefined) {
-			newFileVersion += `+${fileState.builderNumber}`; // Reattach builderNumber if previously set.
-		}
-
-		yamlDocument.set("version", newFileVersion);
+		yamlDocument.set("version", newVersion);
 
 		await writeFile(fileState.path, yamlDocument.toString(), "utf8");
 	}

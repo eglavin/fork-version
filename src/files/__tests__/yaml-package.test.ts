@@ -20,8 +20,7 @@ environment:
 		);
 
 		const file = await fileManager.read(relativeTo("pubspec.yaml"));
-		expect(file?.version).toBe("1.2.3");
-		expect(file?.builderNumber).toBe("55");
+		expect(file?.version).toBe("1.2.3+55");
 	});
 
 	it("should read a regular yaml file", async () => {
@@ -37,7 +36,6 @@ version: 1.2.3 # Comment about the version number
 
 		const file = await fileManager.read(relativeTo("my-project.yaml"));
 		expect(file?.version).toBe("1.2.3");
-		expect(file?.builderNumber).toBeUndefined();
 	});
 
 	it("should throw an error if unable to read version", async () => {
@@ -78,14 +76,13 @@ environment:
 			{
 				path: relativeTo("pubspec.yaml"),
 				version: "1.2.3",
-				builderNumber: 55,
+				buildMetadata: "55",
 			},
-			"2.4.6",
+			"2.4.6+55",
 		);
 
 		const file = await fileManager.read(relativeTo("pubspec.yaml"));
-		expect(file?.version).toBe("2.4.6");
-		expect(file?.builderNumber).toBe("55");
+		expect(file?.version).toBe("2.4.6+55");
 	});
 
 	it("should write a regular yaml file", async () => {
@@ -103,14 +100,12 @@ version: 1.2.3 # Comment about the version number
 			{
 				path: relativeTo("my-project.yaml"),
 				version: "1.2.3",
-				builderNumber: undefined,
 			},
 			"2.4.6",
 		);
 
 		const file = await fileManager.read(relativeTo("my-project.yaml"));
 		expect(file?.version).toBe("2.4.6");
-		expect(file?.builderNumber).toBeUndefined();
 	});
 
 	it("should match known yaml files", async () => {

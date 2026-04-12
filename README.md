@@ -472,6 +472,15 @@ If you are using one of the following Git hosts, Fork-Version will automatically
 - [Install Shield ISM](#install-shield-ism)
 - [Custom File Updater's](#custom-file-updaters)
 
+> [!Note]
+> If your version strings include build metadata like one of the following examples:
+>
+> - 1.2.3+49a3f2b
+> - 1.2.3-0+49a3f2b
+> - 1.2.3-alpha.0+49a3f2b
+>
+> this metadata will be retained without modification.
+
 #### Json Package
 
 A json package is a json file which contains a version property, such as a npm package.json file.
@@ -494,9 +503,6 @@ description: "My project"
 publish_to: 'none'
 version: 1.2.3
 ```
-
-> [!NOTE]
-> If you're using Fork-Version for a flutter project, Fork-Version will split the version and the builder number on the "+" character, the version will be updated and the builder number will be left as is.
 
 #### Plain Text
 

@@ -8,6 +8,7 @@ import { MSBuildProject } from "./ms-build-project";
 import { ARMBicep } from "./arm-bicep";
 import { InstallShieldISM } from "./install-shield-ism";
 
+import { extractBuildMetadata } from "../utils/extract-build-metadata";
 import type { ForkConfig } from "../config/types";
 import type { Logger } from "../services/logger";
 
@@ -29,6 +30,7 @@ export class MissingPropertyException extends Error {
 export interface FileState {
 	path: string;
 	version: string;
+	buildMetadata?: string;
 	[other: string]: unknown;
 }
 
@@ -127,7 +129,19 @@ export class FileManager {
 		for (const fileManager of this.#fileManagers) {
 			if (fileManager.isSupportedFile(fileNameLower)) {
 				try {
-					return await fileManager.read(filePath);
+					const fileState = await fileManager.read(filePath);
+
+					if (fileState) {
+						const { version, buildMetadata } = extractBuildMetadata(fileState.version);
+
+						// If the version string contains build metadata, split it out into a separate property.
+						if (buildMetadata) {
+							fileState.version = version;
+							fileState.buildMetadata = buildMetadata;
+						}
+					}
+
+					return fileState;
 				} catch (error) {
 					if (error instanceof MissingPropertyException) {
 						this.#logger.warn(
@@ -166,9 +180,15 @@ export class FileManager {
 		const relativePath = relative(this.#config.path, fileState.path);
 		const fileNameLower = relativePath.toLocaleLowerCase();
 
+		// If the file has build metadata, append it to the new version string before writing to the file.
+		let updatedVersion = newVersion;
+		if (fileState?.buildMetadata) {
+			updatedVersion += `+${fileState.buildMetadata}`;
+		}
+
 		for (const fileManager of this.#fileManagers) {
 			if (fileManager.isSupportedFile(fileNameLower)) {
-				return await fileManager.write(fileState, newVersion);
+				return await fileManager.write(fileState, updatedVersion);
 			}
 		}
 

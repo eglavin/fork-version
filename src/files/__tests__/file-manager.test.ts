@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+
 import { readFile, writeFile } from "node:fs/promises";
 import { readFileSync } from "node:fs";
 
@@ -18,7 +20,9 @@ describe("files file-manager", () => {
 			create.json({ version: "1.2.3" }, "package.json");
 
 			const file = await fileManager.read("package.json");
+			expect(file).toBeDefined();
 			expect(file?.version).toBe("1.2.3");
+			expect(file?.buildMetadata).toBeUndefined();
 		});
 
 		it("should write .json", async () => {
@@ -38,6 +42,23 @@ describe("files file-manager", () => {
 			const packageJSON = JSON.parse(readFileSync(relativeTo("package.json"), "utf8"));
 			expect(packageJSON.version).toBe("1.2.3");
 		});
+
+		it("should retain build metadata when writing new version", async () => {
+			const { config, create, logger, relativeTo } = await setupTest("files file-manager");
+			const fileManager = new FileManager(config, logger);
+
+			create.json({ version: "1.2.3+55" }, "package.json");
+
+			const file = await fileManager.read("package.json");
+			expect(file).toBeDefined();
+			expect(file?.version).toBe("1.2.3");
+			expect(file?.buildMetadata).toBe("55");
+
+			await fileManager.write(file!, "1.2.4");
+
+			const packageJSON = JSON.parse(readFileSync(relativeTo("package.json"), "utf8"));
+			expect(packageJSON.version).toBe("1.2.4+55");
+		});
 	});
 
 	describe("yaml file", () => {
@@ -49,7 +70,7 @@ describe("files file-manager", () => {
 				`name: wordionary
 description: "A new Flutter project."
 publish_to: 'none'
-version: 1.2.3+55 # Comment about the version number
+version: 1.2.3 # Comment about the version number
 environment:
   sdk: ^3.5.4
 
@@ -58,11 +79,41 @@ environment:
 			);
 
 			const file = await fileManager.read("pubspec.yaml");
+			expect(file).toBeDefined();
 			expect(file?.version).toBe("1.2.3");
-			expect(file?.builderNumber).toBe("55");
+			expect(file?.buildMetadata).toBeUndefined();
 		});
 
 		it("should write .yaml", async () => {
+			const { config, create, logger, relativeTo } = await setupTest("files file-manager");
+			const fileManager = new FileManager(config, logger);
+
+			create.file(
+				`name: wordionary
+description: "A new Flutter project."
+publish_to: 'none'
+version: 1.2.3 # Comment about the version number
+environment:
+  sdk: ^3.5.4
+`,
+				"pubspec.yaml",
+			);
+
+			await fileManager.write(
+				{
+					path: relativeTo("pubspec.yaml"),
+					version: "1.2.3",
+				},
+				"2.4.6",
+			);
+
+			const file = await fileManager.read(relativeTo("pubspec.yaml"));
+			expect(file).toBeDefined();
+			expect(file?.version).toBe("2.4.6");
+			expect(file?.buildMetadata).toBeUndefined();
+		});
+
+		it("should retain build metadata when writing new version to .yaml", async () => {
 			const { config, create, logger, relativeTo } = await setupTest("files file-manager");
 			const fileManager = new FileManager(config, logger);
 
@@ -77,18 +128,17 @@ environment:
 				"pubspec.yaml",
 			);
 
-			await fileManager.write(
-				{
-					path: relativeTo("pubspec.yaml"),
-					version: "1.2.3",
-					builderNumber: 55,
-				},
-				"2.4.6",
-			);
+			const file = await fileManager.read("pubspec.yaml");
+			expect(file).toBeDefined();
+			expect(file?.version).toBe("1.2.3");
+			expect(file?.buildMetadata).toBe("55");
 
-			const file = await fileManager.read(relativeTo("pubspec.yaml"));
-			expect(file?.version).toBe("2.4.6");
-			expect(file?.builderNumber).toBe("55");
+			await fileManager.write(file!, "2.4.6");
+
+			const updatedFile = await fileManager.read(relativeTo("pubspec.yaml"));
+			expect(updatedFile).toBeDefined();
+			expect(updatedFile?.version).toBe("2.4.6");
+			expect(updatedFile?.buildMetadata).toBe("55");
 		});
 	});
 
@@ -100,7 +150,9 @@ environment:
 			create.file("1.2.3", "version.txt");
 
 			const file = await fileManager.read("version.txt");
+			expect(file).toBeDefined();
 			expect(file?.version).toBe("1.2.3");
+			expect(file?.buildMetadata).toBeUndefined();
 		});
 
 		it("should write version.txt", async () => {
@@ -116,8 +168,28 @@ environment:
 				},
 				"1.2.3",
 			);
+
 			const version = readFileSync(relativeTo("version.txt"), "utf8");
 			expect(version).toBe("1.2.3");
+		});
+
+		it("should retain build metadata when writing new version to version.txt", async () => {
+			const { config, create, logger, relativeTo } = await setupTest("files file-manager");
+			const fileManager = new FileManager(config, logger);
+
+			create.file("1.2.3+55", "version.txt");
+
+			await fileManager.write(
+				{
+					path: relativeTo("version.txt"),
+					version: "1.2.3",
+					buildMetadata: "55",
+				},
+				"1.2.4",
+			);
+
+			const version = readFileSync(relativeTo("version.txt"), "utf8");
+			expect(version).toBe("1.2.4+55");
 		});
 	});
 
@@ -137,7 +209,9 @@ environment:
 			);
 
 			const file = await fileManager.read("API.csproj");
+			expect(file).toBeDefined();
 			expect(file?.version).toBe("1.2.3");
+			expect(file?.buildMetadata).toBeUndefined();
 		});
 
 		it("should write .csproj", async () => {
@@ -248,7 +322,6 @@ environment:
 			const file = await fileManager.read("test.json");
 			expect(file?.version).toBe("1.2.3");
 
-			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 			await fileManager.write(file!, "2.3.4");
 
 			const updatedFile = await fileManager.read("test.json");
@@ -296,7 +369,6 @@ environment:
 			const file = await fileManager.read("test.json");
 			expect(file?.version).toBe("1.2.3");
 
-			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 			await fileManager.write(file!, "2.3.4");
 
 			const updatedFile = await fileManager.read("test.json");

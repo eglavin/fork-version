@@ -1,5 +1,19 @@
 # Fork Version
 
+## [5.1.1](https://github.com/eglavin/fork-version/compare/v5.1.0...v5.1.1) (2026-04-12)
+
+
+### Docs
+
+* add all files and custom file manager examples ([43c85a4](https://github.com/eglavin/fork-version/commit/43c85a482906f73c7b45a28a522bec150b3f2cff))
+* update build metadata info in readme ([e03c362](https://github.com/eglavin/fork-version/commit/e03c362094b7f0685fd386c7754f705a4d727472))
+
+
+### Refactor
+
+* move build metadata out of yaml class ([59627fc](https://github.com/eglavin/fork-version/commit/59627fc903bcd5aae1b44954fd6183417025a2f3))
+
+
 ## [5.1.0](https://github.com/eglavin/fork-version/compare/v5.0.2...v5.1.0) (2026-04-11)
 
 

@@ -1,5 +1,13 @@
 # Fork Version
 
+## [5.1.2](https://github.com/eglavin/fork-version/compare/v5.1.1...v5.1.2) (2026-04-13)
+
+
+### Refactor
+
+* remove pnpm from engines ([6902123](https://github.com/eglavin/fork-version/commit/69021234530b1fb6e88c56d1b036c81962b19cf2))
+
+
 ## [5.1.1](https://github.com/eglavin/fork-version/compare/v5.1.0...v5.1.1) (2026-04-12)
 
 

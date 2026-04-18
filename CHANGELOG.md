@@ -1,5 +1,13 @@
 # Fork Version
 
+## [5.1.4](https://github.com/eglavin/fork-version/compare/v5.1.3...v5.1.4) (2026-04-18)
+
+
+### Refactor
+
+* add defineFileManager function ([6e0f437](https://github.com/eglavin/fork-version/commit/6e0f4371824a232f85880a80b218d13b3decb25f))
+
+
 ## [5.1.3](https://github.com/eglavin/fork-version/compare/v5.1.2...v5.1.3) (2026-04-18)
 
 

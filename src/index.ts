@@ -31,6 +31,7 @@ export { commitChanges } from "./process/commit";
 export { tagChanges } from "./process/tag";
 
 export {
+	defineFileManager,
 	FileManager,
 	MissingPropertyException,
 	type FileState,

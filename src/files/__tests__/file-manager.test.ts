@@ -5,6 +5,7 @@ import { readFileSync } from "node:fs";
 
 import { setupTest } from "../../../tests/setup-tests";
 import {
+	defineFileManager,
 	FileManager,
 	MissingPropertyException,
 	type FileState,
@@ -274,8 +275,8 @@ environment:
 			}
 		}
 
-		const CustomFileManagerObject: IFileManager = {
-			read: async (filePath: string): Promise<FileState | undefined> => {
+		const CustomFileManagerObject = defineFileManager({
+			read: async (filePath) => {
 				const fileContent = await readFile(filePath, "utf-8");
 				if (fileContent) {
 					const parsedContent = JSON.parse(fileContent);
@@ -288,7 +289,7 @@ environment:
 				}
 				throw new MissingPropertyException("My Custom File", "package.version");
 			},
-			write: async (fileState: FileState, newVersion: string): Promise<void> => {
+			write: async (fileState, newVersion) => {
 				const fileContent = await readFile(fileState.path, "utf-8");
 				if (fileContent) {
 					const parsedContent = JSON.parse(fileContent);
@@ -299,8 +300,8 @@ environment:
 					}
 				}
 			},
-			isSupportedFile: (fileName: string) => fileName === "test.json",
-		};
+			isSupportedFile: (fileName) => fileName === "test.json",
+		});
 
 		it("should use custom file manager if it supports the file given file", async () => {
 			const { config, create, logger } = await setupTest("files file-manager");

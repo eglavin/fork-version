@@ -1,6 +1,6 @@
 import { execFile } from "node:child_process";
 import semver from "semver";
-import { escapeRegex } from "../utils/escape-regex";
+import { cleanTag } from "../utils/clean-tag";
 import type { ForkConfig } from "../config/types";
 
 interface GitConfig {
@@ -24,7 +24,6 @@ export class Git {
 		this.getBranchName = this.getBranchName.bind(this);
 		this.getRemoteUrl = this.getRemoteUrl.bind(this);
 		this.getTags = this.getTags.bind(this);
-		this.getMostRecentTag = this.getMostRecentTag.bind(this);
 		this.getCommits = this.getCommits.bind(this);
 	}
 
@@ -182,6 +181,65 @@ export class Git {
 	}
 
 	/**
+	 * Determine if a tag should be included based on the preRelease configuration.
+	 *
+	 * Example prerelease tags:
+	 * - `1.2.3-alpha.0`
+	 * - `1.2.3-beta.0`
+	 * - `1.2.3-0`
+	 *
+	 * @example
+	 * ```ts
+	 * const tags = ["1.0.1-0", "1.0.1-alpha.0", "1.0.0"];
+	 *
+	 * shouldIncludeTag("1.0.1-0", true); // true
+	 * shouldIncludeTag("1.0.1-alpha.0", true); // false
+	 * shouldIncludeTag("1.0.0", true); // true
+	 *
+	 * shouldIncludeTag("1.0.1-0", "alpha"); // false
+	 * shouldIncludeTag("1.0.1-alpha.0", "alpha"); // true
+	 * shouldIncludeTag("1.0.0", "alpha"); // true
+	 *
+	 * shouldIncludeTag("1.0.1-0", false); // true
+	 * shouldIncludeTag("1.0.1-alpha.0", false); // true
+	 * shouldIncludeTag("1.0.0", false); // true
+	 * ```
+	 *
+	 * @param tag The tag to evaluate (without prefix)
+	 * @param preRelease The preRelease configuration value (Example: `true`, `false`, or a string like `"beta"`)
+	 * @returns `true` if the tag should be included, `false` otherwise
+	 */
+	#shouldIncludeTag(tag?: string, preRelease?: string | boolean): boolean {
+		if (!tag || !semver.valid(tag)) {
+			return false;
+		}
+
+		// If preRelease is not set, include all valid semver tags
+		if (!preRelease) {
+			return true;
+		}
+
+		const prereleaseParts = semver.prerelease(tag);
+
+		// No pre release parts found, tag is stable, always include
+		if (!prereleaseParts) {
+			return true;
+		}
+
+		// If preRelease is a string, only include tags that match the specified value
+		if (typeof preRelease === "string") {
+			return prereleaseParts[0] === preRelease;
+		}
+
+		// If preRelease is true, include all pre-release tags that do not have a specific identifier (e.g., `1.2.3-0`)
+		if (preRelease === true) {
+			return prereleaseParts.length === 1;
+		}
+
+		return false;
+	}
+
+	/**
 	 * `getTags` returns valid semver version tags in order of the commit history
 	 *
 	 * Using `git log` to get the commit history, we then parse the tags from the
@@ -202,7 +260,7 @@ export class Git {
 	 * await git.getTags("v"); // ["v1.0.2", "v1.0.1", "v1.0.0"]
 	 * ```
 	 */
-	async getTags(tagPrefix: string | undefined): Promise<string[]> {
+	async getTags(tagPrefix?: string, preRelease?: string | boolean): Promise<string[]> {
 		const logOutput = await this.log("--decorate", "--no-color", "--date-order");
 
 		/**
@@ -211,7 +269,6 @@ export class Git {
 		 */
 		const TAG_REGEX = /tag:\s*(?<tag>.+?)[,)]/gi;
 		const tags: string[] = [];
-		const escapedTagPrefix = tagPrefix ? escapeRegex(tagPrefix) : undefined;
 
 		let tagMatch: RegExpExecArray | null = null;
 		while ((tagMatch = TAG_REGEX.exec(logOutput))) {
@@ -219,32 +276,19 @@ export class Git {
 
 			if (tagPrefix) {
 				if (tag.startsWith(tagPrefix)) {
-					const tagWithoutPrefix = tag.replace(new RegExp(`^${escapedTagPrefix}`), "");
-					if (semver.valid(tagWithoutPrefix)) {
+					const tagWithoutPrefix = cleanTag(tag, tagPrefix);
+					if (this.#shouldIncludeTag(tagWithoutPrefix, preRelease)) {
 						tags.push(tag);
 					}
 				}
 			}
 			// If no tagPrefix is provided, only include tags that start with a digit and are valid semver
-			else if (/^\d/.test(tag) && semver.valid(tag)) {
+			else if (/^\d/.test(tag) && this.#shouldIncludeTag(tag, preRelease)) {
 				tags.push(tag);
 			}
 		}
 
 		return tags;
-	}
-
-	/**
-	 * Returns the most recent tag from the commit history, or `undefined` if no valid semver tags are found
-	 *
-	 * @example
-	 * ```ts
-	 * await git.getMostRecentTag("v"); // "1.2.3"
-	 * ```
-	 */
-	async getMostRecentTag(tagPrefix: string | undefined): Promise<string | undefined> {
-		const tags = await this.getTags(tagPrefix);
-		return tags[0] || undefined;
 	}
 
 	/**

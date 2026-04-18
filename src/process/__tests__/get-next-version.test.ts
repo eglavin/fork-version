@@ -290,6 +290,36 @@ describe("getNextVersion", () => {
 		});
 	});
 
+	it("should bump from a preRelease current version", async () => {
+		const { config, logger } = await setupTest("version getNextVersion");
+
+		expect(await getNextVersion(config, logger, [], "1.2.3-alpha.0")).toStrictEqual({
+			version: "1.2.3",
+			releaseType: "patch",
+			preMajor: false,
+			changes: {
+				major: 0,
+				minor: 0,
+				patch: 0,
+				merges: 0,
+				reverts: 0,
+			},
+		});
+
+		expect(await getNextVersion(config, logger, [], "1.2.3-0")).toStrictEqual({
+			version: "1.2.3",
+			releaseType: "patch",
+			preMajor: false,
+			changes: {
+				major: 0,
+				minor: 0,
+				patch: 0,
+				merges: 0,
+				reverts: 0,
+			},
+		});
+	});
+
 	it("should skip version bump", async () => {
 		const { config, logger } = await setupTest("version getNextVersion");
 		config.skipBump = true;

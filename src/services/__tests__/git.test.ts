@@ -153,52 +153,6 @@ test/**
 		await expect(git.isIgnored("test/my-file.txt")).resolves.toBe(true);
 	});
 
-	it("should be able to get the latest tag", async () => {
-		const { config, create, execGit } = await setupTest("execute-file");
-		const git = new Git(config);
-
-		create.json({ version: "1.0.0" }, "package.json").add();
-		execGit.commits();
-
-		const noTags = await git.getMostRecentTag(config.tagPrefix);
-		expect(noTags).toBe(undefined);
-
-		await git.commit("--allow-empty", "-m", "test: a commit");
-		await git.tag("v1.0.0", "-m", "chore: release v1.0.0");
-
-		await git.commit("--allow-empty", "-m", "test: another commit");
-		await git.tag("v1.0.2", "-m", "chore: release v1.0.2");
-
-		await git.commit("--allow-empty", "-m", "test: another commit");
-		await git.tag("v1.0.1", "-m", "chore: release v1.0.1");
-
-		const hasTags = await git.getMostRecentTag(config.tagPrefix);
-		expect(hasTags).toStrictEqual("v1.0.1");
-	});
-
-	it("should be able to get the latest tag with empty tagPrefix", async () => {
-		const { config, create, execGit } = await setupTest("execute-file");
-		const git = new Git(config);
-
-		create.json({ version: "1.0.0" }, "package.json").add();
-		execGit.commits();
-
-		const noTags = await git.getMostRecentTag("");
-		expect(noTags).toBe(undefined);
-
-		await git.commit("--allow-empty", "-m", "test: a commit");
-		await git.tag("1.0.0", "-m", "chore: release 1.0.0");
-
-		await git.commit("--allow-empty", "-m", "test: another commit");
-		await git.tag("1.0.1", "-m", "chore: release 1.0.1");
-
-		await git.commit("--allow-empty", "-m", "test: another another commit");
-		await git.tag("1.0.0-fix.0", "-m", "chore: release 1.0.0-fix.0");
-
-		const hasTags = await git.getMostRecentTag("");
-		expect(hasTags).toStrictEqual("1.0.0-fix.0");
-	});
-
 	it("should only return tags that match the provided tagPrefix", async () => {
 		const { config } = await setupTest("execute-file");
 		const git = new Git(config);
@@ -212,12 +166,9 @@ test/**
 		await git.commit("--allow-empty", "-m", "test: another another commit");
 		await git.tag("1.0.2", "-m", "chore: release 1.0.2");
 
-		const vTags = await git.getTags("v");
-		expect(vTags).toStrictEqual(["v1.0.1"]);
-		expect(vTags).not.toContain("@fork-version/1.0.0");
-
 		await expect(git.getTags("@fork-version/")).resolves.toStrictEqual(["@fork-version/1.0.0"]);
-
+		await expect(git.getTags("v")).resolves.toStrictEqual(["v1.0.1"]);
+		await expect(git.getTags("")).resolves.toStrictEqual(["1.0.2"]);
 		await expect(git.getTags("non-existing-prefix")).resolves.toStrictEqual([]);
 	});
 
@@ -264,12 +215,57 @@ test/**
 
 		await expect(git.getTags("fork-version'")).resolves.toStrictEqual(["fork-version'2.1.0"]);
 	});
+
 	it("should handle no tags", async () => {
 		const { config } = await setupTest("execute-file");
 		const git = new Git(config);
 
 		await expect(git.getTags(config.tagPrefix)).resolves.toStrictEqual([]);
-		await expect(git.getMostRecentTag(config.tagPrefix)).resolves.toBe(undefined);
+	});
+
+	it("should return all tags if not currently running in prerelease mode", async () => {
+		const { config } = await setupTest("execute-file");
+		const git = new Git(config);
+
+		await git.commit("--allow-empty", "-m", "test: a commit");
+		await git.tag("v1.0.0", "-m", "chore: release v1.0.0");
+
+		await git.commit("--allow-empty", "-m", "test: another commit");
+		await git.tag("v1.0.1-alpha.0", "-m", "chore: release v1.0.1-alpha.0");
+
+		await git.commit("--allow-empty", "-m", "test: another another commit");
+		await git.tag("v1.0.1-beta.0", "-m", "chore: release v1.0.1-beta.0");
+
+		await git.commit("--allow-empty", "-m", "test: another another another commit");
+		await git.tag("v1.0.2-0", "-m", "chore: release v1.0.2-0");
+
+		await expect(git.getTags("v", false)).resolves.toStrictEqual([
+			"v1.0.2-0",
+			"v1.0.1-beta.0",
+			"v1.0.1-alpha.0",
+			"v1.0.0",
+		]);
+	});
+
+	it("should return only tags that match the prerelease identifier", async () => {
+		const { config } = await setupTest("execute-file");
+		const git = new Git(config);
+
+		await git.commit("--allow-empty", "-m", "test: a commit");
+		await git.tag("v1.0.0", "-m", "chore: release v1.0.0");
+
+		await git.commit("--allow-empty", "-m", "test: another commit");
+		await git.tag("v1.0.1-alpha.0", "-m", "chore: release v1.0.1-alpha.0");
+
+		await git.commit("--allow-empty", "-m", "test: another another commit");
+		await git.tag("v1.0.1-beta.0", "-m", "chore: release v1.0.1-beta.0");
+
+		await git.commit("--allow-empty", "-m", "test: another another another commit");
+		await git.tag("v1.0.2-0", "-m", "chore: release v1.0.2-0");
+
+		await expect(git.getTags("v", "alpha")).resolves.toStrictEqual(["v1.0.1-alpha.0", "v1.0.0"]);
+		await expect(git.getTags("v", "beta")).resolves.toStrictEqual(["v1.0.1-beta.0", "v1.0.0"]);
+		await expect(git.getTags("v", true)).resolves.toStrictEqual(["v1.0.2-0", "v1.0.0"]);
 	});
 
 	it("should read commits", async () => {

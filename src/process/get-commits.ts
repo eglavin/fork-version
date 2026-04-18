@@ -7,6 +7,7 @@ import type { Git } from "../services/git";
 import type { Commit } from "../commit-parser/types";
 
 export interface CommitsSinceTag {
+	tags: string[];
 	latestTag: string | undefined;
 	latestTagVersion: string | undefined;
 	commits: Commit[];
@@ -20,7 +21,8 @@ export async function getCommitsSinceTag(
 	const commitParser = new CommitParser(config.commitParserOptions);
 	if (config.debug) commitParser.setLogger(logger);
 
-	const latestTag = await git.getMostRecentTag(config.tagPrefix);
+	const tags = await git.getTags(config.tagPrefix, config.preRelease);
+	const latestTag = tags.length > 0 ? tags[0] : undefined;
 	if (!latestTag) {
 		logger.warn("No previous tag found, using all commits");
 	}
@@ -40,6 +42,7 @@ export async function getCommitsSinceTag(
 	);
 
 	return {
+		tags,
 		latestTag,
 		latestTagVersion: cleanTag(latestTag, config.tagPrefix),
 		commits: filteredCommits,

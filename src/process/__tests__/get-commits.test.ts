@@ -16,8 +16,13 @@ describe("get-commits", () => {
 
 		execGit.commit("feat: an amazing new feature");
 
-		const { latestTag, latestTagVersion, commits } = await getCommitsSinceTag(config, logger, git);
+		const { tags, latestTag, latestTagVersion, commits } = await getCommitsSinceTag(
+			config,
+			logger,
+			git,
+		);
 
+		expect(tags).toStrictEqual(["v0.0.1", "v1.0.0", "v0.0.0"]);
 		expect(latestTag).toBe("v0.0.1");
 		expect(latestTagVersion).toBe("0.0.1");
 
@@ -41,8 +46,13 @@ describe("get-commits", () => {
 		create.file("", "packages/package-2/package.json").add();
 		execGit.commit("feat: package-2 feat");
 
-		const { latestTag, latestTagVersion, commits } = await getCommitsSinceTag(config, logger, git);
+		const { tags, latestTag, latestTagVersion, commits } = await getCommitsSinceTag(
+			config,
+			logger,
+			git,
+		);
 
+		expect(tags).toStrictEqual(["v0.0.0"]);
 		expect(latestTag).toBe("v0.0.0");
 		expect(latestTagVersion).toBe("0.0.0");
 
@@ -59,8 +69,13 @@ describe("get-commits", () => {
 		execGit.commit("chore: init");
 		execGit.commit("feat: an amazing new feature");
 
-		const { latestTag, latestTagVersion, commits } = await getCommitsSinceTag(config, logger, git);
+		const { tags, latestTag, latestTagVersion, commits } = await getCommitsSinceTag(
+			config,
+			logger,
+			git,
+		);
 
+		expect(tags).toStrictEqual([]);
 		expect(latestTag).toBeUndefined();
 		expect(latestTagVersion).toBeUndefined();
 
@@ -69,5 +84,45 @@ describe("get-commits", () => {
 		expect(commits[1]?.subject).toBe("chore: init");
 
 		expect(warnSpy).toHaveBeenCalledWith("No previous tag found, using all commits");
+	});
+
+	it("should filter out unrelated pre-release tags if preRelease config is true", async () => {
+		const { config, execGit, git, logger } = await setupTest("get-commits");
+		config.preRelease = true;
+
+		execGit.commit("feat: a feat commit");
+		execGit.tag("v1.0.0", "feat: a feat commit");
+
+		execGit.commit("fix: a fix commit");
+		execGit.tag("v1.0.0-beta.1", "fix(beta): a fix commit");
+
+		execGit.commit("refactor: a refactor commit");
+		execGit.tag("v1.0.0-1", "refactor: a refactor commit");
+
+		const { tags, latestTag, latestTagVersion } = await getCommitsSinceTag(config, logger, git);
+
+		expect(tags).toStrictEqual(["v1.0.0-1", "v1.0.0"]);
+		expect(latestTag).toBe("v1.0.0-1");
+		expect(latestTagVersion).toBe("1.0.0-1");
+	});
+
+	it("should filter out unrelated pre-release tags if preRelease config is a string", async () => {
+		const { config, execGit, git, logger } = await setupTest("get-commits");
+		config.preRelease = "beta";
+
+		execGit.commit("feat: a feat commit");
+		execGit.tag("v1.0.0", "feat: a feat commit");
+
+		execGit.commit("fix: a fix commit");
+		execGit.tag("v1.0.0-beta.1", "fix(beta): a fix commit");
+
+		execGit.commit("refactor: a refactor commit");
+		execGit.tag("v1.0.0-1", "refactor: a refactor commit");
+
+		const { tags, latestTag, latestTagVersion } = await getCommitsSinceTag(config, logger, git);
+
+		expect(tags).toStrictEqual(["v1.0.0-beta.1", "v1.0.0"]);
+		expect(latestTag).toBe("v1.0.0-beta.1");
+		expect(latestTagVersion).toBe("1.0.0-beta.1");
 	});
 });

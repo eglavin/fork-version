@@ -14,10 +14,8 @@ import { escapeRegex } from "./escape-regex";
 export function cleanTag(tag?: string, tagPrefix?: string): string | undefined {
 	if (!tag) return undefined;
 
-	const escapedTagPrefix = tagPrefix ? escapeRegex(tagPrefix) : undefined;
-
-	const tagWithoutPrefix = escapedTagPrefix
-		? tag.replace(new RegExp(`^${escapedTagPrefix}`), "")
+	const tagWithoutPrefix = tagPrefix
+		? tag.replace(new RegExp(`^${escapeRegex(tagPrefix)}`), "")
 		: tag;
 
 	return semver.clean(tagWithoutPrefix) ?? undefined;

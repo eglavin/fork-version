@@ -1,5 +1,13 @@
 # Fork Version
 
+## [5.1.3](https://github.com/eglavin/fork-version/compare/v5.1.2...v5.1.3) (2026-04-18)
+
+
+### Bug Fixes
+
+* filter unrelated prerelease tags to ensure out of order prereleases are handled bumped correctly ([1440272](https://github.com/eglavin/fork-version/commit/1440272dd55900945fae66539637d14b9b702b9b))
+
+
 ## [5.1.2](https://github.com/eglavin/fork-version/compare/v5.1.1...v5.1.2) (2026-04-13)
 
 

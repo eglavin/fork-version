@@ -574,6 +574,9 @@ Example `test.json` file:
 
 Example Custom File Manager implementation:
 
+- [Using a class to define a file manager](./examples/custom-file-manager/fork.config.ts)
+- [Using the defineFileManager function](./examples/custom-file-manager/fork.config.defineFileManager.ts)
+
 ```ts
 // fork.config.ts
 import { readFile, writeFile } from "node:fs/promises";

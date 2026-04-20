@@ -240,28 +240,25 @@ export class Git {
 	}
 
 	/**
-	 * `getTags` returns valid semver version tags in order of the commit history
+	 * Returns an array of tags from the git log, filtered by an optional tag prefix and pre-release configuration.
 	 *
-	 * Using `git log` to get the commit history, we then parse the tags from the
-	 * commit details which is expected to be in the following format:
-	 * ```txt
-	 * commit 3841b1d05750d42197fe958e3d8e06df378a842d (HEAD -> main, tag: v1.0.2, tag: v1.0.1, tag: v1.0.0)
-	 * Author: Username <username@example.com>
-	 * Date:   Sat Nov 9 15:00:00 2024 +0000
+	 * @example
+	 * ```ts
+	 * // Given the following git log: (HEAD -> main, tag: v1.0.2, tag: v1.0.1, tag: v1.0.0)
+	 * await git.getTags("v"); // ["v1.0.2", "v1.0.1", "v1.0.0"]
 	 *
-	 *     chore(release): v1.0.0
+	 * // Given the following git log: (HEAD -> main, tag: v1.0.2-0, tag: v1.0.1-0, tag: v1.0.0)
+	 * await git.getTags("v", true); // ["v1.0.2-0", "v1.0.1-0", "v1.0.0"]
+	 *
+	 * // Given the following git log: (HEAD -> main, tag: v1.0.2-alpha.0, tag: v1.0.1-alpha.0, tag: v1.0.0)
+	 * await git.getTags("v", "alpha"); // ["v1.0.2-alpha.0", "v1.0.1-alpha.0", "v1.0.0"]
 	 * ```
 	 *
 	 * - [Functionality extracted from the conventional-changelog - git-semver-tags project](https://github.com/conventional-changelog/conventional-changelog/blob/fac8045242099c016f5f3905e54e02b7d466bd7b/packages/git-semver-tags/index.js)
 	 * - [conventional-changelog git-semver-tags MIT Licence](https://github.com/conventional-changelog/conventional-changelog/blob/fac8045242099c016f5f3905e54e02b7d466bd7b/packages/git-semver-tags/LICENSE.md)
-	 *
-	 * @example
-	 * ```ts
-	 * await git.getTags("v"); // ["v1.0.2", "v1.0.1", "v1.0.0"]
-	 * ```
 	 */
 	async getTags(tagPrefix?: string, preRelease?: string | boolean): Promise<string[]> {
-		const logOutput = await this.log("--decorate", "--no-color", "--date-order");
+		const logOutput = await this.log("--format=%d", "--no-color", "--date-order");
 
 		/**
 		 * Search for tags in the following formats:
@@ -292,13 +289,14 @@ export class Git {
 	}
 
 	/**
-	 * Get commit history in a parsable format
+	 * Returns an array of commits between two git references (e.g., tags, branches, or commits), optionally filtered by file paths.
 	 *
-	 * An array of strings with commit details is returned in the following format:
+	 * Each commit in the returned array is a string containing the following information, separated by newlines:
 	 * ```txt
 	 * subject
 	 * body
 	 * hash
+	 * ref names
 	 * committer date
 	 * committer name
 	 * committer email
@@ -306,6 +304,7 @@ export class Git {
 	 *
 	 * @example
 	 * ```ts
+	 * await git.getCommits("v1.0.0", "HEAD");
 	 * await git.getCommits("v1.0.0", "HEAD", "src/utils");
 	 * ```
 	 */
@@ -323,14 +322,16 @@ export class Git {
 			SCISSOR,
 		].join("%n");
 
-		const commits = await this.log(
+		const logOutput = await this.log(
 			`--format=${LOG_FORMAT}`,
+			"--no-color",
+			"--date-order",
 			[from, to].filter(Boolean).join(".."),
 			paths.length ? "--" : "",
 			...paths,
 		);
 
-		const splitCommits = commits.split(`\n${SCISSOR}\n`);
+		const splitCommits = logOutput.split(`\n${SCISSOR}\n`);
 
 		if (splitCommits.length === 0) {
 			return splitCommits;

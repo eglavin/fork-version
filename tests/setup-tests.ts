@@ -239,5 +239,16 @@ export async function setupTest(testName: string, options?: Partial<ISetupTestOp
 				execSync(`git tag --annotate "${tag}" --message "${message}"`, execSyncOptions);
 			},
 		},
+
+		/**
+		 * Sleep for a specified number of milliseconds.
+		 * @example
+		 * ```js
+		 * await sleep(1000); // Sleep for 1 second
+		 * ```
+		 */
+		sleep: function _sleep(ms: number) {
+			return new Promise((resolve) => setTimeout(resolve, ms));
+		},
 	};
 }

@@ -1,4 +1,6 @@
 import { setupTest } from "../../../tests/setup-tests";
+import { IS_E2E } from "../../../tests/options";
+import { CommitParser } from "../../commit-parser/commit-parser";
 import { Git } from "../git";
 
 describe("git", () => {
@@ -451,7 +453,7 @@ system so we'll see what happens.`,
 		}
 	});
 
-	it("should handle out of order commits", { timeout: 10_000 }, async () => {
+	it("should handle out of order commits", { timeout: 10_000, skip: !IS_E2E }, async () => {
 		const { config, create, execGit, sleep } = await setupTest("execute-file");
 		const git = new Git(config);
 
@@ -459,6 +461,8 @@ system so we'll see what happens.`,
 		create.file("File 1 content", "src", "file1.txt").add();
 		await git.commit("-m", "feat: initial commit");
 		await git.tag("v1.0.0");
+
+		await sleep(1000);
 
 		// Create a long lived branch and commit to it, but don't merge it yet so that the commit is out of order in the git log
 		await execGit.raw("checkout", "-b", "long-lived-feature-branch");
@@ -479,6 +483,8 @@ system so we'll see what happens.`,
 		await execGit.raw("merge", "quick-feature-branch", "--no-ff");
 		await git.tag("v1.1.0");
 
+		await sleep(1000);
+
 		await execGit.raw("checkout", "-b", "quick-bugfix-branch");
 		create.file("File 4 content", "src", "file4.txt").add();
 		await git.commit("-m", "fix: add file4");
@@ -489,54 +495,52 @@ system so we'll see what happens.`,
 		await execGit.raw("merge", "quick-bugfix-branch", "--no-ff");
 		await git.tag("v1.1.1");
 
+		await sleep(1000);
+
 		// Merge the long lived branch last so that its commit is out of order in the git log
 		await execGit.raw("merge", "long-lived-feature-branch", "--no-ff");
 		await git.tag("v1.2.0");
 
 		const commits = await git.getCommits();
 
-		expect(commits.length).toBe(7);
+		const commitParser = new CommitParser();
+		const parsedCommits = commits.map(commitParser.parseRawCommit);
 
+		expect(parsedCommits.length).toBe(7);
 		{
-			const [subject, , , , , ref] = commits[0].split("\n");
+			const { subject, refNames } = parsedCommits[0];
 			expect(subject).toBe("Merge branch 'long-lived-feature-branch'");
-			expect(ref).toBe(" (HEAD -> main, tag: v1.2.0)");
+			expect(refNames).toBe("(HEAD -> main, tag: v1.2.0)");
 		}
-
 		{
-			const [subject, , , , , ref] = commits[1].split("\n");
+			const { subject, refNames } = parsedCommits[1];
 			expect(subject).toBe("Merge branch 'quick-bugfix-branch'");
-			expect(ref).toBe(" (tag: v1.1.1)");
+			expect(refNames).toBe("(tag: v1.1.1)");
 		}
-
 		{
-			const [subject, , , ref] = commits[2].split("\n");
+			const { subject, refNames } = parsedCommits[2];
 			expect(subject).toBe("fix: add file4");
-			expect(ref).toBe(" (quick-bugfix-branch)");
+			expect(refNames).toBe("(quick-bugfix-branch)");
 		}
-
 		{
-			const [subject, , , , , ref] = commits[3].split("\n");
+			const { subject, refNames } = parsedCommits[3];
 			expect(subject).toBe("Merge branch 'quick-feature-branch'");
-			expect(ref).toBe(" (tag: v1.1.0)");
+			expect(refNames).toBe("(tag: v1.1.0)");
 		}
-
 		{
-			const [subject, , , ref] = commits[4].split("\n");
+			const { subject, refNames } = parsedCommits[4];
 			expect(subject).toBe("feat: add file3");
-			expect(ref).toBe(" (quick-feature-branch)");
+			expect(refNames).toBe("(quick-feature-branch)");
 		}
-
 		{
-			const [subject, , , ref] = commits[5].split("\n");
+			const { subject, refNames } = parsedCommits[5];
 			expect(subject).toBe("feat: add file2");
-			expect(ref).toBe(" (long-lived-feature-branch)");
+			expect(refNames).toBe("(long-lived-feature-branch)");
 		}
-
 		{
-			const [subject, , , ref] = commits[6].split("\n");
+			const { subject, refNames } = parsedCommits[6];
 			expect(subject).toBe("feat: initial commit");
-			expect(ref).toBe(" (tag: v1.0.0)");
+			expect(refNames).toBe("(tag: v1.0.0)");
 		}
 	});
 });

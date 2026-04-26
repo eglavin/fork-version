@@ -1,5 +1,19 @@
 # Fork Version
 
+## [5.1.5](https://github.com/eglavin/fork-version/compare/v5.1.4...v5.1.5) (2026-04-26)
+
+
+### Refactor
+
+* set no-color and date-order opts when getting commits ([2756155](https://github.com/eglavin/fork-version/commit/27561551745da68f7eaa2b298a2a34b803cc2a6d))
+
+
+### Test
+
+* add test for long running branch scenario ([4dfcbbc](https://github.com/eglavin/fork-version/commit/4dfcbbcec5a27a8baf66dff440b58d9d6ef864f9))
+* tag out of order commit test as skippable when not running in e2e mode ([b7d67e3](https://github.com/eglavin/fork-version/commit/b7d67e3fd5cfaccccffd2173473dfd85d2dc2728))
+
+
 ## [5.1.4](https://github.com/eglavin/fork-version/compare/v5.1.3...v5.1.4) (2026-04-18)
 
 

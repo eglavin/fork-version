@@ -110,7 +110,7 @@ The following example show a custom file manager for a json file with the name o
 Example Custom File Manager implementation:
 
 - [Using a class to define a file manager](../examples/custom-file-manager/fork.config.ts)
-- [Using the defineFileManager function](.../examples/custom-file-manager/fork.config.defineFileManager.ts)
+- [Using the defineFileManager function](../examples/custom-file-manager/fork.config.defineFileManager.ts)
 
 ```ts
 // fork.config.ts

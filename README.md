@@ -52,7 +52,7 @@ npx fork-version
 > [!NOTE]
 > By default `npx` [will use a cached version if available on your system](https://github.com/npm/cli/issues/4108#issuecomment-1022827890) or the latest version otherwise. You can use the `latest` tag to force npx to use the latest version. Alternatively if you want to use a specific version or pin to a range you can add a version tag to the end of the package name:
 >
-> - `npx fork-version@5`
+> - `npx fork-version@5` (Recommended)
 >   - Use the latest version of fork-version in the 5.x range
 > - `npx fork-version@5.1`
 >   - Use the latest version of fork-version in the 5.1.x range

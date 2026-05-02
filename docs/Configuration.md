@@ -1,5 +1,8 @@
 # Configuration
 
+[Skip to config options](#config-options)
+
+
 Fork-Version can be configured either through a config file or by passing options to the tool when ran.
 
 The following config file types are supported:
@@ -92,7 +95,7 @@ Alternatively you can define your config using a key in your `package.json` file
 }
 ```
 
-## Config Properties
+## Config Options
 
 | Property                                                                | Type                 | Default                 | Description                                                                                                         |
 | :---------------------------------------------------------------------- | :------------------- | :---------------------- | :------------------------------------------------------------------------------------------------------------------ |

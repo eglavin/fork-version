@@ -14,6 +14,9 @@ Fork-Version can be configured either through a config file or by passing option
   - package.json
     - Key Name: "fork-version"
 
+> [!NOTE]
+> Command line options get merged with config file options, any options that are declared through the cli will override options that are also in the config file (Except for the list of [files](#configfiles) which get merged).
+
 ## Javascript Config
 
 Configuring using a javascript file is the most flexible option. You can use any javascript file type you prefer including typescript. Both commonjs and esm exports styles are supported. The `defineConfig` function in the following snippet is optional, using it will give you intellisense information in your code editor.

@@ -36,9 +36,6 @@ Primarily designed to be used with `npx`, Fork-Version can also be installed glo
 
 Fork-Version can be configured either through a config file or by passing options to the tool when ran. To see command line options you can run `fork-version --help` or [view the Configuration documentation](./docs/Configuration.md) for details on the supported options and how to use them.
 
-> [!NOTE]
-> Command line options get merged with config file options, any options that are declared through the cli will override options that are also in the config file (Except for the list of [files](./docs/Configuration.md#configfiles) which get merged).
-
 ### Using `npx`
 
 To use Fork-Version without installation you can use `npx`:
@@ -119,8 +116,8 @@ When ran as a cli tool Fork-Version will exit with one of the following exit cod
 
 Check out the docs folder for more details on configuration options and supported file managers details.
 
-- [Configuration](./docs/Configuration.md)
-- [Supported File Managers](./docs/Supported-File-Managers.md)
+- [Configuration documentation](./docs/Configuration.md)
+- [Supported File Managers documentation](./docs/Supported-File-Managers.md)
 
 ### Code Usage
 

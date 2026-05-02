@@ -176,14 +176,6 @@ Fork-Version uses [meow](https://github.com/sindresorhus/meow) for CLI argument 
 | `fork-version --pre-release`           | `1.2.3-0`       |
 | `fork-version --pre-release-tag alpha` | `1.2.3-alpha.0` |
 
-#### config.releaseMessageSuffix
-
-Add a suffix to the end of the release message, useful to add a `[skip ci]` message to the end of the created commit.
-
-- [GitHub Actions - Skipping workflow runs](https://docs.github.com/en/actions/managing-workflow-runs/skipping-workflow-runs)
-- [GitLab Pipelines - Skip a pipeline](https://docs.gitlab.com/ci/pipelines/#skip-a-pipeline)
-- [Azure Devops - Skipping CI for individual pushes](https://learn.microsoft.com/en-us/azure/devops/pipelines/repos/azure-repos-git?view=azure-devops&tabs=yaml#skipping-ci-for-individual-pushes)
-
 #### config.releaseAs
 
 Allows you to override the default versioning behaviour and increment by the specified level. For example if the current version is `1.2.3` and you run Fork-Version with one of the following arguments, the version will be incremented as shown below.
@@ -193,6 +185,14 @@ Allows you to override the default versioning behaviour and increment by the spe
 | "major"       | `2.0.0`         |
 | "minor"       | `1.3.0`         |
 | "patch"       | `1.2.4`         |
+
+#### config.releaseMessageSuffix
+
+Add a suffix to the end of the release message, useful to add a `[skip ci]` message to the end of the created commit.
+
+- [GitHub Actions - Skipping workflow runs](https://docs.github.com/en/actions/managing-workflow-runs/skipping-workflow-runs)
+- [GitLab Pipelines - Skip a pipeline](https://docs.gitlab.com/ci/pipelines/#skip-a-pipeline)
+- [Azure Devops - Skipping CI for individual pushes](https://learn.microsoft.com/en-us/azure/devops/pipelines/repos/azure-repos-git?view=azure-devops&tabs=yaml#skipping-ci-for-individual-pushes)
 
 ### Flags
 

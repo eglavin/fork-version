@@ -112,12 +112,18 @@ When ran as a cli tool Fork-Version will exit with one of the following exit cod
 | 2         | Unknown Command              |
 | 3         | Config File Validation Error |
 
-### Documentation
+### Supported File Managers
 
-Check out the docs folder for more details on configuration options and supported file managers details.
+Fork-Version supports a number of built in file managers for popular file types, the following file types are supported out of the box:
 
-- [Configuration documentation](./docs/Configuration.md)
-- [Supported File Managers documentation](./docs/Supported-File-Managers.md)
+- [Json Package](./docs/Supported-File-Managers.md#json-package)
+- [Yaml Package](./docs/Supported-File-Managers.md#yaml-package)
+- [Plain Text](./docs/Supported-File-Managers.md#plain-text)
+- [MS Build](./docs/Supported-File-Managers.md#ms-build)
+- [ARM Bicep](./docs/Supported-File-Managers.md#arm-bicep)
+- [Install Shield ISM](./docs/Supported-File-Managers.md#install-shield-ism)
+
+[Read more about the supported file managers and how to create your own custom file managers.](./docs/Supported-File-Managers.md)
 
 ### Code Usage
 

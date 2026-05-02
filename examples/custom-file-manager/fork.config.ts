@@ -1,51 +1,10 @@
 // @ts-nocheck
 
-import { readFile, writeFile } from "node:fs/promises";
-import {
-	defineConfig,
-	MissingPropertyException,
-	type FileState,
-	type IFileManager,
-} from "fork-version";
+import { defineConfig } from "fork-version";
 
-class CustomFileManager implements IFileManager {
-	async read(filePath: string): Promise<FileState | undefined> {
-		const fileContent = await readFile(filePath, "utf8");
-
-		if (fileContent) {
-			const parsedContent = JSON.parse(fileContent);
-
-			if ("package" in parsedContent && "version" in parsedContent.package) {
-				return {
-					path: filePath,
-					version: parsedContent.package.version,
-				};
-			}
-		}
-
-		throw new MissingPropertyException("My Custom File", "package.version");
-	}
-
-	async write(fileState: FileState, newVersion: string): Promise<void> {
-		const fileContent = await readFile(fileState.path, "utf8");
-
-		if (fileContent) {
-			const parsedContent = JSON.parse(fileContent);
-
-			if ("package" in parsedContent && "version" in parsedContent.package) {
-				parsedContent.package.version = newVersion;
-
-				const updatedContent = JSON.stringify(parsedContent, null, 2);
-				await writeFile(fileState.path, updatedContent, "utf8");
-			}
-		}
-	}
-
-	isSupportedFile(fileName: string) {
-		return fileName.endsWith("my-json-file.json");
-	}
-}
+import { CustomFileManager } from "./custom-file-manager-class";
+import { customFileManager } from "./custom-file-manager-function";
 
 export default defineConfig({
-	customFileManagers: [new CustomFileManager()],
+	customFileManagers: [new CustomFileManager(), customFileManager],
 });

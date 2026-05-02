@@ -1,14 +1,9 @@
 // @ts-nocheck
 
 import { readFile, writeFile } from "node:fs/promises";
-import {
-	defineConfig,
-	defineFileManager,
-	MissingPropertyException,
-	type FileState,
-} from "fork-version";
+import { defineFileManager, MissingPropertyException, type FileState } from "fork-version";
 
-const customFileManager = defineFileManager({
+export const customFileManager = defineFileManager({
 	read: async (filePath) => {
 		const fileContent = await readFile(filePath, "utf8");
 
@@ -44,8 +39,4 @@ const customFileManager = defineFileManager({
 	isSupportedFile: (fileName) => {
 		return fileName.endsWith("my-json-file.json");
 	},
-});
-
-export default defineConfig({
-	customFileManagers: [customFileManager],
 });

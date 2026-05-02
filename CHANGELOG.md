@@ -1,5 +1,13 @@
 # Fork Version
 
+## [5.1.6](https://github.com/eglavin/fork-version/compare/v5.1.5...v5.1.6) (2026-05-02)
+
+
+### Docs
+
+* split docs out from single readme file ([#133](https://github.com/eglavin/fork-version/issues/133)) ([fb84f0c](https://github.com/eglavin/fork-version/commit/fb84f0c016b834eda248fd0d497bdeb08c748eb6))
+
+
 ## [5.1.5](https://github.com/eglavin/fork-version/compare/v5.1.4...v5.1.5) (2026-04-26)
 
 

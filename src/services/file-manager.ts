@@ -1,12 +1,12 @@
 import { isAbsolute, relative, resolve } from "node:path";
 
 import { fileExists } from "../utils/file-state";
-import { JSONPackage } from "../files/json-package";
-import { YAMLPackage } from "../files/yaml-package";
-import { PlainText } from "../files/plain-text";
-import { MSBuildProject } from "../files/ms-build-project";
-import { ARMBicep } from "../files/arm-bicep";
-import { InstallShieldISM } from "../files/install-shield-ism";
+import { JSONPackage } from "../file-managers/json-package";
+import { YAMLPackage } from "../file-managers/yaml-package";
+import { PlainText } from "../file-managers/plain-text";
+import { MSBuildProject } from "../file-managers/ms-build-project";
+import { ARMBicep } from "../file-managers/arm-bicep";
+import { InstallShieldISM } from "../file-managers/install-shield-ism";
 
 import { extractBuildMetadata } from "../utils/extract-build-metadata";
 import type { ForkConfig } from "../config/types";

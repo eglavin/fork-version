@@ -1,5 +1,13 @@
 # Fork Version
 
+## [5.1.7](https://github.com/eglavin/fork-version/compare/v5.1.6...v5.1.7) (2026-05-05)
+
+
+### Refactor
+
+* restructure file managers within source code ([#134](https://github.com/eglavin/fork-version/issues/134)) ([71fedc8](https://github.com/eglavin/fork-version/commit/71fedc87d146222f2320bf0756d8592e67e74290))
+
+
 ## [5.1.6](https://github.com/eglavin/fork-version/compare/v5.1.5...v5.1.6) (2026-05-02)
 
 

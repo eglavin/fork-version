@@ -5,12 +5,12 @@ import { readFileSync } from "node:fs";
 
 import { setupTest } from "../../../tests/setup-tests";
 import {
-	defineFileManager,
 	FileManager,
 	MissingPropertyException,
 	type FileState,
 	type IFileManager,
 } from "../file-manager";
+import { defineFileManager } from "../../config/define-file-manager";
 
 describe("files file-manager", () => {
 	describe("json file", () => {

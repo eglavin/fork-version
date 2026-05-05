@@ -154,4 +154,4 @@ export default defineConfig({
 });
 ```
 
-> [See `IFileManager` interface to see the required methods and properties for a custom file manager.](../src/files/file-manager.ts)
+> [See `IFileManager` interface to see the required methods and properties for a custom file manager.](../src/services/file-manager.ts)

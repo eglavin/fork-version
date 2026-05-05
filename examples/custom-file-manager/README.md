@@ -26,4 +26,4 @@ You can define a custom file manager either by implementing the `IFileManager` i
 - [custom-file-manager-function.ts](./custom-file-manager-function.ts) - defines a custom file manager using the `defineFileManager` function.
 
 > [!NOTE]
-> Have a look at the [files folder](../../src/files) within the fork-version source code for example on how to work with different file types.
+> Have a look at the [file-managers folder](../../src/file-managers) within the fork-version source code for example on how to work with different file types.

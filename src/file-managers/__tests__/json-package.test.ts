@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 
 import { setupTest } from "../../../tests/setup-tests";
-import { MissingPropertyException } from "../file-manager";
+import { MissingPropertyException } from "../../services/file-manager";
 import { JSONPackage } from "../json-package";
 
 describe("files json-package", () => {

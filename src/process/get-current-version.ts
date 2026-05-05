@@ -1,7 +1,7 @@
 import semver from "semver";
 
 import type { ForkConfig } from "../config/types";
-import type { FileManager, FileState } from "../files/file-manager";
+import type { FileManager, FileState } from "../services/file-manager";
 import type { Logger } from "../services/logger";
 import type { Git } from "../services/git";
 

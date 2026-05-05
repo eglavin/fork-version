@@ -1,6 +1,10 @@
 import { readFile, writeFile } from "node:fs/promises";
 
-import { MissingPropertyException, type FileState, type IFileManager } from "./file-manager";
+import {
+	MissingPropertyException,
+	type FileState,
+	type IFileManager,
+} from "../services/file-manager";
 
 /**
  * A plain text file will have just the version as the content.

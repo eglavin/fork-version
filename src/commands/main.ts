@@ -7,7 +7,7 @@ import { tagChanges } from "../process/tag";
 
 import type { ForkConfig } from "../config/types";
 import type { Logger } from "../services/logger";
-import type { FileManager } from "../files/file-manager";
+import type { FileManager } from "../services/file-manager";
 import type { Git } from "../services/git";
 
 export async function main(config: ForkConfig, logger: Logger, fileManager: FileManager, git: Git) {

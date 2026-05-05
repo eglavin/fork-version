@@ -1,6 +1,10 @@
 import { readFile, writeFile } from "node:fs/promises";
 
-import { MissingPropertyException, type FileState, type IFileManager } from "./file-manager";
+import {
+	MissingPropertyException,
+	type FileState,
+	type IFileManager,
+} from "../services/file-manager";
 
 /**
  * An ARM bicep file with metadata and variable called contentVersion.

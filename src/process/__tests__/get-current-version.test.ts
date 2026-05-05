@@ -1,7 +1,7 @@
 import { setupTest } from "../../../tests/setup-tests";
 import { getCommitsSinceTag } from "../get-commits";
 import { getCurrentVersion } from "../get-current-version";
-import { FileManager } from "../../files/file-manager";
+import { FileManager } from "../../services/file-manager";
 
 describe("getCurrentVersion", () => {
 	it("should be able to read package.json", async () => {

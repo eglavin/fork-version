@@ -21,6 +21,7 @@ export type {
 	Config,
 } from "./config/types";
 export { defineConfig } from "./config/define-config";
+export { defineFileManager } from "./config/define-file-manager";
 export { getUserConfig } from "./config/user-config";
 
 export { getCommitsSinceTag, type CommitsSinceTag } from "./process/get-commits";
@@ -31,12 +32,10 @@ export { commitChanges } from "./process/commit";
 export { tagChanges } from "./process/tag";
 
 export {
-	defineFileManager,
 	FileManager,
 	MissingPropertyException,
 	type FileState,
 	type IFileManager,
-} from "./files/file-manager";
-
+} from "./services/file-manager";
 export { Logger } from "./services/logger";
 export { Git } from "./services/git";

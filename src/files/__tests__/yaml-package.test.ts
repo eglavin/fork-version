@@ -1,5 +1,5 @@
 import { setupTest } from "../../../tests/setup-tests";
-import { MissingPropertyException } from "../file-manager";
+import { MissingPropertyException } from "../../services/file-manager";
 import { YAMLPackage } from "../yaml-package";
 
 describe("files yaml-package", () => {

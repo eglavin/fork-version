@@ -1,16 +1,16 @@
 import { isAbsolute, relative, resolve } from "node:path";
 
 import { fileExists } from "../utils/file-state";
-import { JSONPackage } from "./json-package";
-import { YAMLPackage } from "./yaml-package";
-import { PlainText } from "./plain-text";
-import { MSBuildProject } from "./ms-build-project";
-import { ARMBicep } from "./arm-bicep";
-import { InstallShieldISM } from "./install-shield-ism";
+import { JSONPackage } from "../files/json-package";
+import { YAMLPackage } from "../files/yaml-package";
+import { PlainText } from "../files/plain-text";
+import { MSBuildProject } from "../files/ms-build-project";
+import { ARMBicep } from "../files/arm-bicep";
+import { InstallShieldISM } from "../files/install-shield-ism";
 
 import { extractBuildMetadata } from "../utils/extract-build-metadata";
 import type { ForkConfig } from "../config/types";
-import type { Logger } from "../services/logger";
+import type { Logger } from "./logger";
 
 /**
  * Exception thrown if a file manager encounters a file missing a required property,

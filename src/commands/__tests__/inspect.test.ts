@@ -1,5 +1,5 @@
 import { setupTest } from "../../../tests/setup-tests";
-import { FileManager } from "../../files/file-manager";
+import { FileManager } from "../../services/file-manager";
 import { inspect } from "../inspect";
 
 describe("inspect", () => {

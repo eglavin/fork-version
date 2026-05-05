@@ -1,7 +1,11 @@
 import { readFile, writeFile } from "node:fs/promises";
 import * as cheerio from "cheerio/slim";
 
-import { MissingPropertyException, type FileState, type IFileManager } from "./file-manager";
+import {
+	MissingPropertyException,
+	type FileState,
+	type IFileManager,
+} from "../services/file-manager";
 
 /**
  * A ms-build file is an xml file with a version property under the Project > PropertyGroup node.

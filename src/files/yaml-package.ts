@@ -1,7 +1,11 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { parse, parseDocument } from "yaml";
 
-import { MissingPropertyException, type FileState, type IFileManager } from "./file-manager";
+import {
+	MissingPropertyException,
+	type FileState,
+	type IFileManager,
+} from "../services/file-manager";
 
 /**
  * A yaml package file should have a version property on the top level, like what can be seen

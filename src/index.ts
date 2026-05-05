@@ -36,7 +36,6 @@ export {
 	MissingPropertyException,
 	type FileState,
 	type IFileManager,
-} from "./files/file-manager";
-
+} from "./services/file-manager";
 export { Logger } from "./services/logger";
 export { Git } from "./services/git";

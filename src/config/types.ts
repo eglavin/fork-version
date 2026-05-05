@@ -1,6 +1,6 @@
 import type { getCliArguments } from "./cli-arguments";
 import type { ParserOptions } from "../commit-parser/options";
-import type { IFileManager } from "../files/file-manager";
+import type { IFileManager } from "../services/file-manager";
 
 export interface ChangelogPresetConfigType {
 	/**

@@ -8,7 +8,11 @@ import {
 	type ParseOptions,
 } from "jsonc-parser";
 
-import { MissingPropertyException, type FileState, type IFileManager } from "./file-manager";
+import {
+	MissingPropertyException,
+	type FileState,
+	type IFileManager,
+} from "../services/file-manager";
 
 /** The things we are interested in, in package.json-like files. */
 interface PackageJsonish {

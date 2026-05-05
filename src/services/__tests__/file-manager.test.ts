@@ -9,7 +9,7 @@ import {
 	MissingPropertyException,
 	type FileState,
 	type IFileManager,
-} from "../file-manager";
+} from "../../services/file-manager";
 import { defineFileManager } from "../../config/define-file-manager";
 
 describe("files file-manager", () => {

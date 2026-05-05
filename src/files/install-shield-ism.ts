@@ -1,7 +1,11 @@
 import { readFile, writeFile } from "node:fs/promises";
 import * as cheerio from "cheerio/slim";
 
-import { MissingPropertyException, type FileState, type IFileManager } from "./file-manager";
+import {
+	MissingPropertyException,
+	type FileState,
+	type IFileManager,
+} from "../services/file-manager";
 
 /**
  * An InstallShield ISM file can be either XML or binary, only the XML format is supported

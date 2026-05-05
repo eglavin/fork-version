@@ -1,4 +1,4 @@
-import type { IFileManager } from "../files/file-manager";
+import type { IFileManager } from "../services/file-manager";
 
 /**
  * Helper function to define a custom file manager with proper typing.

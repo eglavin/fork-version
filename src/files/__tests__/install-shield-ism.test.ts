@@ -1,5 +1,5 @@
 import { setupTest } from "../../../tests/setup-tests";
-import { MissingPropertyException } from "../file-manager";
+import { MissingPropertyException } from "../../services/file-manager";
 import { InstallShieldISM } from "../install-shield-ism";
 
 describe("files install-shield-ism", () => {

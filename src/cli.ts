@@ -7,7 +7,7 @@ import { ZodError } from "zod";
 import { getCliArguments } from "./config/cli-arguments";
 import { getUserConfig } from "./config/user-config";
 import { Logger } from "./services/logger";
-import { FileManager } from "./files/file-manager";
+import { FileManager } from "./services/file-manager";
 import { Git } from "./services/git";
 
 import { validateConfig } from "./commands/validate-config";

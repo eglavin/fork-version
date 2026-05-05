@@ -1,5 +1,5 @@
 import { defineFileManager } from "../define-file-manager";
-import type { IFileManager } from "../../files/file-manager";
+import type { IFileManager } from "../../services/file-manager";
 
 describe("define-file-manager", () => {
 	it("should return the given file manager", () => {

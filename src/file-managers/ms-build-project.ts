@@ -39,6 +39,14 @@ export class MSBuildProject implements IFileManager {
 			};
 		}
 
+		const versionPrefix = $("Project > PropertyGroup > VersionPrefix").text();
+        if (versionPrefix) {
+            return {
+                path: filePath,
+                version: versionPrefix,
+            };
+        }
+
 		throw new MissingPropertyException("MSBuild", "Version");
 	}
 
@@ -46,7 +54,12 @@ export class MSBuildProject implements IFileManager {
 		const fileContents = await readFile(fileState.path, "utf8");
 
 		const $ = cheerio.load(fileContents, this.#cheerioOptions);
-		$("Project > PropertyGroup > Version").text(newVersion);
+		const versionNode = $("Project > PropertyGroup > Version");
+        if (versionNode.length) {
+            versionNode.text(newVersion);
+        } else {
+            $("Project > PropertyGroup > VersionPrefix").text(newVersion);
+        }
 
 		// Cheerio doesn't handle self-closing tags well,
 		// so we're manually adding a space before the closing tag.

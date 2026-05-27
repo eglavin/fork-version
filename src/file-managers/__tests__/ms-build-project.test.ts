@@ -148,4 +148,94 @@ describe("files ms-build-project", () => {
 		expect(fileManager.isSupportedFile("API.txt")).toBe(false);
 		expect(fileManager.isSupportedFile("API.json")).toBe(false);
 	});
+
+	it("should read version prefix from csproj file", async () => {
+		const { create, relativeTo } = await setupTest("files ms-build-project");
+		const fileManager = new MSBuildProject();
+
+		create.file(
+			`<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<VersionPrefix>1.2.3</VersionPrefix>
+	</PropertyGroup>
+</Project>
+`,
+			"API.csproj",
+		);
+
+		const file = await fileManager.read(relativeTo("API.csproj"));
+		expect(file?.version).toBe("1.2.3");
+	});
+
+	it("should read version prefix and suffix from csproj file", async () => {
+		const { create, relativeTo } = await setupTest("files ms-build-project");
+		const fileManager = new MSBuildProject();
+
+		create.file(
+			`<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<VersionPrefix>1.2.3</VersionPrefix>
+		<VersionSuffix>beta.1</VersionSuffix>
+	</PropertyGroup>
+</Project>
+`,
+			"API.csproj",
+		);
+
+		const file = await fileManager.read(relativeTo("API.csproj"));
+		expect(file?.version).toBe("1.2.3-beta.1");
+	});
+
+	it("should write version prefix to csproj file", async () => {
+		const { create, relativeTo } = await setupTest("files ms-build-project");
+		const fileManager = new MSBuildProject();
+
+		create.file(
+			`<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<VersionPrefix>1.2.3</VersionPrefix>
+		<VersionSuffix>beta.1</VersionSuffix>
+	</PropertyGroup>
+</Project>
+`,
+			"API.csproj",
+		);
+
+		await fileManager.write(
+			{
+				path: relativeTo("API.csproj"),
+				version: "1.2.3-beta.1",
+			},
+			"1.2.3",
+		);
+
+		const file = await fileManager.read(relativeTo("API.csproj"));
+		expect(file?.version).toBe("1.2.3");
+	});
+
+	it("should write prerelease version prefix and suffix", async () => {
+		const { create, relativeTo } = await setupTest("files ms-build-project");
+		const fileManager = new MSBuildProject();
+
+		create.file(
+			`<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<VersionPrefix>1.2.3</VersionPrefix>
+	</PropertyGroup>
+</Project>
+`,
+			"API.csproj",
+		);
+
+		await fileManager.write(
+			{
+				path: relativeTo("API.csproj"),
+				version: "1.2.3",
+			},
+			"4.5.6-beta-1",
+		);
+
+		const file = await fileManager.read(relativeTo("API.csproj"));
+		expect(file?.version).toBe("4.5.6-beta-1");
+	});
 });

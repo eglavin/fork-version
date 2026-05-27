@@ -1,5 +1,18 @@
 # Fork Version
 
+## [5.2.0](https://github.com/eglavin/fork-version/compare/v5.1.7...v5.2.0) (2026-05-27)
+
+
+### Features
+
+* support version prefix ([e1ee015](https://github.com/eglavin/fork-version/commit/e1ee015dbf07109b28565821af537aa9554a85c6))
+
+
+### Refactor
+
+* handle version suffix property if defined in an ms-build project ([1f569d6](https://github.com/eglavin/fork-version/commit/1f569d60f7d3f9226c5d445df4529922de9e73f0))
+
+
 ## [5.1.7](https://github.com/eglavin/fork-version/compare/v5.1.6...v5.1.7) (2026-05-05)
 
 

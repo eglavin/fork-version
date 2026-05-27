@@ -6,6 +6,7 @@ import {
 	type FileState,
 	type IFileManager,
 } from "../services/file-manager";
+import { extractPrerelease } from "../utils/extract-prerelease";
 
 /**
  * A ms-build file is an xml file with a version property under the Project > PropertyGroup node.
@@ -20,6 +21,19 @@ import {
  *   </PropertyGroup>
  * </Project>
  * ```
+ *
+ * ms-build projects can also use VersionPrefix and VersionSuffix properties instead of Version, in
+ * which case the full version is determined by concatenating the prefix and suffix.
+ *
+ * @example
+ * ```xml
+ * <Project Sdk="Microsoft.NET.Sdk">
+ *   <PropertyGroup>
+ *     <VersionPrefix>1.2.3</VersionPrefix>
+ *     <VersionSuffix>beta.1</VersionSuffix>
+ *   </PropertyGroup>
+ * </Project>
+ * ```
  */
 export class MSBuildProject implements IFileManager {
 	#cheerioOptions: cheerio.CheerioOptions = {
@@ -31,6 +45,7 @@ export class MSBuildProject implements IFileManager {
 		const fileContents = await readFile(filePath, "utf8");
 
 		const $ = cheerio.load(fileContents, this.#cheerioOptions);
+
 		const version = $("Project > PropertyGroup > Version").text();
 		if (version) {
 			return {
@@ -40,12 +55,13 @@ export class MSBuildProject implements IFileManager {
 		}
 
 		const versionPrefix = $("Project > PropertyGroup > VersionPrefix").text();
-        if (versionPrefix) {
-            return {
-                path: filePath,
-                version: versionPrefix,
-            };
-        }
+		const versionSuffix = $("Project > PropertyGroup > VersionSuffix").text();
+		if (versionPrefix) {
+			return {
+				path: filePath,
+				version: versionSuffix ? `${versionPrefix}-${versionSuffix}` : versionPrefix,
+			};
+		}
 
 		throw new MissingPropertyException("MSBuild", "Version");
 	}
@@ -54,12 +70,32 @@ export class MSBuildProject implements IFileManager {
 		const fileContents = await readFile(fileState.path, "utf8");
 
 		const $ = cheerio.load(fileContents, this.#cheerioOptions);
-		const versionNode = $("Project > PropertyGroup > Version");
-        if (versionNode.length) {
-            versionNode.text(newVersion);
-        } else {
-            $("Project > PropertyGroup > VersionPrefix").text(newVersion);
-        }
+
+		const version = $("Project > PropertyGroup > Version");
+		if (version.length) {
+			version.text(newVersion);
+		} else {
+			const versionPrefix = $("Project > PropertyGroup > VersionPrefix");
+			const versionSuffix = $("Project > PropertyGroup > VersionSuffix");
+
+			if (versionPrefix.length) {
+				const { prefix, suffix } = extractPrerelease(newVersion);
+
+				versionPrefix.text(prefix);
+
+				// Depending of if there is a suffix in the new version, we either need to update,
+				// add or remove the VersionSuffix property.
+				if (suffix) {
+					if (versionSuffix.length) {
+						versionSuffix.text(suffix);
+					} else {
+						$(`\n<VersionSuffix>${suffix}</VersionSuffix>`).insertAfter(versionPrefix);
+					}
+				} else {
+					versionSuffix.remove();
+				}
+			}
+		}
 
 		// Cheerio doesn't handle self-closing tags well,
 		// so we're manually adding a space before the closing tag.

@@ -2,9 +2,11 @@ import { resolve } from "node:path";
 import { writeFile, readFile } from "node:fs/promises";
 import conventionalChangelog from "conventional-changelog";
 
+import { ChangelogWriter } from "../changelog-writer/changelog-writer";
 import { fileExists } from "../utils/file-state";
-import type { ForkConfig } from "../config/types";
+import type { ForkConfig, ChangelogPresetConfig } from "../config/types";
 import type { Logger } from "../services/logger";
+import type { Commit } from "../commit-parser/types";
 
 /**
  * Matches the following changelog header formats:
@@ -71,9 +73,29 @@ function getNewReleaseContent(
 	});
 }
 
+/**
+ * Compares the legacy `conventional-changelog` output against the experimental changelog writer's
+ * output for the same release. Returns `undefined` when they match (ignoring surrounding whitespace),
+ * or a human readable description of both outputs when they differ.
+ *
+ * Extracted as a pure function so it can be unit tested without needing git/filesystem access.
+ */
+export function describeChangelogDifference(
+	legacyContent: string,
+	experimentalContent: string,
+): string | undefined {
+	if (legacyContent.trim() === experimentalContent.trim()) {
+		return undefined;
+	}
+
+	return `--- conventional-changelog ---\n${legacyContent}\n--- changelog-writer (experimental) ---\n${experimentalContent}`;
+}
+
 export async function updateChangelog(
 	config: ForkConfig,
 	logger: Logger,
+	commits: Commit[],
+	previousTag: string | undefined,
 	nextVersion: string,
 ): Promise<void> {
 	if (config.skipChangelog) {
@@ -98,6 +120,28 @@ export async function updateChangelog(
 
 	const oldContent = await getOldReleaseContent(changelogPath, fileExists(changelogPath));
 	const newContent = await getNewReleaseContent(config, logger, nextVersion);
+
+	if (config.experimentalChangelogWriter) {
+		// `changelogPresetConfig` is always fully resolved by `getUserConfig`, see `getChangelogPresetConfig`.
+		const changelogWriter = new ChangelogWriter(
+			config.changelogPresetConfig as ChangelogPresetConfig,
+		);
+		const experimentalContent = changelogWriter.generate(commits, {
+			version: nextVersion,
+			previousTag,
+			currentTag: `${config.tagPrefix}${nextVersion}`,
+		});
+
+		const diff = describeChangelogDifference(newContent, experimentalContent);
+
+		if (diff) {
+			logger.warn(
+				`[experimental-changelog-writer] The experimental changelog writer produced different output than conventional-changelog:\n${diff}`,
+			);
+		} else {
+			logger.debug("[experimental-changelog-writer] Output matches conventional-changelog output.");
+		}
+	}
 
 	if (!config.dryRun && newContent) {
 		await writeFile(

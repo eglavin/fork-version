@@ -204,6 +204,7 @@ Add a suffix to the end of the release message, useful to add a `[skip ci]` mess
 | allowMultipleVersions | boolean | true    | Don't throw an error if multiple versions are found in the given files.                                  |
 | commitAll             | boolean | false   | Commit all changes, not just files updated by Fork-Version                                               |
 | changelogAll          | boolean | false   | If this flag is set, all default commit types will be added to the changelog, not just `feat` and `fix`. |
+| experimentalChangelogWriter | boolean | false | Run the experimental changelog writer alongside conventional-changelog for comparison; a warning is logged if outputs differ, but the file written is always the conventional-changelog output. |
 | debug                 | boolean | false   | Output debug information (will save a json file with debug details)                                      |
 | dryRun                | boolean | false   | No output will be written to disk or committed                                                           |
 | silent                | boolean | false   | Run without logging to the terminal                                                                      |

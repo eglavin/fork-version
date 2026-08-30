@@ -83,6 +83,11 @@ export const ForkConfigJSONSchema = z.object({
 		.describe(
 			"If this flag is set, all default commit types will be added to the changelog, not just `feat` and `fix`.",
 		),
+	experimentalChangelogWriter: z
+		.boolean()
+		.describe(
+			"Run the experimental changelog writer alongside conventional-changelog for comparison purposes. The file written is always the conventional-changelog output; a warning is logged if the two differ.",
+		),
 	debug: z.boolean().describe("Output debug information."),
 	dryRun: z.boolean().describe("No output will be written to disk or committed."),
 	silent: z.boolean().describe("Run without logging to the terminal."),

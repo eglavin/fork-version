@@ -208,6 +208,15 @@ export interface ForkConfig {
 	 */
 	changelogAll: boolean;
 	/**
+	 * Run the experimental changelog writer (`src/changelog-writer/changelog-writer.ts`) alongside the
+	 * existing `conventional-changelog` based generator, purely to compare their output.
+	 *
+	 * The file written to disk is always the `conventional-changelog` output — the experimental writer's
+	 * output is never written. If the two outputs differ, a warning is logged along with the full diff.
+	 * @default false
+	 */
+	experimentalChangelogWriter: boolean;
+	/**
 	 * Output debug information.
 	 * @default false
 	 */

@@ -92,6 +92,10 @@
       "type": "boolean",
       "description": "If this flag is set, all default commit types will be added to the changelog, not just `feat` and `fix`."
     },
+    "experimentalChangelogWriter": {
+      "type": "boolean",
+      "description": "Run the experimental changelog writer alongside conventional-changelog for comparison purposes. The file written is always the conventional-changelog output; a warning is logged if the two differ."
+    },
     "debug": {
       "type": "boolean",
       "description": "Output debug information."

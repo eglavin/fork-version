@@ -33,7 +33,6 @@ Flags:
   --allow-multiple-versions        Don't throw an error if multiple versions are found in the given files. [Default: true]
   --commit-all                     Commit all changes, not just files updated by Fork-Version.
   --changelog-all                  If this flag is set, all default commit types will be added to the changelog.
-  --experimental-changelog-writer  Run the experimental changelog writer alongside conventional-changelog for comparison; a warning is logged if outputs differ.
   --debug                          Output debug information.
   --dry-run                        No output will be written to disk or committed.
   --silent                         Run without logging to the terminal.
@@ -107,7 +106,6 @@ export function getCliArguments() {
 			allowMultipleVersions: { type: "boolean" },
 			commitAll: { type: "boolean" },
 			changelogAll: { type: "boolean" },
-			experimentalChangelogWriter: { type: "boolean" },
 			debug: { type: "boolean" },
 			dryRun: { type: "boolean" },
 			silent: { type: "boolean" },

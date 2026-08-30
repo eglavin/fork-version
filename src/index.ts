@@ -1,3 +1,19 @@
+export { ChangelogWriter } from "./changelog-writer/changelog-writer";
+export {
+	CHANGELOG_ENTRY_TEMPLATE,
+	renderChangelogEntry,
+	type ChangelogTemplateContext,
+} from "./changelog-writer/templates";
+export type {
+	CommitGroup,
+	NoteGroup,
+	RenderableCommit,
+	RenderableCommitReference,
+	RenderableNote,
+	TransformedCommits,
+	WriterContext,
+} from "./changelog-writer/types";
+
 export { inspect } from "./commands/inspect";
 export { main } from "./commands/main";
 export { validateConfig } from "./commands/validate-config";

@@ -46,6 +46,6 @@ export async function commitChanges(
 		shouldVerify,
 		shouldSign,
 		"--message",
-		formatCommitMessage(config.changelogPresetConfig?.releaseCommitMessageFormat, nextVersion),
+		formatCommitMessage(config.releaseMessageFormat, nextVersion),
 	);
 }

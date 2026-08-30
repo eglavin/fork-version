@@ -43,6 +43,7 @@ function getNewReleaseContent(
 	// `changelogPresetConfig` is always fully resolved by `getUserConfig`, see `getChangelogPresetConfig`.
 	const changelogWriter = new ChangelogWriter(
 		config.changelogPresetConfig as ChangelogPresetConfig,
+		config.commitParserOptions,
 	);
 
 	return changelogWriter.generate(commits, {

@@ -150,4 +150,53 @@ describe("user-config", () => {
 			relativeTo("API", "MyApi.csproj"),
 		]);
 	});
+
+	it("should default to the standard release message format", async () => {
+		const { testFolder } = await setupTest("user-config");
+
+		const config = await getUserConfig({
+			input: [],
+			flags: {
+				path: testFolder,
+			},
+		});
+
+		expect(config.releaseMessageFormat).toBe("chore(release): {{currentTag}}");
+	});
+
+	it("should append a releaseMessageSuffix to the releaseMessageFormat", async () => {
+		const { testFolder } = await setupTest("user-config");
+
+		const config = await getUserConfig({
+			input: [],
+			flags: {
+				path: testFolder,
+				releaseMessageSuffix: "[skip ci]",
+			},
+		});
+
+		expect(config.releaseMessageFormat).toBe("chore(release): {{currentTag}} [skip ci]");
+	});
+
+	it("should prefer a releaseMessageFormat and releaseMessageSuffix from CLI args over the config file", async () => {
+		const { testFolder, create } = await setupTest("user-config");
+
+		create.json(
+			{
+				releaseMessageFormat: "release: {{currentTag}}",
+				releaseMessageSuffix: "[from config file]",
+			},
+			"fork.config.json",
+		);
+		const config = await getUserConfig({
+			input: [],
+			flags: {
+				path: testFolder,
+				releaseMessageFormat: "chore(release): {{currentTag}}",
+				releaseMessageSuffix: "[from cli]",
+			},
+		});
+
+		expect(config.releaseMessageFormat).toBe("chore(release): {{currentTag}} [from cli]");
+	});
 });

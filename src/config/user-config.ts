@@ -63,6 +63,9 @@ export async function getUserConfig(cliArguments: ForkVersionCLIArgs): Promise<F
 		preRelease:
 			// Meow doesn't support multiple flags with the same name, so we need to check both.
 			cliArguments.flags.preReleaseTag ?? cliArguments.flags.preRelease ?? configFile.preRelease,
+		releaseMessageFormat: mergedConfig.releaseMessageSuffix
+			? `${mergedConfig.releaseMessageFormat} ${mergedConfig.releaseMessageSuffix}`
+			: mergedConfig.releaseMessageFormat,
 		silent: shouldBeSilent || mergedConfig.silent,
 
 		detectedGitHost: detectedGitHost?.hostName,

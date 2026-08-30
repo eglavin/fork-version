@@ -8,14 +8,7 @@ describe("changelog-preset-config", () => {
 			commitUrlFormat: "{{host}}/{{owner}}/{{repository}}/commit/{{hash}}",
 			compareUrlFormat:
 				"{{host}}/{{owner}}/{{repository}}/compare/{{previousTag}}...{{currentTag}}",
-			header: `# Changelog
-
-`,
-			issuePrefixes: ["#"],
 			issueUrlFormat: "{{host}}/{{owner}}/{{repository}}/issues/{{id}}",
-			name: "conventionalcommits",
-			preMajor: false,
-			releaseCommitMessageFormat: "chore(release): {{currentTag}}",
 			types: [
 				{
 					section: "Features",
@@ -61,7 +54,6 @@ describe("changelog-preset-config", () => {
 					commitUrlFormat: "{{host}}/fork-version/commit/{{hash}}",
 					compareUrlFormat:
 						"{{host}}/fork-version/branchCompare?baseVersion=GT{{previousTag}}&targetVersion=GT{{currentTag}}",
-					releaseCommitMessageFormat: "chore(release): {{currentTag}} [skip ci]",
 					types: [
 						{ type: "feat", section: "New Features" },
 						{ type: "fix", section: "Bug Fixes" },
@@ -76,14 +68,7 @@ describe("changelog-preset-config", () => {
 			commitUrlFormat: "{{host}}/fork-version/commit/{{hash}}",
 			compareUrlFormat:
 				"{{host}}/fork-version/branchCompare?baseVersion=GT{{previousTag}}&targetVersion=GT{{currentTag}}",
-			header: `# Changelog
-
-`,
-			issuePrefixes: ["#"],
 			issueUrlFormat: "{{host}}/{{owner}}/{{repository}}/issues/{{id}}",
-			name: "conventionalcommits",
-			preMajor: false,
-			releaseCommitMessageFormat: "chore(release): {{currentTag}} [skip ci]",
 			types: [
 				{
 					section: "New Features",
@@ -107,7 +92,6 @@ describe("changelog-preset-config", () => {
 					"{{host}}/fork-version/branchCompare?baseVersion=GT{{previousTag}}&targetVersion=GT{{currentTag}}",
 				issueUrlFormat: "{{host}}/fork-version/issues/{{id}}",
 				userUrlFormat: "{{host}}/fork-version/user/{{user}}",
-				releaseCommitMessageFormat: "chore(release): {{currentTag}} [skip ci]",
 			} as never,
 			undefined,
 		);
@@ -118,31 +102,6 @@ describe("changelog-preset-config", () => {
 		);
 		expect(config.issueUrlFormat).toBe("{{host}}/fork-version/issues/{{id}}");
 		expect(config.userUrlFormat).toBe("{{host}}/fork-version/user/{{user}}");
-		expect(config.releaseCommitMessageFormat).toBe("chore(release): {{currentTag}} [skip ci]");
-	});
-
-	it("should be able to append a releaseMessageSuffix to the releaseCommitMessageFormat", () => {
-		const config = getChangelogPresetConfig(
-			{
-				releaseMessageSuffix: "[skip ci]",
-			},
-			{} as never,
-			undefined,
-		);
-
-		expect(config.releaseCommitMessageFormat).toBe("chore(release): {{currentTag}} [skip ci]");
-	});
-
-	it("should be able to append a releaseMessageSuffix to the releaseCommitMessageFormat from CLI arguments", () => {
-		const config = getChangelogPresetConfig(
-			{},
-			{
-				releaseMessageSuffix: "[no ci]",
-			} as never,
-			undefined,
-		);
-
-		expect(config.releaseCommitMessageFormat).toBe("chore(release): {{currentTag}} [no ci]");
 	});
 
 	it("should be able to detect the git host", () => {

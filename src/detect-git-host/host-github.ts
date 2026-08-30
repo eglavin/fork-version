@@ -33,7 +33,6 @@ export function detectGitHubOptions(remoteUrl: string): DetectedGitHost | undefi
 				commitUrlFormat: `https://github.com/${organisation}/${repository}/commit/{{hash}}`,
 				compareUrlFormat: `https://github.com/${organisation}/${repository}/compare/{{previousTag}}...{{currentTag}}`,
 				issueUrlFormat: `https://github.com/${organisation}/${repository}/issues/{{id}}`,
-				issuePrefixes: ["#", "gh-"],
 			},
 			commitParserOptions: {
 				mergePattern: /^Merge pull request #(?<id>\d*) from (?<source>.*)/i,

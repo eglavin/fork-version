@@ -49,16 +49,6 @@ export interface ChangelogPresetConfig {
 	 * @default "{{host}}/{{user}}"
 	 */
 	userUrlFormat: string;
-	/**
-	 * A string to be used to format the auto-generated release commit message.
-	 * @default "chore(release): {{currentTag}}"
-	 */
-	releaseCommitMessageFormat: string;
-	/**
-	 * List of prefixes used to detect references to issues.
-	 * @default ["#"]
-	 */
-	issuePrefixes: string[];
 }
 
 export interface ForkConfig {
@@ -135,6 +125,17 @@ export interface ForkConfig {
 	 * ```
 	 */
 	header: string;
+	/**
+	 * A string to be used to format the auto-generated release commit message.
+	 * @default "chore(release): {{currentTag}}"
+	 */
+	releaseMessageFormat: string;
+	/**
+	 * Add a suffix to the release commit message.
+	 * @example "[skip ci]"
+	 */
+	releaseMessageSuffix?: string;
+
 	/**
 	 * Specify a prefix for the created tag.
 	 *
@@ -282,14 +283,9 @@ export interface ForkConfig {
 	 */
 	detectedGitHost?: string;
 	/**
-	 * Override the default "conventional-changelog-conventionalcommits" preset configuration.
+	 * Override the commit types and URL formats used when generating the changelog.
 	 */
 	changelogPresetConfig?: Partial<ChangelogPresetConfig>;
-	/**
-	 * Add a suffix to the release commit message.
-	 * @example "[skip ci]"
-	 */
-	releaseMessageSuffix?: string;
 	/**
 	 * Options to pass to commits parser.
 	 */

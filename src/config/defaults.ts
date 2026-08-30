@@ -22,6 +22,7 @@ export const DEFAULT_CONFIG: ForkConfig = {
 
 All notable changes to this project will be documented in this file. See [fork-version](https://github.com/eglavin/fork-version) for commit guidelines.
 `,
+	releaseMessageFormat: "chore(release): {{currentTag}}",
 	tagPrefix: "v",
 
 	// Flags

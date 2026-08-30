@@ -18,12 +18,6 @@ export const ChangelogPresetConfigSchema = z.object({
 	compareUrlFormat: z.string().describe("A URL representing the comparison between two git SHAs."),
 	issueUrlFormat: z.string().describe("A URL representing the issue format."),
 	userUrlFormat: z.string().describe("A URL representing a user's profile on GitHub, Gitlab, etc."),
-	releaseCommitMessageFormat: z
-		.string()
-		.describe("A string to be used to format the auto-generated release commit message."),
-	issuePrefixes: z
-		.array(z.string())
-		.describe("List of prefixes used to detect references to issues."),
 });
 
 export const ForkConfigJSONSchema = z.object({
@@ -48,6 +42,13 @@ export const ForkConfigJSONSchema = z.object({
 	path: z.string().describe('The path Fork-Version will run from. Defaults to "process.cwd()".'),
 	changelog: z.string().describe('Name of the changelog file. Defaults to "CHANGELOG.md".'),
 	header: z.string().describe("The header text for the changelog."),
+	releaseMessageFormat: z
+		.string()
+		.describe("A string to be used to format the auto-generated release commit message."),
+	releaseMessageSuffix: z
+		.string()
+		.optional()
+		.describe("Add a suffix to the release commit message."),
 	tagPrefix: z.string().describe('Specify a prefix for the created tag. Defaults to "v".'),
 	preRelease: z
 		.string()
@@ -114,13 +115,7 @@ export const ForkConfigJSONSchema = z.object({
 		),
 	changelogPresetConfig: ChangelogPresetConfigSchema.partial()
 		.optional()
-		.describe(
-			'Override the default "conventional-changelog-conventionalcommits" preset configuration.',
-		),
-	releaseMessageSuffix: z
-		.string()
-		.optional()
-		.describe("Add a suffix to the release commit message."),
+		.describe("Override the commit types and URL formats used when generating the changelog."),
 	commitParserOptions: z.looseObject({}).optional().describe("Options to pass to commits parser."),
 });
 

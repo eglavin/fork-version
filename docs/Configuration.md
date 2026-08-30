@@ -23,7 +23,7 @@ Configuring using a javascript file is the most flexible option. You can use any
 
 ```js
 // fork.config.ts
-import { defineConfig } from 'fork-version';
+import { defineConfig } from "fork-version";
 
 export default defineConfig({
   header: `# My Changelog`,
@@ -35,7 +35,7 @@ Alternatively you can use typescript type annotations in a typescript file:
 
 ```ts
 // fork.config.ts
-import type { Config } from 'fork-version';
+import type { Config } from "fork-version";
 
 const config: Config = {
   header: `# My Changelog`,
@@ -99,20 +99,21 @@ Alternatively you can define your config using a key in your `package.json` file
 
 ### Options
 
-| Property                                                                | Type                 | Default                 | Description                                                                                                        |
-| :---------------------------------------------------------------------- | :------------------- | :---------------------- | :----------------------------------------------------------------------------------------------------------------- |
-| path                                                                    | string               | `process.cwd()`         | The path Fork-Version will run from                                                                                |
-| [files](#configfiles)                                                   | Array\<string>       | `["package.json", ...]` | List of the files to be updated                                                                                    |
-| [customFileManagers](./Supported-File-Managers.md#custom-file-updaters) | Array\<IFileManager> | -                       | Support for user provided custom file managers                                                                     |
-| [glob](#configglob)                                                     | string               | -                       | Glob pattern to match files to be updated                                                                          |
-| changelog                                                               | string               | `CHANGELOG.md`          | Name of the changelog file                                                                                         |
-| header                                                                  | string               | `# Changelog...`        | The header text for the changelog                                                                                  |
-| [tagPrefix](#configtagprefix)                                           | string               | `v`                     | Prefix for the created tag                                                                                         |
-| [preRelease](#configprerelease)                                         | string / boolean     | -                       | Make a pre-release with optional label if given value is a string                                                  |
-| currentVersion                                                          | string               | -                       | Use this version instead of trying to determine one                                                                |
-| nextVersion                                                             | string               | -                       | Attempt to update to this version, instead of incrementing using "conventional-commit"                             |
-| [releaseAs](#configreleaseas)                                           | string               | -                       | Release as increments the version by the specified level. Overrides the default behaviour of "conventional-commit" |
-| [releaseMessageSuffix](#configreleasemessagesuffix)                     | string               | -                       | Add a suffix to the end of the release message                                                                     |
+| Property                                                                | Type                 | Default                          | Description                                                                                                        |
+| :---------------------------------------------------------------------- | :------------------- | :------------------------------- | :----------------------------------------------------------------------------------------------------------------- |
+| path                                                                    | string               | `process.cwd()`                  | The path Fork-Version will run from                                                                                |
+| [files](#configfiles)                                                   | Array\<string>       | `["package.json", ...]`          | List of the files to be updated                                                                                    |
+| [customFileManagers](./Supported-File-Managers.md#custom-file-updaters) | Array\<IFileManager> | -                                | Support for user provided custom file managers                                                                     |
+| [glob](#configglob)                                                     | string               | -                                | Glob pattern to match files to be updated                                                                          |
+| changelog                                                               | string               | `CHANGELOG.md`                   | Name of the changelog file                                                                                         |
+| header                                                                  | string               | `# Changelog...`                 | The header text for the changelog                                                                                  |
+| [releaseMessageFormat](#configreleasemessageformat)                     | string               | `chore(release): {{currentTag}}` | A string to be used to format the auto-generated release commit message                                            |
+| [releaseMessageSuffix](#configreleasemessagesuffix)                     | string               | -                                | Add a suffix to the end of the release message                                                                     |
+| [tagPrefix](#configtagprefix)                                           | string               | `v`                              | Prefix for the created tag                                                                                         |
+| [preRelease](#configprerelease)                                         | string / boolean     | -                                | Make a pre-release with optional label if given value is a string                                                  |
+| currentVersion                                                          | string               | -                                | Use this version instead of trying to determine one                                                                |
+| nextVersion                                                             | string               | -                                | Attempt to update to this version, instead of incrementing using "conventional-commit"                             |
+| [releaseAs](#configreleaseas)                                           | string               | -                                | Release as increments the version by the specified level. Overrides the default behaviour of "conventional-commit" |
 
 #### config.files
 
@@ -152,6 +153,20 @@ Running `npx fork-version -G "{*/*.csproj,*/package.json}"` will update both csp
 > [!WARNING]
 > Ensure you wrap your glob pattern in quotes to prevent shell expansion.
 
+#### config.releaseMessageFormat
+
+A string to be used to format the auto-generated release commit message. `{{currentTag}}` is replaced with the tag being created for this release, e.g. `v1.2.3`.
+
+See also [config.releaseMessageSuffix](#configreleasemessagesuffix), which appends to whatever format is configured here.
+
+#### config.releaseMessageSuffix
+
+Add a suffix to the end of the release message, useful to add a `[skip ci]` message to the end of the created commit.
+
+- [GitHub Actions - Skipping workflow runs](https://docs.github.com/en/actions/managing-workflow-runs/skipping-workflow-runs)
+- [GitLab Pipelines - Skip a pipeline](https://docs.gitlab.com/ci/pipelines/#skip-a-pipeline)
+- [Azure Devops - Skipping CI for individual pushes](https://learn.microsoft.com/en-us/azure/devops/pipelines/repos/azure-repos-git?view=azure-devops&tabs=yaml#skipping-ci-for-individual-pushes)
+
 #### config.tagPrefix
 
 Allows you to control the prefix for the created tag. This is useful if your using a mono-repo in which you version multiple projects separately or simply want to use a different prefix for your tags.
@@ -189,14 +204,6 @@ Allows you to override the default versioning behaviour and increment by the spe
 | "minor"       | `1.3.0`         |
 | "patch"       | `1.2.4`         |
 
-#### config.releaseMessageSuffix
-
-Add a suffix to the end of the release message, useful to add a `[skip ci]` message to the end of the created commit.
-
-- [GitHub Actions - Skipping workflow runs](https://docs.github.com/en/actions/managing-workflow-runs/skipping-workflow-runs)
-- [GitLab Pipelines - Skip a pipeline](https://docs.gitlab.com/ci/pipelines/#skip-a-pipeline)
-- [Azure Devops - Skipping CI for individual pushes](https://learn.microsoft.com/en-us/azure/devops/pipelines/repos/azure-repos-git?view=azure-devops&tabs=yaml#skipping-ci-for-individual-pushes)
-
 ### Flags
 
 | Property              | Type    | Default | Description                                                                                              |
@@ -223,10 +230,10 @@ Add a suffix to the end of the release message, useful to add a `[skip ci]` mess
 
 ### Commit Parser and Changelog Options
 
-| Property                                              | Type   | Default | Description                                                                                  |
-| :---------------------------------------------------- | :----- | :------ | :------------------------------------------------------------------------------------------- |
-| [commitParserOptions](#configcommitparseroptions)     | object | {}      | Options to pass to commit parser                                                             |
-| [changelogPresetConfig](#configchangelogpresetconfig) | object | {}      | Override defaults from the "conventional-changelog-conventionalcommits" preset configuration |
+| Property                                              | Type   | Default | Description                                                                  |
+| :---------------------------------------------------- | :----- | :------ | :--------------------------------------------------------------------------- |
+| [commitParserOptions](#configcommitparseroptions)     | object | {}      | Options to pass to commit parser                                             |
+| [changelogPresetConfig](#configchangelogpresetconfig) | object | {}      | Override the commit types and URL formats used when generating the changelog |
 
 #### config.commitParserOptions
 
@@ -259,17 +266,15 @@ If you are using one of the following Git hosts, Fork-Version will automatically
 
 #### config.changelogPresetConfig
 
-Fork-Version uses the [conventional changelog config spec](https://github.com/conventional-changelog/conventional-changelog-config-spec). The following is an excerpt of the configurable options.
+Controls the commit types shown in the changelog and the URL formats used to link commits, comparisons, issues, and user mentions. The shape of this config is modelled after the [conventional changelog config spec](https://github.com/conventional-changelog/conventional-changelog-config-spec).
 
-| Property                                   | Type           | Default                                                                      | Description                                                             |
-| :----------------------------------------- | :------------- | :--------------------------------------------------------------------------- | :---------------------------------------------------------------------- |
-| [types](#configchangelogpresetconfigtypes) | Array\<Type>   | {}                                                                           | List of explicitly supported commit message types                       |
-| commitUrlFormat                            | string         | `{{host}}/{{owner}}/{{repository}}/commit/{{hash}}`                          | A URL representing a specific commit at a hash                          |
-| compareUrlFormat                           | string         | `{{host}}/{{owner}}/{{repository}}/compare/{{previousTag}}...{{currentTag}}` | A URL representing the comparison between two git SHAs                  |
-| issueUrlFormat                             | string         | `{{host}}/{{owner}}/{{repository}}/issues/{{id}}`                            | A URL representing the issue format                                     |
-| userUrlFormat                              | string         | `{{host}}/{{user}}`                                                          | A URL representing a user's profile                                     |
-| releaseCommitMessageFormat                 | string         | `chore(release): {{currentTag}}`                                             | A string to be used to format the auto-generated release commit message |
-| issuePrefixes                              | Array\<string> | `["#"]`                                                                      | List of prefixes used to detect references to issues                    |
+| Property                                   | Type         | Default                                                                      | Description                                            |
+| :----------------------------------------- | :----------- | :--------------------------------------------------------------------------- | :----------------------------------------------------- |
+| [types](#configchangelogpresetconfigtypes) | Array\<Type> | {}                                                                           | List of explicitly supported commit message types      |
+| commitUrlFormat                            | string       | `{{host}}/{{owner}}/{{repository}}/commit/{{hash}}`                          | A URL representing a specific commit at a hash         |
+| compareUrlFormat                           | string       | `{{host}}/{{owner}}/{{repository}}/compare/{{previousTag}}...{{currentTag}}` | A URL representing the comparison between two git SHAs |
+| issueUrlFormat                             | string       | `{{host}}/{{owner}}/{{repository}}/issues/{{id}}`                            | A URL representing the issue format                    |
+| userUrlFormat                              | string       | `{{host}}/{{user}}`                                                          | A URL representing a user's profile                    |
 
 ##### config.changelogPresetConfig.types
 

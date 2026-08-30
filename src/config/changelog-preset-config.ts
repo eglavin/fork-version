@@ -1,7 +1,4 @@
-import { z } from "zod";
-import conventionalChangelogConfigSpec from "conventional-changelog-config-spec";
-
-import { ChangelogPresetConfigTypeSchema, ChangelogPresetConfigSchema } from "./schema";
+import { ChangelogPresetConfigSchema } from "./schema";
 import type { ForkVersionCLIArgs, ForkConfig, ChangelogPresetConfig } from "./types";
 
 export function getChangelogPresetConfig(
@@ -9,42 +6,40 @@ export function getChangelogPresetConfig(
 	cliArguments: ForkVersionCLIArgs["flags"],
 	detectedChangelogOptions: ForkConfig["changelogPresetConfig"] | undefined,
 ): ChangelogPresetConfig {
-	const preset: { name: string; [_: string]: unknown } = {
-		name: "conventionalcommits",
+	const preset: ChangelogPresetConfig = {
+		types: [
+			{ type: "feat", section: "Features" },
+			{ type: "fix", section: "Bug Fixes" },
+			{ type: "chore", hidden: true },
+			{ type: "docs", hidden: true },
+			{ type: "style", hidden: true },
+			{ type: "refactor", hidden: true },
+			{ type: "perf", hidden: true },
+			{ type: "test", hidden: true },
+		],
+		commitUrlFormat: "{{host}}/{{owner}}/{{repository}}/commit/{{hash}}",
+		compareUrlFormat: "{{host}}/{{owner}}/{{repository}}/compare/{{previousTag}}...{{currentTag}}",
+		issueUrlFormat: "{{host}}/{{owner}}/{{repository}}/issues/{{id}}",
+		userUrlFormat: "{{host}}/{{user}}",
 	};
 
-	// First take any default values from the conventional-changelog-config-spec
-	if (typeof conventionalChangelogConfigSpec.properties === "object") {
-		Object.entries(conventionalChangelogConfigSpec.properties).forEach(([key, value]) => {
-			if ("default" in value && value.default !== undefined) {
-				// If the user has requested to see all types, we need to remove the hidden flag from the default types.
-				if (mergedConfig?.changelogAll && key === "types") {
-					const parsedTypes = z.array(ChangelogPresetConfigTypeSchema).safeParse(value.default);
-
-					if (parsedTypes.success) {
-						parsedTypes.data.forEach((type) => {
-							if (!type.section) {
-								delete type.hidden;
-								type.section = "Other Changes";
-							}
-						});
-						preset[key] = parsedTypes.data;
-
-						return;
-					}
-				}
-
-				preset[key] = value.default;
+	// If the user has requested to see all types, we need to remove the hidden flag from the default types.
+	if (mergedConfig?.changelogAll) {
+		for (const type of preset.types) {
+			if (type.hidden) {
+				delete type.hidden;
+				type.section = "Other Changes";
 			}
-		});
+		}
 	}
 
 	// If we've detected a git host, use the values from the detected host now so that they can
 	// be overwritten by the users config later
 	if (detectedChangelogOptions) {
 		Object.entries(detectedChangelogOptions).forEach(([key, value]) => {
-			if (value !== undefined) {
-				preset[key] = value;
+			if (key in preset && value !== undefined) {
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any
+				(preset as any)[key] = value;
 			}
 		});
 	}
@@ -56,14 +51,10 @@ export function getChangelogPresetConfig(
 	) {
 		Object.entries(mergedConfig.changelogPresetConfig).forEach(([key, value]) => {
 			if (value !== undefined) {
-				preset[key] = value;
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any
+				(preset as any)[key] = value;
 			}
 		});
-	}
-
-	// If the user has defined a releaseMessageSuffix, append it to the releaseCommitMessageFormat
-	if (mergedConfig?.releaseMessageSuffix && !cliArguments?.releaseMessageSuffix) {
-		preset.releaseCommitMessageFormat = `${preset.releaseCommitMessageFormat} ${mergedConfig.releaseMessageSuffix}`;
 	}
 
 	// Finally overwrite with any values from the CLI arguments
@@ -78,12 +69,6 @@ export function getChangelogPresetConfig(
 	}
 	if (cliArguments?.userUrlFormat) {
 		preset.userUrlFormat = cliArguments.userUrlFormat;
-	}
-	if (cliArguments?.releaseCommitMessageFormat) {
-		preset.releaseCommitMessageFormat = cliArguments.releaseCommitMessageFormat;
-	}
-	if (cliArguments?.releaseMessageSuffix) {
-		preset.releaseCommitMessageFormat = `${preset.releaseCommitMessageFormat} ${cliArguments.releaseMessageSuffix}`;
 	}
 
 	return ChangelogPresetConfigSchema.passthrough().parse(preset);

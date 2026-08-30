@@ -40,6 +40,10 @@
       "type": "string",
       "description": "The header text for the changelog."
     },
+    "releaseMessageFormat": {
+      "type": "string",
+      "description": "A string to be used to format the auto-generated release commit message."
+    },
     "tagPrefix": {
       "type": "string",
       "description": "Specify a prefix for the created tag. Defaults to \"v\"."
@@ -141,7 +145,7 @@
       "type": "string"
     },
     "changelogPresetConfig": {
-      "description": "Override the default \"conventional-changelog-conventionalcommits\" preset configuration.",
+      "description": "Override the commit types and URL formats used when generating the changelog.",
       "type": "object",
       "properties": {
         "types": {
@@ -188,17 +192,6 @@
         "userUrlFormat": {
           "type": "string",
           "description": "A URL representing a user's profile on GitHub, Gitlab, etc."
-        },
-        "releaseCommitMessageFormat": {
-          "type": "string",
-          "description": "A string to be used to format the auto-generated release commit message."
-        },
-        "issuePrefixes": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "List of prefixes used to detect references to issues."
         }
       },
       "additionalProperties": false

@@ -67,7 +67,6 @@
   "dependencies": {
     "bundle-require": "5.1.0",
     "cheerio": "1.2.0",
-    "conventional-changelog-config-spec": "2.1.0",
     "esbuild": "0.28.0",
     "handlebars": "4.7.9",
     "joycon": "3.1.1",
@@ -80,7 +79,6 @@
   "devDependencies": {
     "@arethetypeswrong/core": "0.18.2",
     "@eslint/js": "10.0.1",
-    "@types/json-schema": "7.0.15",
     "@types/node": "24.11.0",
     "@types/semver": "7.7.1",
     "@vitest/coverage-v8": "4.1.2",

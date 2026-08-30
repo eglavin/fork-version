@@ -67,8 +67,6 @@ function createPresetConfig(overrides?: Partial<ChangelogPresetConfig>): Changel
 		compareUrlFormat: "https://example.com/owner/repo/compare/{{previousTag}}...{{currentTag}}",
 		issueUrlFormat: "https://example.com/owner/repo/issues/{{id}}",
 		userUrlFormat: "https://example.com/{{user}}",
-		releaseCommitMessageFormat: "chore(release): {{currentTag}}",
-		issuePrefixes: ["#"],
 		...overrides,
 	};
 }
@@ -198,6 +196,18 @@ describe("ChangelogWriter", () => {
 			const writer = new ChangelogWriter(createPresetConfig());
 
 			expect(writer.resolveSubjectUrls("cc @org/team", new Set())).toBe("cc @org/team");
+		});
+
+		it("recognizes issue prefixes from the commit parser options, defaulting to '#' when none are given", () => {
+			const writer = new ChangelogWriter(createPresetConfig());
+			expect(writer.resolveSubjectUrls("fix gh-123", new Set())).toBe("fix gh-123");
+
+			const githubWriter = new ChangelogWriter(createPresetConfig(), {
+				issuePrefixes: ["#", "gh-"],
+			});
+			expect(githubWriter.resolveSubjectUrls("fix gh-123", new Set())).toBe(
+				"fix [gh-123](https://example.com/owner/repo/issues/123)",
+			);
 		});
 	});
 

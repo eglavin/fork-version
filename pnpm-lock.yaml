@@ -14,9 +14,6 @@ importers:
       cheerio:
         specifier: 1.2.0
         version: 1.2.0
-      conventional-changelog-config-spec:
-        specifier: 2.1.0
-        version: 2.1.0
       esbuild:
         specifier: 0.28.0
         version: 0.28.0
@@ -48,9 +45,6 @@ importers:
       '@eslint/js':
         specifier: 10.0.1
         version: 10.0.1(eslint@10.2.0)
-      '@types/json-schema':
-        specifier: 7.0.15
-        version: 7.0.15
       '@types/node':
         specifier: 24.11.0
         version: 24.11.0
@@ -815,9 +809,6 @@ packages:
 
   cjs-module-lexer@1.4.3:
     resolution: {integrity: sha512-9z8TZaGM1pfswYeXrUpzPrkx8UnWYdhJclsiYMm6x/w5+nN+8Tf/LnAgfLGQCm59qAOxU8WwHEq2vNwF6i4j+Q==}
-
-  conventional-changelog-config-spec@2.1.0:
-    resolution: {integrity: sha512-IpVePh16EbbB02V+UA+HQnnPIohgXvJRxHcS5+Uwk4AT5LjzCZJm5sp/yqs5C6KZJ1jMsV4paEV13BN1pvDuxQ==}
 
   convert-source-map@2.0.0:
     resolution: {integrity: sha512-Kvp459HrV2FEJ1CAsi1Ku+MY3kasH19TFykTz2xWmMeq6bk2NU3XXvfJ+Q61m0xktWwt+1HSYf3JZsTms3aRJg==}
@@ -2272,8 +2263,6 @@ snapshots:
       whatwg-mimetype: 4.0.0
 
   cjs-module-lexer@1.4.3: {}
-
-  conventional-changelog-config-spec@2.1.0: {}
 
   convert-source-map@2.0.0: {}
 

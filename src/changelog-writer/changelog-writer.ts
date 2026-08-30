@@ -1,4 +1,6 @@
+import { createParserOptions } from "../commit-parser/options";
 import { renderChangelogEntry } from "./templates";
+import type { ParserOptions } from "../commit-parser/options";
 import type { ChangelogPresetConfig, ChangelogPresetConfigType } from "../config/types";
 import type { Commit, CommitReference } from "../commit-parser/types";
 import type {
@@ -13,9 +15,11 @@ import type {
 
 export class ChangelogWriter {
 	#presetConfig: ChangelogPresetConfig;
+	#issuePrefixes: string[];
 
-	constructor(presetConfig: ChangelogPresetConfig) {
+	constructor(presetConfig: ChangelogPresetConfig, commitParserOptions?: Partial<ParserOptions>) {
 		this.#presetConfig = presetConfig;
+		this.#issuePrefixes = createParserOptions(commitParserOptions).issuePrefixes ?? ["#"];
 
 		this.expandUrl = this.expandUrl.bind(this);
 		this.hasUnresolvedPlaceholder = this.hasUnresolvedPlaceholder.bind(this);
@@ -86,11 +90,8 @@ export class ChangelogWriter {
 	resolveSubjectUrls(subject: string, seenIssues: Set<string>): string {
 		let result = subject;
 
-		if (this.#presetConfig.issuePrefixes.length > 0) {
-			const issuePattern = new RegExp(
-				`(${this.#presetConfig.issuePrefixes.join("|")})([a-z0-9]+)`,
-				"g",
-			);
+		if (this.#issuePrefixes.length > 0) {
+			const issuePattern = new RegExp(`(${this.#issuePrefixes.join("|")})([a-z0-9]+)`, "g");
 
 			result = result.replace(issuePattern, (_match, prefix: string, issue: string) => {
 				// Still recorded even when left unlinked below, so it's excluded from the footer references.

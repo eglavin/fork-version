@@ -2,6 +2,9 @@
 
 [Skip to config options](#config-options)
 
+> [!NOTE]
+> Upgrading from an older version? See the [Migration Guides](./Migration.md) for a list of breaking changes and how to update your config.
+
 Fork-Version can be configured either through a config file or by passing options to the tool when ran. The following config file types are supported:
 
 - [Javascript file](#javascript-config):
@@ -220,18 +223,18 @@ Allows you to override the default versioning behaviour and increment by the spe
 
 ### Flags
 
-| Property              | Type    | Default | Description                                                                                              |
-| :-------------------- | :------ | :------ | :------------------------------------------------------------------------------------------------------- |
-| allowMultipleVersions | boolean | true    | Don't throw an error if multiple versions are found in the given files.                                  |
-| commitAll             | boolean | false   | Commit all changes, not just files updated by Fork-Version                                               |
-| changelogAll          | boolean | false   | If this flag is set, all default commit types will be added to the changelog, not just `feat` and `fix`. |
-| debug                 | boolean | false   | Output debug information (will save a json file with debug details)                                      |
-| dryRun                | boolean | false   | No output will be written to disk or committed                                                           |
-| silent                | boolean | false   | Run without logging to the terminal                                                                      |
-| gitTagFallback        | boolean | true    | If unable to find a version in the given files, fallback and attempt to use the latest git tag           |
-| sign                  | boolean | false   | Sign the commit with the systems GPG key                                                                 |
-| verify                | boolean | false   | Run user defined git hooks before committing                                                             |
-| asJson                | boolean | false   | Print inspected output as a parsable json string                                                         |
+| Property              | Type    | Default | Description                                                                                                          |
+| :-------------------- | :------ | :------ | :------------------------------------------------------------------------------------------------------------------- |
+| allowMultipleVersions | boolean | true    | Don't throw an error if multiple versions are found in the given files.                                              |
+| commitAll             | boolean | false   | Commit all changes, not just files updated by Fork-Version                                                           |
+| changelogAll          | boolean | false   | If this flag is set, every hidden type in your configured `types` list is revealed under an "Other Changes" section. |
+| debug                 | boolean | false   | Output debug information (will save a json file with debug details)                                                  |
+| dryRun                | boolean | false   | No output will be written to disk or committed                                                                       |
+| silent                | boolean | false   | Run without logging to the terminal                                                                                  |
+| gitTagFallback        | boolean | true    | If unable to find a version in the given files, fallback and attempt to use the latest git tag                       |
+| sign                  | boolean | false   | Sign the commit with the systems GPG key                                                                             |
+| verify                | boolean | false   | Run user defined git hooks before committing                                                                         |
+| asJson                | boolean | false   | Print inspected output as a parsable json string                                                                     |
 
 ### Skip Steps
 
@@ -282,7 +285,7 @@ Otherwise it will fall back to a generic, best-effort host/owner/repository dete
 
 #### config.changelogWriterOptions
 
-Controls the commit types shown in the changelog and the URL formats used to link commits, comparisons, issues, and user mentions. The shape of this config is modelled after the [conventional changelog config spec](https://github.com/conventional-changelog/conventional-changelog-config-spec).
+Controls the URL formats used to link commits, comparisons, issues, and user mentions in the generated changelog. See [config.types](#configtypes) to control which commit types show up in the changelog.
 
 | Property          | Type   | Default                                                                      | Description                                            |
 | :---------------- | :----- | :--------------------------------------------------------------------------- | :----------------------------------------------------- |

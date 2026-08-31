@@ -36,6 +36,9 @@ Primarily designed to be used with `npx`, Fork-Version can also be installed glo
 
 Fork-Version can be configured either through a config file or by passing options to the tool when ran. To see command line options you can run `fork-version --help` or [view the Configuration documentation](./docs/Configuration.md) for details on the supported options and how to use them.
 
+> [!NOTE]
+> Upgrading from an older version? See the [Migration Guides](./docs/Migration.md) for a list of breaking changes and how to update your config.
+
 ### Using `npx`
 
 To use Fork-Version without installation you can use `npx`:

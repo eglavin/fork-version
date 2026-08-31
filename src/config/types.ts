@@ -191,9 +191,9 @@ export interface ForkConfig {
 	 */
 	commitAll: boolean;
 	/**
-	 * By default the conventional-changelog spec will only add commit types of `feat` and `fix` to the generated changelog.
-	 * If this flag is set, all [default commit types](https://github.com/conventional-changelog/conventional-changelog-config-spec/blob/238093090c14bd7d5151eb5316e635623ce633f9/versions/2.2.0/schema.json#L18)
-	 * will be added to the changelog.
+	 * By default only commit types of `feat` and `fix` are added to the generated changelog (see the
+	 * default {@link ForkConfig.types}). If this flag is set, every hidden type is revealed under a
+	 * catch-all "Other Changes" section instead.
 	 * @default false
 	 */
 	changelogAll: boolean;

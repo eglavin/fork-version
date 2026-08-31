@@ -1,6 +1,6 @@
 {
   "name": "fork-version",
-  "version": "5.2.0",
+  "version": "6.0.0",
   "license": "MIT",
   "description": "Fork-Version automates version control tasks such as determining, updating, and committing versions, files, and changelogs, simplifying the process when adhering to the conventional commit standard.",
   "keywords": [
@@ -41,7 +41,7 @@
     "./package.json": "./package.json"
   },
   "bin": {
-    "fork-version": "dist/cli.js"
+    "fork-version": "./dist/cli.js"
   },
   "files": [
     "dist",

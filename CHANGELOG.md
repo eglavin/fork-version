@@ -1,5 +1,43 @@
 # Fork Version
 
+## [6.0.0](https://github.com/eglavin/fork-version/compare/v5.2.0...v6.0.0) (2026-08-31)
+
+### ⚠ BREAKING CHANGES
+
+* The `changelogPresetConfig` config option has been renamed
+to `changelogWriterOptions`, and `types` has moved out of it to a new
+top-level `types` option. The `ChangelogPresetConfig` and
+`ChangelogPresetConfigType` exports have been renamed to `WriterOptions`
+and `CommitType`.
+* changelogPresetConfig.releaseCommitMessageFormat and
+changelogPresetConfig.issuePrefixes are no longer supported. Set
+releaseMessageFormat at the top level of your config instead of
+changelogPresetConfig.releaseCommitMessageFormat. issuePrefixes should
+be set via commitParserOptions.issuePrefixes instead. The
+--release-commit-message-format CLI flag has been renamed to
+--release-message-format.
+* remove conventional-changelog implementation
+
+### Bug Fixes
+
+* correctness fixes and generic git host fallback in changelog-writer ([f0f8a7c](https://github.com/eglavin/fork-version/commit/f0f8a7cd3495cfd75b6c1ecc84d662f7082766ad)), closes [owner/repo#123](https://github.com/eglavin/fork-version/issues/123)
+
+### Chore
+
+* bump dependencies ([960c8eb](https://github.com/eglavin/fork-version/commit/960c8eba5237a2c74d4039eb9b67b273aaf09c62))
+
+### Docs
+
+* create migration docs for upgrading to v6 ([5abd636](https://github.com/eglavin/fork-version/commit/5abd6364eed13d75f1f08bce6e1f821e0119fcff))
+
+### Refactor
+
+* expose changelog-writer ([69b7272](https://github.com/eglavin/fork-version/commit/69b7272ea7c555eedeb8d41075bfe6c2f573fd23))
+* implement changelog-writer with experimental flag ([4f0e595](https://github.com/eglavin/fork-version/commit/4f0e595388d91d6530fd3e5e1ab7afb3f2a04110))
+* move commit types out of changelogPresetConfig into ForkConfig.types ([2a3e9d1](https://github.com/eglavin/fork-version/commit/2a3e9d1726e7d5863b493ba77766675b12f03b18))
+* remove conventional-changelog implementation ([aa7650b](https://github.com/eglavin/fork-version/commit/aa7650b1fd073dc7aec43deb811924cda0ea6914))
+* remove conventional-changelog-config-spec dependency ([f7e51e2](https://github.com/eglavin/fork-version/commit/f7e51e28cb0b0586a96fcfdfac61968e40b84743)), closes [#123](https://github.com/eglavin/fork-version/issues/123) [gh-123](https://github.com/eglavin/fork-version/issues/123)
+
 ## [5.2.0](https://github.com/eglavin/fork-version/compare/v5.1.7...v5.2.0) (2026-05-27)
 
 

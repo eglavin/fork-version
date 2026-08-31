@@ -98,6 +98,13 @@ describe("changelog-writer", () => {
 				writer.expandUrl("{{host}}/commit/{{hash}}", { host: undefined, hash: "abc1234" }),
 			).toBe("{{host}}/commit/abc1234");
 		});
+
+		it("inserts a value containing '$' patterns literally, instead of treating them as replacement patterns", () => {
+			const writer = new ChangelogWriter(createPresetConfig(), types);
+
+			expect(writer.expandUrl("compare/{{tag}}", { tag: "v1.0.0$&" })).toBe("compare/v1.0.0$&");
+			expect(writer.expandUrl("compare/{{tag}}", { tag: "v1.0.0$$" })).toBe("compare/v1.0.0$$");
+		});
 	});
 
 	describe("hasUnresolvedPlaceholder", () => {
@@ -142,6 +149,19 @@ describe("changelog-writer", () => {
 				section: "API Features",
 			});
 			expect(writer.findCommitType(commit("feat(ui): add button"))).toBeUndefined();
+		});
+
+		it("only matches an entry configured with an empty scope when the commit itself has no scope", () => {
+			const writer = new ChangelogWriter(createPresetConfig(), [
+				{ type: "feat", scope: "", section: "Core Features" },
+			]);
+
+			expect(writer.findCommitType(commit("feat: add new feature"))).toStrictEqual({
+				type: "feat",
+				scope: "",
+				section: "Core Features",
+			});
+			expect(writer.findCommitType(commit("feat(api): add endpoint"))).toBeUndefined();
 		});
 
 		it("matches revert commits against a configured 'revert' entry", () => {
@@ -212,6 +232,27 @@ describe("changelog-writer", () => {
 			expect(githubWriter.resolveSubjectUrls("fix gh-123", new Set())).toBe(
 				"fix [gh-123](https://example.com/owner/repo/issues/123)",
 			);
+		});
+
+		it("links a cross-repository inline reference, interpolating its owner/repository into the issue url", () => {
+			const writer = new ChangelogWriter(
+				createPresetConfig({
+					issueUrlFormat: "https://example.com/{{owner}}/{{repository}}/issues/{{id}}",
+				}),
+				types,
+			);
+			const seenIssues = new Set<string>();
+
+			expect(writer.resolveSubjectUrls("fixes acme/other-repo#124", seenIssues)).toBe(
+				"fixes [acme/other-repo#124](https://example.com/acme/other-repo/issues/124)",
+			);
+			expect(seenIssues.has("acme/other-repo#124")).toBe(true);
+		});
+
+		it("leaves an issue-like reference untouched when it doesn't end in a digit, matching the commit parser's own rules", () => {
+			const writer = new ChangelogWriter(createPresetConfig(), types);
+
+			expect(writer.resolveSubjectUrls("thanks #abc", new Set())).toBe("thanks #abc");
 		});
 	});
 
@@ -343,6 +384,34 @@ describe("changelog-writer", () => {
 				{ label: "#125", url: "https://example.com/owner/repo/issues/125" },
 			]);
 		});
+
+		it("keeps a footer reference to another repository even if it shares an issue number with an inline reference", () => {
+			const writer = new ChangelogWriter(createPresetConfig(), types);
+			const { commits } = writer.transformCommits([
+				commit("fix: resolve #124", "fixes acme/other-repo#124"),
+			]);
+
+			expect(commits[0].displaySubject).toBe(
+				"resolve [#124](https://example.com/owner/repo/issues/124)",
+			);
+			expect(commits[0].references).toStrictEqual([
+				{ label: "acme/other-repo#124", url: "https://example.com/owner/repo/issues/124" },
+			]);
+		});
+
+		it("excludes a footer reference to another repository when that exact reference was already linked inline in the subject", () => {
+			const writer = new ChangelogWriter(createPresetConfig(), types);
+			const { commits } = writer.transformCommits([
+				commit("fix: resolve acme/other-repo#124", "fixes acme/other-repo#124\nfixes #125"),
+			]);
+
+			expect(commits[0].displaySubject).toBe(
+				"resolve [acme/other-repo#124](https://example.com/owner/repo/issues/124)",
+			);
+			expect(commits[0].references).toStrictEqual([
+				{ label: "#125", url: "https://example.com/owner/repo/issues/125" },
+			]);
+		});
 	});
 
 	describe("groupCommits", () => {
@@ -355,6 +424,20 @@ describe("changelog-writer", () => {
 
 			// "Features" is configured before "Bug Fixes" in createPresetConfig's `types`, so this
 			// also proves the groups are genuinely sorted, not just left in input order.
+			expect(groups.map((group) => group.title)).toStrictEqual(["Features", "Bug Fixes"]);
+		});
+
+		it("orders a section by its first appearance in `types`, even when a later type shares it", () => {
+			const writer = new ChangelogWriter(createPresetConfig(), [
+				{ type: "feat", section: "Features" },
+				{ type: "fix", section: "Bug Fixes" },
+				{ type: "perf", section: "Features" },
+			]);
+			const groups = writer.groupCommits([
+				renderableCommit({ groupTitle: "Bug Fixes" }),
+				renderableCommit({ groupTitle: "Features" }),
+			]);
+
 			expect(groups.map((group) => group.title)).toStrictEqual(["Features", "Bug Fixes"]);
 		});
 
@@ -391,6 +474,18 @@ describe("changelog-writer", () => {
 			]);
 
 			expect(groups[0].commits.map((commit) => commit.scope)).toStrictEqual(["a", "b"]);
+		});
+
+		it("sorts by scope first even when the concatenation of scope and subject would collide", () => {
+			const writer = new ChangelogWriter(createPresetConfig(), types);
+			const groups = writer.groupCommits([
+				renderableCommit({ groupTitle: "Features", scope: "ab", displaySubject: "x" }),
+				renderableCommit({ groupTitle: "Features", scope: "a", displaySubject: "bx" }),
+			]);
+
+			// Concatenated, both commits produce "abx", sorting on the concatenation would leave
+			// them in input order instead of ordering by `scope` first.
+			expect(groups[0].commits.map((commit) => commit.scope)).toStrictEqual(["a", "ab"]);
 		});
 	});
 
@@ -607,8 +702,8 @@ describe("changelog-writer", () => {
 
 				### Other Changes
 
-				* **deps:** removes old testing libraries ([4ef2c86](https://example.com/owner/repo/commit/4ef2c86d393a9660aa9f753144256b1f200c16bd))
 				* migrate tests to vitest ([4ef2c86](https://example.com/owner/repo/commit/4ef2c86d393a9660aa9f753144256b1f200c16bd))
+				* **deps:** removes old testing libraries ([4ef2c86](https://example.com/owner/repo/commit/4ef2c86d393a9660aa9f753144256b1f200c16bd))
 				"
 			`);
 		});

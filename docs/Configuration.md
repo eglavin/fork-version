@@ -276,6 +276,8 @@ If you are using one of the following Git hosts, Fork-Version will automatically
 - BitBucket
 - Azure DevOps
 
+Otherwise it will fall back to a generic, best-effort host/owner/repository detection for any other remote.
+
 [View the `detect-git-host` function to see how Fork-Version detects the git host.](../src/detect-git-host/detect-git-host.ts)
 
 #### config.changelogWriterOptions

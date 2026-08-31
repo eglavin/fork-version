@@ -268,7 +268,8 @@ export interface ForkConfig {
 	 * - `GitLab`
 	 * - `Bitbucket`
 	 * - `Azure Devops`
-	 * - Or undefined if unknown or not detected.
+	 * - The remote's origin URL, for any other detected git host.
+	 * - Or undefined if there's no git remote at all.
 	 */
 	detectedGitHost?: string;
 	/**

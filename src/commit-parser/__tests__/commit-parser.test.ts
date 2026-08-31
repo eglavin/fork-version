@@ -882,6 +882,19 @@ finishes #789, #800`,
 				],
 			});
 		});
+
+		it("keeps a cross-repository reference even when another repository already used the same issue number", () => {
+			const parser = new CommitParser();
+
+			const commit = parser.parse(createCommit("fix: resolve #124", "fixes acme/other-repo#124"));
+
+			expect(commit).toMatchObject({
+				references: [
+					{ prefix: "#", issue: "124", action: "resolve", owner: null, repository: null },
+					{ prefix: "#", issue: "124", action: "fixes", owner: "acme", repository: "other-repo" },
+				],
+			});
+		});
 	});
 
 	describe("notes", () => {

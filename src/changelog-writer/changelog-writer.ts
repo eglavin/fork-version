@@ -1,5 +1,6 @@
 import { createParserOptions } from "../commit-parser/options";
 import { renderChangelogEntry } from "./templates";
+import { splitRepository } from "../utils/split-repository";
 import type { ParserOptions } from "../commit-parser/options";
 import type { Commit, CommitReference } from "../commit-parser/types";
 import type {
@@ -17,7 +18,7 @@ import type { WriterOptions } from "./options";
 export class ChangelogWriter {
 	#options: WriterOptions;
 	#types: CommitType[];
-	#issuePrefixes: string[];
+	#issuePattern: RegExp | undefined;
 
 	constructor(
 		options: WriterOptions,
@@ -26,10 +27,12 @@ export class ChangelogWriter {
 	) {
 		this.#types = types;
 		this.#options = options;
-		this.#issuePrefixes = createParserOptions(commitParserOptions).issuePrefixes ?? ["#"];
+		const { issuePattern } = createParserOptions(commitParserOptions);
+		this.#issuePattern = issuePattern ? new RegExp(issuePattern, "gi") : undefined;
 
 		this.expandUrl = this.expandUrl.bind(this);
 		this.hasUnresolvedPlaceholder = this.hasUnresolvedPlaceholder.bind(this);
+		this.buildReferenceLabel = this.buildReferenceLabel.bind(this);
 		this.findCommitType = this.findCommitType.bind(this);
 		this.resolveSubjectUrls = this.resolveSubjectUrls.bind(this);
 		this.resolveCommitUrl = this.resolveCommitUrl.bind(this);
@@ -56,7 +59,7 @@ export class ChangelogWriter {
 				return result;
 			}
 
-			return result.replaceAll(`{{${key}}}`, value);
+			return result.replaceAll(`{{${key}}}`, () => value);
 		}, format);
 	}
 
@@ -75,6 +78,22 @@ export class ChangelogWriter {
 	}
 
 	/**
+	 * Builds a reference's display label, only showing an owner/repository when it explicitly
+	 * captured a cross-repository issue, e.g. `owner/repo#123`.
+	 *
+	 * @example
+	 * ```ts
+	 * buildReferenceLabel({ owner: null, repository: null, prefix: "#", issue: "123" }); // "#123"
+	 * buildReferenceLabel({ owner: "eglavin", repository: "fork-version", prefix: "#", issue: "123" }); // "eglavin/fork-version#123"
+	 * ```
+	 */
+	buildReferenceLabel(
+		reference: Pick<CommitReference, "owner" | "repository" | "prefix" | "issue">,
+	): string {
+		return `${reference.owner ? `${reference.owner}/` : ""}${reference.repository ?? ""}${reference.prefix}${reference.issue}`;
+	}
+
+	/**
 	 * Finds the configured type entry matching the given commit.
 	 *
 	 * Reverts are matched against a `revert` type entry rather than their own (usually empty) `type`.
@@ -84,7 +103,7 @@ export class ChangelogWriter {
 
 		return this.#types.find((entry) => {
 			if (entry.type !== typeKey) return false;
-			if (entry.scope && entry.scope !== commit.scope) return false;
+			if (entry.scope !== undefined && entry.scope !== commit.scope) return false;
 			return true;
 		});
 	}
@@ -97,21 +116,25 @@ export class ChangelogWriter {
 	resolveSubjectUrls(subject: string, seenIssues: Set<string>): string {
 		let result = subject;
 
-		if (this.#issuePrefixes.length > 0) {
-			const issuePattern = new RegExp(`(${this.#issuePrefixes.join("|")})([a-z0-9]+)`, "g");
+		if (this.#issuePattern) {
+			result = result.replace(
+				this.#issuePattern,
+				(_match, rawRepository: string | undefined, prefix: string, issue: string) => {
+					const { owner, repository } = splitRepository(rawRepository ?? "");
+					const label = this.buildReferenceLabel({ owner, repository, prefix, issue });
 
-			result = result.replace(issuePattern, (_match, prefix: string, issue: string) => {
-				// Still recorded even when left unlinked below, so it's excluded from the footer references.
-				seenIssues.add(prefix + issue);
+					// Still recorded even when left unlinked below, so it's excluded from the footer references.
+					seenIssues.add(label);
 
-				const url = this.expandUrl(this.#options.issueUrlFormat, {
-					id: issue,
-					prefix,
-				});
-				return this.hasUnresolvedPlaceholder(url)
-					? `${prefix}${issue}`
-					: `[${prefix}${issue}](${url})`;
-			});
+					const url = this.expandUrl(this.#options.issueUrlFormat, {
+						owner: owner ?? undefined,
+						repository: repository ?? undefined,
+						id: issue,
+						prefix,
+					});
+					return this.hasUnresolvedPlaceholder(url) ? label : `[${label}](${url})`;
+				},
+			);
 		}
 
 		result = result.replace(/\B@([a-z0-9](?:-?[a-z0-9/]){0,38})/g, (match, user: string) => {
@@ -139,9 +162,7 @@ export class ChangelogWriter {
 	 * Resolves a commit reference into its display label and, when linkable, its issue url.
 	 */
 	resolveReference(reference: CommitReference): RenderableCommitReference {
-		// The label only shows an owner/repository when the reference explicitly captured a
-		// cross-repository issue, e.g. `owner/repo#123`.
-		const label = `${reference.owner ? `${reference.owner}/` : ""}${reference.repository ?? ""}${reference.prefix}${reference.issue}`;
+		const label = this.buildReferenceLabel(reference);
 		const issueUrl = this.expandUrl(this.#options.issueUrlFormat, {
 			owner: reference.owner ?? undefined,
 			repository: reference.repository ?? undefined,
@@ -192,7 +213,7 @@ export class ChangelogWriter {
 				shortHash: commit.hash ? commit.hash.substring(0, 7) : "",
 				commitUrl: this.resolveCommitUrl(commit.hash),
 				references: commit.references
-					.filter((reference) => !seenIssues.has(reference.prefix + reference.issue))
+					.filter((reference) => !seenIssues.has(this.buildReferenceLabel(reference)))
 					.map(this.resolveReference),
 			});
 
@@ -217,7 +238,7 @@ export class ChangelogWriter {
 		const sectionOrder = new Map<string, number>();
 		for (let index = 0; index < this.#types.length; index++) {
 			const type = this.#types[index];
-			if (type.section) {
+			if (type.section && !sectionOrder.has(type.section)) {
 				sectionOrder.set(type.section, index);
 			}
 		}
@@ -237,13 +258,14 @@ export class ChangelogWriter {
 
 		const sortedGroups = Array.from(groups.values());
 		for (const group of sortedGroups) {
-			group.commits.sort((a, b) =>
-				(a.scope + a.displaySubject).localeCompare(b.scope + b.displaySubject),
+			group.commits.sort(
+				(a, b) =>
+					a.scope.localeCompare(b.scope) || a.displaySubject.localeCompare(b.displaySubject),
 			);
 		}
 
-		// "Other Changes" always sorts after every configured section — it's a catch-all, not something
-		// the user explicitly ordered.
+		// "Other Changes" always sorts after every configured section, a catch-all, not something the
+		// user explicitly ordered.
 		function rank(title: string | false) {
 			return title === "Other Changes"
 				? Number.POSITIVE_INFINITY

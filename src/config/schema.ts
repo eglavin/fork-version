@@ -109,7 +109,7 @@ export const ForkConfigJSONSchema = z.object({
 		.string()
 		.optional()
 		.describe(
-			"The detected git host, such as GitHub, GitLab, Bitbucket, Azure Devops, or undefined if unknown or not detected.",
+			"The detected git host, such as GitHub, GitLab, Bitbucket, Azure Devops, the remote's origin URL for any other git host, or undefined if there's no git remote at all.",
 		),
 	commitParserOptions: z.looseObject({}).optional().describe("Options to pass to commits parser."),
 	changelogWriterOptions: WriterOptionsSchema.partial()

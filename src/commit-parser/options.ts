@@ -123,7 +123,7 @@ function createDefaultParserOptions(userOptions?: Partial<ParserOptions>): Parse
 		issuePrefixes,
 		issuePattern: joinedIssuePrefixes
 			? new RegExp(
-					`(?:.*?)??\\s*(?<repository>[\\w-\\.\\/]*?)??(?<prefix>${joinedIssuePrefixes})(?<issue>[\\w-]*\\d+)`,
+					`(?<repository>[\\w-\\.\\/]*?)??(?<prefix>${joinedIssuePrefixes})(?<issue>[\\w-]*\\d+)`,
 				)
 			: undefined,
 

@@ -1,8 +1,9 @@
 import type { getCliArguments } from "./cli-arguments";
 import type { ParserOptions } from "../commit-parser/options";
 import type { IFileManager } from "../services/file-manager";
+import type { WriterOptions } from "../changelog-writer/options";
 
-export interface ChangelogPresetConfigType {
+export interface CommitType {
 	/**
 	 * The type of commit message.
 	 * @example "feat", "fix", "chore", etc..
@@ -20,35 +21,6 @@ export interface ChangelogPresetConfigType {
 	 * Should show in the generated changelog message?
 	 */
 	hidden?: boolean;
-}
-
-export interface ChangelogPresetConfig {
-	/**
-	 * List of explicitly supported commit message types.
-	 */
-	types: ChangelogPresetConfigType[];
-	/**
-	 * A URL representing a specific commit at a hash.
-	 * @default "{{host}}/{{owner}}/{{repository}}/commit/{{hash}}"
-	 */
-	commitUrlFormat: string;
-	/**
-	 * A URL representing the comparison between two git SHAs.
-	 * @default "{{host}}/{{owner}}/{{repository}}/compare/{{previousTag}}...{{currentTag}}"
-	 */
-	compareUrlFormat: string;
-	/**
-	 * A URL representing the issue format (allowing a different URL format to be swapped in
-	 * for Gitlab, Bitbucket, etc).
-	 * @default "{{host}}/{{owner}}/{{repository}}/issues/{{id}}"
-	 */
-	issueUrlFormat: string;
-	/**
-	 * A URL representing a user's profile on GitHub, Gitlab, etc. This URL is used
-	 * for substituting @eglavin with https://github.com/eglavin in commit messages.
-	 * @default "{{host}}/{{user}}"
-	 */
-	userUrlFormat: string;
 }
 
 export interface ForkConfig {
@@ -126,6 +98,24 @@ export interface ForkConfig {
 	 */
 	header: string;
 	/**
+	 * List of explicitly supported commit message types, controlling which commits show up in the
+	 * changelog and under which section.
+	 * @default
+	 * ```js
+	 * [
+	 *   { type: "feat", section: "Features" },
+	 *   { type: "fix", section: "Bug Fixes" },
+	 *   { type: "chore", hidden: true },
+	 *   { type: "docs", hidden: true },
+	 *   { type: "style", hidden: true },
+	 *   { type: "refactor", hidden: true },
+	 *   { type: "perf", hidden: true },
+	 *   { type: "test", hidden: true },
+	 * ]
+	 * ```
+	 */
+	types: CommitType[];
+	/**
 	 * A string to be used to format the auto-generated release commit message.
 	 * @default "chore(release): {{currentTag}}"
 	 */
@@ -135,7 +125,6 @@ export interface ForkConfig {
 	 * @example "[skip ci]"
 	 */
 	releaseMessageSuffix?: string;
-
 	/**
 	 * Specify a prefix for the created tag.
 	 *
@@ -283,13 +272,13 @@ export interface ForkConfig {
 	 */
 	detectedGitHost?: string;
 	/**
-	 * Override the commit types and URL formats used when generating the changelog.
-	 */
-	changelogPresetConfig?: Partial<ChangelogPresetConfig>;
-	/**
 	 * Options to pass to commits parser.
 	 */
 	commitParserOptions?: Partial<ParserOptions>;
+	/**
+	 * Override the commit types and URL formats used when generating the changelog.
+	 */
+	changelogWriterOptions?: Partial<WriterOptions>;
 }
 
 export type Config = Partial<ForkConfig>;

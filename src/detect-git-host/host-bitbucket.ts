@@ -30,14 +30,14 @@ export function detectBitbucketOptions(remoteUrl: string): DetectedGitHost | und
 
 		return {
 			hostName: "Bitbucket",
-			changelogOptions: {
+			commitParser: {
+				mergePattern: /^Merged in (?<source>.*) \(pull request #(?<id>\d*)\)/i,
+			},
+			changelogWriter: {
 				commitUrlFormat: `https://bitbucket.${domain}/${organisation}/${repository}/commits/{{hash}}`,
 				compareUrlFormat: `https://bitbucket.${domain}/${organisation}/${repository}/branches/compare/{{currentTag}}..{{previousTag}}`,
 				// Bitbucket doesn't have a builtin issue tracker like GitHub or GitLab, this should be overridden by the user if they want to link to issues in their changelog.
 				issueUrlFormat: `https://bitbucket.${domain}/${organisation}/${repository}/issues/{{id}}`,
-			},
-			commitParserOptions: {
-				mergePattern: /^Merged in (?<source>.*) \(pull request #(?<id>\d*)\)/i,
 			},
 		};
 	}

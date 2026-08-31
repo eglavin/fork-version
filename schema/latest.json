@@ -40,9 +40,42 @@
       "type": "string",
       "description": "The header text for the changelog."
     },
+    "types": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "The type of commit message, such as \"feat\", \"fix\", \"chore\"."
+          },
+          "scope": {
+            "description": "The scope of the commit message.",
+            "type": "string"
+          },
+          "section": {
+            "description": "The section of the `CHANGELOG` the commit should show up in.",
+            "type": "string"
+          },
+          "hidden": {
+            "description": "Should show in the generated changelog message?",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "type"
+        ],
+        "additionalProperties": false
+      },
+      "description": "List of explicitly supported commit message types."
+    },
     "releaseMessageFormat": {
       "type": "string",
       "description": "A string to be used to format the auto-generated release commit message."
+    },
+    "releaseMessageSuffix": {
+      "description": "Add a suffix to the release commit message.",
+      "type": "string"
     },
     "tagPrefix": {
       "type": "string",
@@ -144,39 +177,16 @@
       "description": "The detected git host, such as GitHub, GitLab, Bitbucket, Azure Devops, or undefined if unknown or not detected.",
       "type": "string"
     },
-    "changelogPresetConfig": {
+    "commitParserOptions": {
+      "description": "Options to pass to commits parser.",
+      "type": "object",
+      "properties": {},
+      "additionalProperties": {}
+    },
+    "changelogWriterOptions": {
       "description": "Override the commit types and URL formats used when generating the changelog.",
       "type": "object",
       "properties": {
-        "types": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "type": {
-                "type": "string",
-                "description": "The type of commit message, such as \"feat\", \"fix\", \"chore\"."
-              },
-              "scope": {
-                "description": "The scope of the commit message.",
-                "type": "string"
-              },
-              "section": {
-                "description": "The section of the `CHANGELOG` the commit should show up in.",
-                "type": "string"
-              },
-              "hidden": {
-                "description": "Should show in the generated changelog message?",
-                "type": "boolean"
-              }
-            },
-            "required": [
-              "type"
-            ],
-            "additionalProperties": false
-          },
-          "description": "List of explicitly supported commit message types."
-        },
         "commitUrlFormat": {
           "type": "string",
           "description": "A URL representing a specific commit at a hash."
@@ -195,16 +205,6 @@
         }
       },
       "additionalProperties": false
-    },
-    "releaseMessageSuffix": {
-      "description": "Add a suffix to the release commit message.",
-      "type": "string"
-    },
-    "commitParserOptions": {
-      "description": "Options to pass to commits parser.",
-      "type": "object",
-      "properties": {},
-      "additionalProperties": {}
     }
   },
   "required": [],

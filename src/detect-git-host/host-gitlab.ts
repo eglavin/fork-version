@@ -29,12 +29,7 @@ export function detectGitlabOptions(remoteUrl: string): DetectedGitHost | undefi
 
 		return {
 			hostName: "GitLab",
-			changelogOptions: {
-				commitUrlFormat: `https://gitlab.com/${organisation}/${repository}/-/commit/{{hash}}`,
-				compareUrlFormat: `https://gitlab.com/${organisation}/${repository}/-/compare/{{previousTag}}...{{currentTag}}`,
-				issueUrlFormat: `https://gitlab.com/${organisation}/${repository}/-/issues/{{id}}`,
-			},
-			commitParserOptions: {
+			commitParser: {
 				mergePattern: /^Merge branch '(?<source>.*)' into '(.*)'/i,
 				// https://docs.gitlab.com/user/project/issues/managing_issues/#default-closing-pattern
 				referenceActions: [
@@ -55,6 +50,11 @@ export function detectGitlabOptions(remoteUrl: string): DetectedGitHost | undefi
 					"implemented",
 					"implementing",
 				],
+			},
+			changelogWriter: {
+				commitUrlFormat: `https://gitlab.com/${organisation}/${repository}/-/commit/{{hash}}`,
+				compareUrlFormat: `https://gitlab.com/${organisation}/${repository}/-/compare/{{previousTag}}...{{currentTag}}`,
+				issueUrlFormat: `https://gitlab.com/${organisation}/${repository}/-/issues/{{id}}`,
 			},
 		};
 	}

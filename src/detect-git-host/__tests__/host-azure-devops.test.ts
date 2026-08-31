@@ -7,18 +7,18 @@ describe("host-azure-devops", () => {
 		);
 
 		expect(gitHost?.hostName).toBe("Azure Devops");
-		expect(gitHost?.changelogOptions?.commitUrlFormat).toBe(
+		expect(gitHost?.changelogWriter?.commitUrlFormat).toBe(
 			"https://dev.azure.com/ORGANISATION/PROJECT/_git/REPOSITORY/commit/{{hash}}",
 		);
-		expect(gitHost?.changelogOptions?.compareUrlFormat).toBe(
+		expect(gitHost?.changelogWriter?.compareUrlFormat).toBe(
 			"https://dev.azure.com/ORGANISATION/PROJECT/_git/REPOSITORY/branchCompare?baseVersion=GT{{previousTag}}&targetVersion=GT{{currentTag}}",
 		);
-		expect(gitHost?.changelogOptions?.issueUrlFormat).toBe(
+		expect(gitHost?.changelogWriter?.issueUrlFormat).toBe(
 			"https://dev.azure.com/ORGANISATION/PROJECT/_workitems/edit/{{id}}",
 		);
 
-		expect(gitHost?.commitParserOptions?.mergePattern).toBeDefined();
-		const parsed = gitHost?.commitParserOptions?.mergePattern?.exec("Merged PR 123: some-branch");
+		expect(gitHost?.commitParser?.mergePattern).toBeDefined();
+		const parsed = gitHost?.commitParser?.mergePattern?.exec("Merged PR 123: some-branch");
 		expect(parsed?.groups?.id).toBe("123");
 		expect(parsed?.groups?.source).toBe("some-branch");
 	});
@@ -29,18 +29,18 @@ describe("host-azure-devops", () => {
 		);
 
 		expect(gitHost?.hostName).toBe("Azure Devops");
-		expect(gitHost?.changelogOptions?.commitUrlFormat).toBe(
+		expect(gitHost?.changelogWriter?.commitUrlFormat).toBe(
 			"https://dev.azure.com/ORGANISATION/PROJECT/_git/REPOSITORY/commit/{{hash}}",
 		);
-		expect(gitHost?.changelogOptions?.compareUrlFormat).toBe(
+		expect(gitHost?.changelogWriter?.compareUrlFormat).toBe(
 			"https://dev.azure.com/ORGANISATION/PROJECT/_git/REPOSITORY/branchCompare?baseVersion=GT{{previousTag}}&targetVersion=GT{{currentTag}}",
 		);
-		expect(gitHost?.changelogOptions?.issueUrlFormat).toBe(
+		expect(gitHost?.changelogWriter?.issueUrlFormat).toBe(
 			"https://dev.azure.com/ORGANISATION/PROJECT/_workitems/edit/{{id}}",
 		);
 
-		expect(gitHost?.commitParserOptions?.mergePattern).toBeDefined();
-		const parsed = gitHost?.commitParserOptions?.mergePattern?.exec("Merged PR 123: some-branch");
+		expect(gitHost?.commitParser?.mergePattern).toBeDefined();
+		const parsed = gitHost?.commitParser?.mergePattern?.exec("Merged PR 123: some-branch");
 		expect(parsed?.groups?.id).toBe("123");
 		expect(parsed?.groups?.source).toBe("some-branch");
 	});

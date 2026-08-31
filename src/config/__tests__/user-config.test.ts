@@ -199,4 +199,68 @@ describe("user-config", () => {
 
 		expect(config.releaseMessageFormat).toBe("chore(release): {{currentTag}} [from cli]");
 	});
+
+	it("should not change the default types when changelogAll is not set", async () => {
+		const { testFolder } = await setupTest("user-config");
+
+		const config = await getUserConfig({
+			input: [],
+			flags: {
+				path: testFolder,
+			},
+		});
+
+		expect(config.types).toStrictEqual([
+			{ type: "feat", section: "Features" },
+			{ type: "fix", section: "Bug Fixes" },
+			{ type: "chore", hidden: true },
+			{ type: "docs", hidden: true },
+			{ type: "style", hidden: true },
+			{ type: "refactor", hidden: true },
+			{ type: "perf", hidden: true },
+			{ type: "test", hidden: true },
+		]);
+	});
+
+	it("should reveal hidden types under 'Other Changes' when changelogAll is set", async () => {
+		const { testFolder } = await setupTest("user-config");
+
+		const config = await getUserConfig({
+			input: [],
+			flags: {
+				path: testFolder,
+				changelogAll: true,
+			},
+		});
+
+		expect(config.types).toStrictEqual([
+			{ type: "feat", section: "Features" },
+			{ type: "fix", section: "Bug Fixes" },
+			{ type: "chore", section: "Other Changes", hidden: false },
+			{ type: "docs", section: "Other Changes", hidden: false },
+			{ type: "style", section: "Other Changes", hidden: false },
+			{ type: "refactor", section: "Other Changes", hidden: false },
+			{ type: "perf", section: "Other Changes", hidden: false },
+			{ type: "test", section: "Other Changes", hidden: false },
+		]);
+	});
+
+	it("should be able to override the default types via a config file", async () => {
+		const { testFolder, create } = await setupTest("user-config");
+
+		create.json(
+			{
+				types: [{ type: "feat", section: "New Features" }],
+			},
+			"fork.config.json",
+		);
+		const config = await getUserConfig({
+			input: [],
+			flags: {
+				path: testFolder,
+			},
+		});
+
+		expect(config.types).toStrictEqual([{ type: "feat", section: "New Features" }]);
+	});
 });

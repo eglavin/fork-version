@@ -1,13 +1,21 @@
 import { CommitParser } from "../../commit-parser/commit-parser";
 import { ChangelogWriter } from "../changelog-writer";
-import type { ChangelogPresetConfig } from "../../config/types";
 import type { Commit, CommitReference } from "../../commit-parser/types";
 import type { RenderableCommit, RenderableNote } from "../types";
+import type { CommitType } from "../../config/types";
+import type { WriterOptions } from "../options";
 
 const hash = "4ef2c86d393a9660aa9f753144256b1f200c16bd";
 const date = "2024-12-22T17:36:50Z";
 const name = "Fork Version";
 const email = "fork-version@example.com";
+
+const types: CommitType[] = [
+	{ type: "feat", section: "Features" },
+	{ type: "fix", section: "Bug Fixes" },
+	{ type: "chore", hidden: true },
+	{ type: "docs", hidden: true },
+];
 
 function commit(subject: string, body = "", commitHash = hash): Commit {
 	const parser = new CommitParser();
@@ -55,14 +63,8 @@ function renderableNote(overrides: Partial<RenderableNote> = {}): RenderableNote
  * be resolved into the url formats (e.g. by `detect-git-host.ts`), so tests use fully resolved
  * formats here just like a detected GitHub remote would produce.
  */
-function createPresetConfig(overrides?: Partial<ChangelogPresetConfig>): ChangelogPresetConfig {
+function createPresetConfig(overrides?: Partial<WriterOptions>): WriterOptions {
 	return {
-		types: [
-			{ type: "feat", section: "Features" },
-			{ type: "fix", section: "Bug Fixes" },
-			{ type: "chore", hidden: true },
-			{ type: "docs", hidden: true },
-		],
 		commitUrlFormat: "https://example.com/owner/repo/commit/{{hash}}",
 		compareUrlFormat: "https://example.com/owner/repo/compare/{{previousTag}}...{{currentTag}}",
 		issueUrlFormat: "https://example.com/owner/repo/issues/{{id}}",
@@ -71,10 +73,10 @@ function createPresetConfig(overrides?: Partial<ChangelogPresetConfig>): Changel
 	};
 }
 
-describe("ChangelogWriter", () => {
+describe("changelog-writer", () => {
 	describe("expandUrl", () => {
 		it("replaces every placeholder it has a value for", () => {
-			const writer = new ChangelogWriter(createPresetConfig());
+			const writer = new ChangelogWriter(createPresetConfig(), types);
 
 			expect(
 				writer.expandUrl("{{host}}/{{owner}}/{{repository}}/commit/{{hash}}", {
@@ -87,7 +89,7 @@ describe("ChangelogWriter", () => {
 		});
 
 		it("leaves a placeholder untouched when it has no value, or its value is undefined", () => {
-			const writer = new ChangelogWriter(createPresetConfig());
+			const writer = new ChangelogWriter(createPresetConfig(), types);
 
 			expect(writer.expandUrl("{{host}}/commit/{{hash}}", { hash: "abc1234" })).toBe(
 				"{{host}}/commit/abc1234",
@@ -100,7 +102,7 @@ describe("ChangelogWriter", () => {
 
 	describe("hasUnresolvedPlaceholder", () => {
 		it("detects whether a placeholder remains", () => {
-			const writer = new ChangelogWriter(createPresetConfig());
+			const writer = new ChangelogWriter(createPresetConfig(), types);
 
 			expect(writer.hasUnresolvedPlaceholder("{{host}}/owner/repo/commit/abc1234")).toBe(true);
 			expect(writer.hasUnresolvedPlaceholder("https://example.com/owner/repo/commit/abc1234")).toBe(
@@ -111,44 +113,44 @@ describe("ChangelogWriter", () => {
 
 	describe("findTypeEntry", () => {
 		it("finds the entry matching a commit's type, case-insensitively", () => {
-			const writer = new ChangelogWriter(createPresetConfig());
+			const writer = new ChangelogWriter(createPresetConfig(), types);
 
-			expect(writer.findTypeEntry(commit("feat: add new feature"))).toStrictEqual({
+			expect(writer.findCommitType(commit("feat: add new feature"))).toStrictEqual({
 				type: "feat",
 				section: "Features",
 			});
-			expect(writer.findTypeEntry(commit("Feat: add new feature"))).toStrictEqual({
+			expect(writer.findCommitType(commit("Feat: add new feature"))).toStrictEqual({
 				type: "feat",
 				section: "Features",
 			});
 		});
 
 		it("returns undefined when no configured type matches", () => {
-			const writer = new ChangelogWriter(createPresetConfig());
+			const writer = new ChangelogWriter(createPresetConfig(), types);
 
-			expect(writer.findTypeEntry(commit("test: add a test"))).toBeUndefined();
+			expect(writer.findCommitType(commit("test: add a test"))).toBeUndefined();
 		});
 
 		it("only matches a scoped entry when the commit's scope matches too", () => {
-			const writer = new ChangelogWriter(
-				createPresetConfig({ types: [{ type: "feat", scope: "api", section: "API Features" }] }),
-			);
+			const writer = new ChangelogWriter(createPresetConfig(), [
+				{ type: "feat", scope: "api", section: "API Features" },
+			]);
 
-			expect(writer.findTypeEntry(commit("feat(api): add endpoint"))).toStrictEqual({
+			expect(writer.findCommitType(commit("feat(api): add endpoint"))).toStrictEqual({
 				type: "feat",
 				scope: "api",
 				section: "API Features",
 			});
-			expect(writer.findTypeEntry(commit("feat(ui): add button"))).toBeUndefined();
+			expect(writer.findCommitType(commit("feat(ui): add button"))).toBeUndefined();
 		});
 
 		it("matches revert commits against a configured 'revert' entry", () => {
-			const writer = new ChangelogWriter(
-				createPresetConfig({ types: [{ type: "revert", section: "Reverts" }] }),
-			);
+			const writer = new ChangelogWriter(createPresetConfig(), [
+				{ type: "revert", section: "Reverts" },
+			]);
 			const revertCommit = commit('Revert "feat: add new feature"', `This reverts commit ${hash}.`);
 
-			expect(writer.findTypeEntry(revertCommit)).toStrictEqual({
+			expect(writer.findCommitType(revertCommit)).toStrictEqual({
 				type: "revert",
 				section: "Reverts",
 			});
@@ -157,7 +159,7 @@ describe("ChangelogWriter", () => {
 
 	describe("resolveSubjectUrls", () => {
 		it("links an inline issue reference when the issue url resolves, and always records it in seenIssues", () => {
-			const writer = new ChangelogWriter(createPresetConfig());
+			const writer = new ChangelogWriter(createPresetConfig(), types);
 			const seenIssues = new Set<string>();
 
 			expect(writer.resolveSubjectUrls("fix #123", seenIssues)).toBe(
@@ -167,6 +169,7 @@ describe("ChangelogWriter", () => {
 
 			const unresolvedWriter = new ChangelogWriter(
 				createPresetConfig({ issueUrlFormat: "{{host}}/{{owner}}/{{repository}}/issues/{{id}}" }),
+				types,
 			);
 			const unresolvedSeenIssues = new Set<string>();
 
@@ -177,7 +180,7 @@ describe("ChangelogWriter", () => {
 		});
 
 		it("links an @mention when the user url resolves, otherwise leaves it as plain text", () => {
-			const writer = new ChangelogWriter(createPresetConfig());
+			const writer = new ChangelogWriter(createPresetConfig(), types);
 
 			expect(writer.resolveSubjectUrls("thanks @someuser", new Set())).toBe(
 				"thanks [@someuser](https://example.com/someuser)",
@@ -185,6 +188,7 @@ describe("ChangelogWriter", () => {
 
 			const unresolvedWriter = new ChangelogWriter(
 				createPresetConfig({ userUrlFormat: "{{host}}/{{user}}" }),
+				types,
 			);
 
 			expect(unresolvedWriter.resolveSubjectUrls("thanks @someuser", new Set())).toBe(
@@ -193,16 +197,16 @@ describe("ChangelogWriter", () => {
 		});
 
 		it("skips team/org mentions, e.g. @org/team", () => {
-			const writer = new ChangelogWriter(createPresetConfig());
+			const writer = new ChangelogWriter(createPresetConfig(), types);
 
 			expect(writer.resolveSubjectUrls("cc @org/team", new Set())).toBe("cc @org/team");
 		});
 
 		it("recognizes issue prefixes from the commit parser options, defaulting to '#' when none are given", () => {
-			const writer = new ChangelogWriter(createPresetConfig());
+			const writer = new ChangelogWriter(createPresetConfig(), types);
 			expect(writer.resolveSubjectUrls("fix gh-123", new Set())).toBe("fix gh-123");
 
-			const githubWriter = new ChangelogWriter(createPresetConfig(), {
+			const githubWriter = new ChangelogWriter(createPresetConfig(), types, {
 				issuePrefixes: ["#", "gh-"],
 			});
 			expect(githubWriter.resolveSubjectUrls("fix gh-123", new Set())).toBe(
@@ -217,6 +221,7 @@ describe("ChangelogWriter", () => {
 				createPresetConfig({
 					commitUrlFormat: "{{host}}/{{owner}}/{{repository}}/commit/{{hash}}",
 				}),
+				types,
 			);
 
 			expect(writer.resolveCommitUrl("")).toBeUndefined();
@@ -224,7 +229,7 @@ describe("ChangelogWriter", () => {
 		});
 
 		it("resolves a commit url from the configured format", () => {
-			const writer = new ChangelogWriter(createPresetConfig());
+			const writer = new ChangelogWriter(createPresetConfig(), types);
 
 			expect(writer.resolveCommitUrl(hash)).toBe(`https://example.com/owner/repo/commit/${hash}`);
 		});
@@ -232,7 +237,7 @@ describe("ChangelogWriter", () => {
 
 	describe("resolveReference", () => {
 		it("builds a label, showing an owner/repository only for cross-repository references", () => {
-			const writer = new ChangelogWriter(createPresetConfig());
+			const writer = new ChangelogWriter(createPresetConfig(), types);
 
 			expect(writer.resolveReference(reference())).toStrictEqual({
 				label: "#123",
@@ -251,6 +256,7 @@ describe("ChangelogWriter", () => {
 				createPresetConfig({
 					issueUrlFormat: "https://example.com/{{owner}}/{{repository}}/issues/{{id}}",
 				}),
+				types,
 			);
 
 			expect(
@@ -264,6 +270,7 @@ describe("ChangelogWriter", () => {
 		it("returns url undefined when the issue url isn't fully resolved, keeping the label", () => {
 			const writer = new ChangelogWriter(
 				createPresetConfig({ issueUrlFormat: "{{host}}/{{owner}}/{{repository}}/issues/{{id}}" }),
+				types,
 			);
 
 			expect(writer.resolveReference(reference())).toStrictEqual({ label: "#123", url: undefined });
@@ -272,7 +279,7 @@ describe("ChangelogWriter", () => {
 
 	describe("transformCommits", () => {
 		it("keeps a commit whose type is configured and assigns its section as the group title", () => {
-			const writer = new ChangelogWriter(createPresetConfig());
+			const writer = new ChangelogWriter(createPresetConfig(), types);
 			const { commits } = writer.transformCommits([commit("feat: add new feature")]);
 
 			expect(commits).toHaveLength(1);
@@ -281,7 +288,7 @@ describe("ChangelogWriter", () => {
 		});
 
 		it("discards a commit with no breaking change whose type is hidden or not configured at all", () => {
-			const writer = new ChangelogWriter(createPresetConfig());
+			const writer = new ChangelogWriter(createPresetConfig(), types);
 			const { commits, notes } = writer.transformCommits([
 				commit("chore: routine chore"),
 				commit("test: add a test"),
@@ -292,7 +299,7 @@ describe("ChangelogWriter", () => {
 		});
 
 		it("groups a hidden type's breaking change commit into an 'Other Changes' section, regardless of scope", () => {
-			const writer = new ChangelogWriter(createPresetConfig());
+			const writer = new ChangelogWriter(createPresetConfig(), types);
 
 			const scoped = writer.transformCommits([commit("chore(deps)!: bump deps")]);
 			expect(scoped.commits[0].groupTitle).toBe("Other Changes");
@@ -305,7 +312,7 @@ describe("ChangelogWriter", () => {
 		});
 
 		it("groups a commit whose type doesn't match any configured entry into an 'Other Changes' section", () => {
-			const writer = new ChangelogWriter(createPresetConfig());
+			const writer = new ChangelogWriter(createPresetConfig(), types);
 			const { commits } = writer.transformCommits([commit("obscure!: something weird")]);
 
 			expect(commits).toHaveLength(1);
@@ -313,7 +320,7 @@ describe("ChangelogWriter", () => {
 		});
 
 		it("uses an explicit BREAKING CHANGE footer instead of deriving a note from the bang marker", () => {
-			const writer = new ChangelogWriter(createPresetConfig());
+			const writer = new ChangelogWriter(createPresetConfig(), types);
 			const { notes } = writer.transformCommits([
 				commit("feat!: a breaking feature", "BREAKING CHANGE: explicit reason"),
 			]);
@@ -324,7 +331,7 @@ describe("ChangelogWriter", () => {
 		});
 
 		it("excludes a footer reference already linked inline in the subject, but keeps the rest", () => {
-			const writer = new ChangelogWriter(createPresetConfig());
+			const writer = new ChangelogWriter(createPresetConfig(), types);
 			const { commits } = writer.transformCommits([
 				commit("fix: resolve #124", "fixes #124\nfixes #125"),
 			]);
@@ -340,7 +347,7 @@ describe("ChangelogWriter", () => {
 
 	describe("groupCommits", () => {
 		it("groups commits and sorts groups using the order sections first appear in the configured types", () => {
-			const writer = new ChangelogWriter(createPresetConfig());
+			const writer = new ChangelogWriter(createPresetConfig(), types);
 			const groups = writer.groupCommits([
 				renderableCommit({ groupTitle: "Bug Fixes" }),
 				renderableCommit({ groupTitle: "Features" }),
@@ -352,7 +359,7 @@ describe("ChangelogWriter", () => {
 		});
 
 		it("sorts an untitled/unmatched group before any titled group", () => {
-			const writer = new ChangelogWriter(createPresetConfig());
+			const writer = new ChangelogWriter(createPresetConfig(), types);
 			const groups = writer.groupCommits([
 				renderableCommit({ groupTitle: "Features" }),
 				renderableCommit({ groupTitle: false }),
@@ -362,7 +369,7 @@ describe("ChangelogWriter", () => {
 		});
 
 		it("sorts the catch-all 'Other Changes' group after every configured section", () => {
-			const writer = new ChangelogWriter(createPresetConfig());
+			const writer = new ChangelogWriter(createPresetConfig(), types);
 			const groups = writer.groupCommits([
 				renderableCommit({ groupTitle: "Other Changes" }),
 				renderableCommit({ groupTitle: "Bug Fixes" }),
@@ -377,7 +384,7 @@ describe("ChangelogWriter", () => {
 		});
 
 		it("sorts commits within a group by scope, then subject", () => {
-			const writer = new ChangelogWriter(createPresetConfig());
+			const writer = new ChangelogWriter(createPresetConfig(), types);
 			const groups = writer.groupCommits([
 				renderableCommit({ groupTitle: "Features", scope: "b", displaySubject: "second" }),
 				renderableCommit({ groupTitle: "Features", scope: "a", displaySubject: "first" }),
@@ -389,7 +396,7 @@ describe("ChangelogWriter", () => {
 
 	describe("groupNotes", () => {
 		it("groups notes by title", () => {
-			const writer = new ChangelogWriter(createPresetConfig());
+			const writer = new ChangelogWriter(createPresetConfig(), types);
 			const groups = writer.groupNotes([
 				renderableNote({ text: "first" }),
 				renderableNote({ text: "second" }),
@@ -400,7 +407,7 @@ describe("ChangelogWriter", () => {
 		});
 
 		it("sorts groups alphabetically by title", () => {
-			const writer = new ChangelogWriter(createPresetConfig());
+			const writer = new ChangelogWriter(createPresetConfig(), types);
 			const groups = writer.groupNotes([
 				renderableNote({ title: "Z", text: "last" }),
 				renderableNote({ title: "A", text: "first" }),
@@ -412,7 +419,7 @@ describe("ChangelogWriter", () => {
 
 	describe("generate", () => {
 		it("should render a version heading without a compare link when there is no previous tag", () => {
-			const output = new ChangelogWriter(createPresetConfig()).generate([], {
+			const output = new ChangelogWriter(createPresetConfig(), types).generate([], {
 				version: "1.0.0",
 				currentTag: "v1.0.0",
 				date: "2024-01-01",
@@ -423,7 +430,7 @@ describe("ChangelogWriter", () => {
 		});
 
 		it("should render a version heading with a compare link when a previous tag is known", () => {
-			const output = new ChangelogWriter(createPresetConfig()).generate([], {
+			const output = new ChangelogWriter(createPresetConfig(), types).generate([], {
 				version: "1.1.0",
 				previousTag: "v1.0.0",
 				currentTag: "v1.1.0",
@@ -441,7 +448,7 @@ describe("ChangelogWriter", () => {
 					"{{host}}/{{owner}}/{{repository}}/compare/{{previousTag}}...{{currentTag}}",
 			});
 
-			const output = new ChangelogWriter(presetConfig).generate([], {
+			const output = new ChangelogWriter(presetConfig, types).generate([], {
 				version: "1.1.0",
 				previousTag: "v1.0.0",
 				currentTag: "v1.1.0",
@@ -459,7 +466,7 @@ describe("ChangelogWriter", () => {
 				commitUrlFormat: "{{host}}/{{owner}}/{{repository}}/commit/{{hash}}",
 			});
 
-			const output = new ChangelogWriter(presetConfig).generate(commits, {
+			const output = new ChangelogWriter(presetConfig, types).generate(commits, {
 				version: "1.1.0",
 				currentTag: "v1.1.0",
 				date: "2024-01-01",
@@ -475,7 +482,7 @@ describe("ChangelogWriter", () => {
 				issueUrlFormat: "{{host}}/{{owner}}/{{repository}}/issues/{{id}}",
 			});
 
-			const output = new ChangelogWriter(presetConfig).generate(commits, {
+			const output = new ChangelogWriter(presetConfig, types).generate(commits, {
 				version: "1.1.0",
 				currentTag: "v1.1.0",
 				date: "2024-01-01",
@@ -491,7 +498,7 @@ describe("ChangelogWriter", () => {
 				commit("fix: a bug fix", "fixes #124"),
 			];
 
-			const output = new ChangelogWriter(createPresetConfig()).generate(commits, {
+			const output = new ChangelogWriter(createPresetConfig(), types).generate(commits, {
 				version: "1.1.0",
 				currentTag: "v1.1.0",
 				date: "2024-01-01",
@@ -512,7 +519,7 @@ describe("ChangelogWriter", () => {
 		it("should place a hidden type's breaking change commits into an 'Other Changes' section", () => {
 			const commits = [commit("chore(deps)!: bump deps"), commit("docs!: rewrite the readme")];
 
-			const output = new ChangelogWriter(createPresetConfig()).generate(commits, {
+			const output = new ChangelogWriter(createPresetConfig(), types).generate(commits, {
 				version: "2.0.0",
 				currentTag: "v2.0.0",
 				date: "2024-01-01",
@@ -530,7 +537,7 @@ describe("ChangelogWriter", () => {
 				commit("feat: initial commit", "BREAKING CHANGE: this is a breaking change"),
 			];
 
-			const output = new ChangelogWriter(createPresetConfig()).generate(commits, {
+			const output = new ChangelogWriter(createPresetConfig(), types).generate(commits, {
 				version: "2.0.0",
 				currentTag: "v2.0.0",
 				date: "2024-01-01",
@@ -554,20 +561,16 @@ describe("ChangelogWriter", () => {
 				commit("test(deps)!: removes old testing libraries"),
 			];
 
-			const output = new ChangelogWriter(
-				createPresetConfig({
-					types: [
-						{ type: "feat", section: "🔨 Features" },
-						{ type: "fix", section: "⚙️ Bug Fixes" },
-						{ type: "refactor", section: "✂️ Refactor" },
-						{ type: "chore", section: "🧹 Chore" },
-						{ type: "docs", section: "📕 Docs" },
-						{ type: "style", section: "💅 Style" },
-						{ type: "perf", section: "🏎️ Perf" },
-						{ type: "test", hidden: true },
-					],
-				}),
-			).generate(commits, {
+			const output = new ChangelogWriter(createPresetConfig(), [
+				{ type: "feat", section: "🔨 Features" },
+				{ type: "fix", section: "⚙️ Bug Fixes" },
+				{ type: "refactor", section: "✂️ Refactor" },
+				{ type: "chore", section: "🧹 Chore" },
+				{ type: "docs", section: "📕 Docs" },
+				{ type: "style", section: "💅 Style" },
+				{ type: "perf", section: "🏎️ Perf" },
+				{ type: "test", hidden: true },
+			]).generate(commits, {
 				title: "big release",
 				version: "2.0.0",
 				previousTag: "v1.2.3",

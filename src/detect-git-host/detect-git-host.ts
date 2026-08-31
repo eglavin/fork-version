@@ -8,8 +8,8 @@ import { detectAzureDevopsOptions } from "./host-azure-devops";
 
 export interface DetectedGitHost {
 	hostName: string;
-	changelogOptions: ForkConfig["changelogPresetConfig"];
-	commitParserOptions: ForkConfig["commitParserOptions"];
+	commitParser: ForkConfig["commitParserOptions"];
+	changelogWriter: ForkConfig["changelogWriterOptions"];
 }
 
 /**

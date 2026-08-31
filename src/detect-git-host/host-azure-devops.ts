@@ -30,13 +30,13 @@ export function detectAzureDevopsOptions(remoteUrl: string): DetectedGitHost | u
 
 		return {
 			hostName: "Azure Devops",
-			changelogOptions: {
+			commitParser: {
+				mergePattern: /^Merged PR (?<id>\d*): (?<source>.*)/i,
+			},
+			changelogWriter: {
 				commitUrlFormat: `https://dev.azure.com/${organisation}/${project}/_git/${repository}/commit/{{hash}}`,
 				compareUrlFormat: `https://dev.azure.com/${organisation}/${project}/_git/${repository}/branchCompare?baseVersion=GT{{previousTag}}&targetVersion=GT{{currentTag}}`,
 				issueUrlFormat: `https://dev.azure.com/${organisation}/${project}/_workitems/edit/{{id}}`,
-			},
-			commitParserOptions: {
-				mergePattern: /^Merged PR (?<id>\d*): (?<source>.*)/i,
 			},
 		};
 	}

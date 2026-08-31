@@ -5,18 +5,18 @@ describe("host-github", () => {
 		const gitHost = detectGitHubOptions("https://github.com/ORGANISATION/REPOSITORY.git");
 
 		expect(gitHost?.hostName).toBe("GitHub");
-		expect(gitHost?.changelogOptions?.commitUrlFormat).toBe(
+		expect(gitHost?.changelogWriter?.commitUrlFormat).toBe(
 			"https://github.com/ORGANISATION/REPOSITORY/commit/{{hash}}",
 		);
-		expect(gitHost?.changelogOptions?.compareUrlFormat).toBe(
+		expect(gitHost?.changelogWriter?.compareUrlFormat).toBe(
 			"https://github.com/ORGANISATION/REPOSITORY/compare/{{previousTag}}...{{currentTag}}",
 		);
-		expect(gitHost?.changelogOptions?.issueUrlFormat).toBe(
+		expect(gitHost?.changelogWriter?.issueUrlFormat).toBe(
 			"https://github.com/ORGANISATION/REPOSITORY/issues/{{id}}",
 		);
 
-		expect(gitHost?.commitParserOptions?.mergePattern).toBeDefined();
-		const parsed = gitHost?.commitParserOptions?.mergePattern?.exec(
+		expect(gitHost?.commitParser?.mergePattern).toBeDefined();
+		const parsed = gitHost?.commitParser?.mergePattern?.exec(
 			"Merge pull request #123 from some-branch",
 		);
 		expect(parsed?.groups?.id).toBe("123");
@@ -27,18 +27,18 @@ describe("host-github", () => {
 		const gitHost = detectGitHubOptions("git@github.com:ORGANISATION/REPOSITORY.git");
 
 		expect(gitHost?.hostName).toBe("GitHub");
-		expect(gitHost?.changelogOptions?.commitUrlFormat).toBe(
+		expect(gitHost?.changelogWriter?.commitUrlFormat).toBe(
 			"https://github.com/ORGANISATION/REPOSITORY/commit/{{hash}}",
 		);
-		expect(gitHost?.changelogOptions?.compareUrlFormat).toBe(
+		expect(gitHost?.changelogWriter?.compareUrlFormat).toBe(
 			"https://github.com/ORGANISATION/REPOSITORY/compare/{{previousTag}}...{{currentTag}}",
 		);
-		expect(gitHost?.changelogOptions?.issueUrlFormat).toBe(
+		expect(gitHost?.changelogWriter?.issueUrlFormat).toBe(
 			"https://github.com/ORGANISATION/REPOSITORY/issues/{{id}}",
 		);
 
-		expect(gitHost?.commitParserOptions?.mergePattern).toBeDefined();
-		const parsed = gitHost?.commitParserOptions?.mergePattern?.exec(
+		expect(gitHost?.commitParser?.mergePattern).toBeDefined();
+		const parsed = gitHost?.commitParser?.mergePattern?.exec(
 			"Merge pull request #123 from some-branch",
 		);
 		expect(parsed?.groups?.id).toBe("123");

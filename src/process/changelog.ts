@@ -3,9 +3,10 @@ import { writeFile, readFile } from "node:fs/promises";
 
 import { ChangelogWriter } from "../changelog-writer/changelog-writer";
 import { fileExists } from "../utils/file-state";
-import type { ForkConfig, ChangelogPresetConfig } from "../config/types";
+import type { ForkConfig } from "../config/types";
 import type { Logger } from "../services/logger";
 import type { Commit } from "../commit-parser/types";
+import type { WriterOptions } from "../changelog-writer/options";
 
 /**
  * Matches the following changelog header formats:
@@ -40,9 +41,10 @@ function getNewReleaseContent(
 	previousTag: string | undefined,
 	nextVersion: string,
 ): string {
-	// `changelogPresetConfig` is always fully resolved by `getUserConfig`, see `getChangelogPresetConfig`.
+	// `changelogWriterOptions` is always fully resolved by `getUserConfig`, see `createWriterOptions`.
 	const changelogWriter = new ChangelogWriter(
-		config.changelogPresetConfig as ChangelogPresetConfig,
+		config.changelogWriterOptions as WriterOptions,
+		config.types,
 		config.commitParserOptions,
 	);
 

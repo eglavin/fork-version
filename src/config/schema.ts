@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const ChangelogPresetConfigTypeSchema = z.object({
+export const CommitTypeSchema = z.object({
 	type: z.string().describe('The type of commit message, such as "feat", "fix", "chore".'),
 	scope: z.string().optional().describe("The scope of the commit message."),
 	section: z
@@ -10,10 +10,7 @@ export const ChangelogPresetConfigTypeSchema = z.object({
 	hidden: z.boolean().optional().describe("Should show in the generated changelog message?"),
 });
 
-export const ChangelogPresetConfigSchema = z.object({
-	types: z
-		.array(ChangelogPresetConfigTypeSchema)
-		.describe("List of explicitly supported commit message types."),
+export const WriterOptionsSchema = z.object({
 	commitUrlFormat: z.string().describe("A URL representing a specific commit at a hash."),
 	compareUrlFormat: z.string().describe("A URL representing the comparison between two git SHAs."),
 	issueUrlFormat: z.string().describe("A URL representing the issue format."),
@@ -42,6 +39,7 @@ export const ForkConfigJSONSchema = z.object({
 	path: z.string().describe('The path Fork-Version will run from. Defaults to "process.cwd()".'),
 	changelog: z.string().describe('Name of the changelog file. Defaults to "CHANGELOG.md".'),
 	header: z.string().describe("The header text for the changelog."),
+	types: z.array(CommitTypeSchema).describe("List of explicitly supported commit message types."),
 	releaseMessageFormat: z
 		.string()
 		.describe("A string to be used to format the auto-generated release commit message."),
@@ -113,10 +111,10 @@ export const ForkConfigJSONSchema = z.object({
 		.describe(
 			"The detected git host, such as GitHub, GitLab, Bitbucket, Azure Devops, or undefined if unknown or not detected.",
 		),
-	changelogPresetConfig: ChangelogPresetConfigSchema.partial()
+	commitParserOptions: z.looseObject({}).optional().describe("Options to pass to commits parser."),
+	changelogWriterOptions: WriterOptionsSchema.partial()
 		.optional()
 		.describe("Override the commit types and URL formats used when generating the changelog."),
-	commitParserOptions: z.looseObject({}).optional().describe("Options to pass to commits parser."),
 });
 
 export const CustomFileManagerSchema = z.looseObject({

@@ -73,19 +73,16 @@ export async function setupTest(testName: string, options?: Partial<ISetupTestOp
 	const config = await getUserConfig({ input: [], flags: {} });
 	config.path = testFolder;
 	config.header = "# Test Header\n";
-	config.changelogPresetConfig = {
-		...config.changelogPresetConfig,
-		types: [
-			{ type: "feat", section: "Features" },
-			{ type: "fix", section: "Bug Fixes" },
-			{ type: "chore", section: "Chore" },
-			{ type: "docs", section: "Docs" },
-			{ type: "style", section: "Style" },
-			{ type: "refactor", section: "Refactor" },
-			{ type: "perf", section: "Perf" },
-			{ type: "test", section: "Test" },
-		],
-	};
+	config.types = [
+		{ type: "feat", section: "Features" },
+		{ type: "fix", section: "Bug Fixes" },
+		{ type: "chore", section: "Chore" },
+		{ type: "docs", section: "Docs" },
+		{ type: "style", section: "Style" },
+		{ type: "refactor", section: "Refactor" },
+		{ type: "perf", section: "Perf" },
+		{ type: "test", section: "Test" },
+	];
 	config.gitTagFallback = false;
 
 	const logger = new Logger({ silent: true, debug: false });

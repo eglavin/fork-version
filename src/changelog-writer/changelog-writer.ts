@@ -1,7 +1,6 @@
 import { createParserOptions } from "../commit-parser/options";
 import { renderChangelogEntry } from "./templates";
 import type { ParserOptions } from "../commit-parser/options";
-import type { ChangelogPresetConfig, ChangelogPresetConfigType } from "../config/types";
 import type { Commit, CommitReference } from "../commit-parser/types";
 import type {
 	CommitGroup,
@@ -12,18 +11,26 @@ import type {
 	TransformedCommits,
 	WriterContext,
 } from "./types";
+import type { CommitType } from "../config/types";
+import type { WriterOptions } from "./options";
 
 export class ChangelogWriter {
-	#presetConfig: ChangelogPresetConfig;
+	#options: WriterOptions;
+	#types: CommitType[];
 	#issuePrefixes: string[];
 
-	constructor(presetConfig: ChangelogPresetConfig, commitParserOptions?: Partial<ParserOptions>) {
-		this.#presetConfig = presetConfig;
+	constructor(
+		options: WriterOptions,
+		types: CommitType[],
+		commitParserOptions?: Partial<ParserOptions>,
+	) {
+		this.#types = types;
+		this.#options = options;
 		this.#issuePrefixes = createParserOptions(commitParserOptions).issuePrefixes ?? ["#"];
 
 		this.expandUrl = this.expandUrl.bind(this);
 		this.hasUnresolvedPlaceholder = this.hasUnresolvedPlaceholder.bind(this);
-		this.findTypeEntry = this.findTypeEntry.bind(this);
+		this.findCommitType = this.findCommitType.bind(this);
 		this.resolveSubjectUrls = this.resolveSubjectUrls.bind(this);
 		this.resolveCommitUrl = this.resolveCommitUrl.bind(this);
 		this.resolveReference = this.resolveReference.bind(this);
@@ -72,10 +79,10 @@ export class ChangelogWriter {
 	 *
 	 * Reverts are matched against a `revert` type entry rather than their own (usually empty) `type`.
 	 */
-	findTypeEntry(commit: Commit): ChangelogPresetConfigType | undefined {
+	findCommitType(commit: Commit): CommitType | undefined {
 		const typeKey = (commit.revert ? "revert" : commit.type || "").toLowerCase();
 
-		return this.#presetConfig.types.find((entry) => {
+		return this.#types.find((entry) => {
 			if (entry.type !== typeKey) return false;
 			if (entry.scope && entry.scope !== commit.scope) return false;
 			return true;
@@ -97,7 +104,7 @@ export class ChangelogWriter {
 				// Still recorded even when left unlinked below, so it's excluded from the footer references.
 				seenIssues.add(prefix + issue);
 
-				const url = this.expandUrl(this.#presetConfig.issueUrlFormat, {
+				const url = this.expandUrl(this.#options.issueUrlFormat, {
 					id: issue,
 					prefix,
 				});
@@ -111,7 +118,7 @@ export class ChangelogWriter {
 			// Skip team/org mentions, e.g. `@org/team`.
 			if (user.includes("/")) return match;
 
-			const url = this.expandUrl(this.#presetConfig.userUrlFormat, { user });
+			const url = this.expandUrl(this.#options.userUrlFormat, { user });
 			return this.hasUnresolvedPlaceholder(url) ? match : `[@${user}](${url})`;
 		});
 
@@ -124,7 +131,7 @@ export class ChangelogWriter {
 	resolveCommitUrl(hash: string): string | undefined {
 		if (!hash) return undefined;
 
-		const commitUrl = this.expandUrl(this.#presetConfig.commitUrlFormat, { hash });
+		const commitUrl = this.expandUrl(this.#options.commitUrlFormat, { hash });
 		return this.hasUnresolvedPlaceholder(commitUrl) ? undefined : commitUrl;
 	}
 
@@ -135,7 +142,7 @@ export class ChangelogWriter {
 		// The label only shows an owner/repository when the reference explicitly captured a
 		// cross-repository issue, e.g. `owner/repo#123`.
 		const label = `${reference.owner ? `${reference.owner}/` : ""}${reference.repository ?? ""}${reference.prefix}${reference.issue}`;
-		const issueUrl = this.expandUrl(this.#presetConfig.issueUrlFormat, {
+		const issueUrl = this.expandUrl(this.#options.issueUrlFormat, {
 			owner: reference.owner ?? undefined,
 			repository: reference.repository ?? undefined,
 			id: reference.issue,
@@ -161,7 +168,7 @@ export class ChangelogWriter {
 		};
 
 		for (const commit of commits) {
-			const entry = this.findTypeEntry(commit);
+			const entry = this.findCommitType(commit);
 
 			const commitNotes =
 				commit.notes.length === 0 && commit.breakingChange
@@ -202,14 +209,14 @@ export class ChangelogWriter {
 	}
 
 	/**
-	 * Groups commits by their section title, sorted using the order sections first appear in `presetConfig.types`.
+	 * Groups commits by their section title, sorted using the order sections first appear in `types`.
 	 *
 	 * Commits within a group are sorted by scope, then subject.
 	 */
 	groupCommits(commits: RenderableCommit[]): CommitGroup[] {
 		const sectionOrder = new Map<string, number>();
-		for (let index = 0; index < this.#presetConfig.types.length; index++) {
-			const type = this.#presetConfig.types[index];
+		for (let index = 0; index < this.#types.length; index++) {
+			const type = this.#types[index];
 			if (type.section) {
 				sectionOrder.set(type.section, index);
 			}
@@ -274,7 +281,7 @@ export class ChangelogWriter {
 
 		const compareUrl =
 			context.previousTag && context.currentTag
-				? this.expandUrl(this.#presetConfig.compareUrlFormat, {
+				? this.expandUrl(this.#options.compareUrlFormat, {
 						previousTag: context.previousTag,
 						currentTag: context.currentTag,
 					})

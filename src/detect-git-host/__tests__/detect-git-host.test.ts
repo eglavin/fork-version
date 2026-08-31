@@ -52,6 +52,24 @@ describe("detect-git-host", () => {
 		expect(gitHost?.hostName).toBe("Azure Devops");
 	});
 
+	it("should fall back to generic detection for a self-hosted git remote", async () => {
+		const { execGit, testFolder } = await setupTest("detect-git-host");
+
+		await execGit.raw(
+			"remote",
+			"add",
+			"origin",
+			"https://git.example.com/ORGANISATION/REPOSITORY.git",
+		);
+
+		const gitHost = await detectGitHost(testFolder);
+
+		expect(gitHost?.hostName).toBe("https://git.example.com");
+		expect(gitHost?.changelogWriter?.commitUrlFormat).toBe(
+			"https://git.example.com/ORGANISATION/REPOSITORY/commit/{{hash}}",
+		);
+	});
+
 	it("should not throw when no remote defined", async () => {
 		const { testFolder } = await setupTest("detect-git-host");
 

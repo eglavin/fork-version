@@ -5,11 +5,12 @@ import { detectGitHubOptions } from "./host-github";
 import { detectGitlabOptions } from "./host-gitlab";
 import { detectBitbucketOptions } from "./host-bitbucket";
 import { detectAzureDevopsOptions } from "./host-azure-devops";
+import { detectGenericGitHost } from "./host-generic";
 
 export interface DetectedGitHost {
 	hostName: string;
-	changelogOptions: ForkConfig["changelogPresetConfig"];
-	commitParserOptions: ForkConfig["commitParserOptions"];
+	commitParser: ForkConfig["commitParserOptions"];
+	changelogWriter: ForkConfig["changelogWriterOptions"];
 }
 
 /**
@@ -17,11 +18,14 @@ export interface DetectedGitHost {
  *
  * Supports `GitHub`, `GitLab`, `Bitbucket`, and `Azure DevOps`.
  *
+ * Falls back to a generic, best-effort host/owner/repository detection for any other remote.
+ *
  * @param path - The file system path to the Git repository.
- * @returns A promise that resolves to a DetectedGitHost object if a supported host is detected, or undefined if no supported host is found.
+ * @returns A promise that resolves to a DetectedGitHost object if the remote URL could be parsed, or undefined if there's no remote at all.
  */
 export async function detectGitHost(path: string): Promise<DetectedGitHost | undefined> {
 	const remoteUrl = await new Git({ path }).getRemoteUrl();
+	if (!remoteUrl) return undefined;
 
 	if (remoteUrl.includes("github.com")) {
 		const githubOptions = detectGitHubOptions(remoteUrl);
@@ -51,5 +55,5 @@ export async function detectGitHost(path: string): Promise<DetectedGitHost | und
 		}
 	}
 
-	return undefined;
+	return detectGenericGitHost(remoteUrl);
 }

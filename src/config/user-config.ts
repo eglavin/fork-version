@@ -1,7 +1,7 @@
 import { join, resolve } from "node:path";
 import { glob } from "node:fs/promises";
 
-import { getChangelogPresetConfig } from "./changelog-preset-config";
+import { createWriterOptions } from "../changelog-writer/options";
 import { DEFAULT_CONFIG } from "./defaults";
 import { detectGitHost } from "../detect-git-host/detect-git-host";
 import { loadConfigFile } from "./load-config";
@@ -58,22 +58,38 @@ export async function getUserConfig(cliArguments: ForkVersionCLIArgs): Promise<F
 		...mergedConfig,
 
 		command,
+
+		// Options
 		files,
 		path: cwd,
+		// If the user has requested to see all types, remove the hidden flag from any hidden types
+		// so they show up in the changelog under a catch-all "Other Changes" section.
+		types: mergedConfig.changelogAll
+			? mergedConfig.types.map((type) => {
+					if (!type.hidden) return type;
+					return { ...type, section: type.section || "Other Changes", hidden: false };
+				})
+			: mergedConfig.types,
+		releaseMessageFormat: mergedConfig.releaseMessageSuffix
+			? `${mergedConfig.releaseMessageFormat} ${mergedConfig.releaseMessageSuffix}`
+			: mergedConfig.releaseMessageFormat,
 		preRelease:
 			// Meow doesn't support multiple flags with the same name, so we need to check both.
 			cliArguments.flags.preReleaseTag ?? cliArguments.flags.preRelease ?? configFile.preRelease,
+
+		//Flags
 		silent: shouldBeSilent || mergedConfig.silent,
 
+		// Parser Options
 		detectedGitHost: detectedGitHost?.hostName,
-		changelogPresetConfig: getChangelogPresetConfig(
-			mergedConfig,
-			cliArguments.flags,
-			detectedGitHost?.changelogOptions,
-		),
 		commitParserOptions: {
-			...detectedGitHost?.commitParserOptions,
+			...detectedGitHost?.commitParser,
 			...mergedConfig.commitParserOptions,
 		},
+		changelogWriterOptions: createWriterOptions(
+			mergedConfig,
+			cliArguments.flags,
+			detectedGitHost?.changelogWriter,
+		),
 	};
 }

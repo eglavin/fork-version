@@ -1,8 +1,9 @@
 import type { getCliArguments } from "./cli-arguments";
 import type { ParserOptions } from "../commit-parser/options";
 import type { IFileManager } from "../services/file-manager";
+import type { WriterOptions } from "../changelog-writer/options";
 
-export interface ChangelogPresetConfigType {
+export interface CommitType {
 	/**
 	 * The type of commit message.
 	 * @example "feat", "fix", "chore", etc..
@@ -20,45 +21,6 @@ export interface ChangelogPresetConfigType {
 	 * Should show in the generated changelog message?
 	 */
 	hidden?: boolean;
-}
-
-export interface ChangelogPresetConfig {
-	/**
-	 * List of explicitly supported commit message types.
-	 */
-	types: ChangelogPresetConfigType[];
-	/**
-	 * A URL representing a specific commit at a hash.
-	 * @default "{{host}}/{{owner}}/{{repository}}/commit/{{hash}}"
-	 */
-	commitUrlFormat: string;
-	/**
-	 * A URL representing the comparison between two git SHAs.
-	 * @default "{{host}}/{{owner}}/{{repository}}/compare/{{previousTag}}...{{currentTag}}"
-	 */
-	compareUrlFormat: string;
-	/**
-	 * A URL representing the issue format (allowing a different URL format to be swapped in
-	 * for Gitlab, Bitbucket, etc).
-	 * @default "{{host}}/{{owner}}/{{repository}}/issues/{{id}}"
-	 */
-	issueUrlFormat: string;
-	/**
-	 * A URL representing a user's profile on GitHub, Gitlab, etc. This URL is used
-	 * for substituting @eglavin with https://github.com/eglavin in commit messages.
-	 * @default "{{host}}/{{user}}"
-	 */
-	userUrlFormat: string;
-	/**
-	 * A string to be used to format the auto-generated release commit message.
-	 * @default "chore(release): {{currentTag}}"
-	 */
-	releaseCommitMessageFormat: string;
-	/**
-	 * List of prefixes used to detect references to issues.
-	 * @default ["#"]
-	 */
-	issuePrefixes: string[];
 }
 
 export interface ForkConfig {
@@ -136,6 +98,34 @@ export interface ForkConfig {
 	 */
 	header: string;
 	/**
+	 * List of explicitly supported commit message types, controlling which commits show up in the
+	 * changelog and under which section.
+	 * @default
+	 * ```js
+	 * [
+	 *   { type: "feat", section: "Features" },
+	 *   { type: "fix", section: "Bug Fixes" },
+	 *   { type: "chore", hidden: true },
+	 *   { type: "docs", hidden: true },
+	 *   { type: "style", hidden: true },
+	 *   { type: "refactor", hidden: true },
+	 *   { type: "perf", hidden: true },
+	 *   { type: "test", hidden: true },
+	 * ]
+	 * ```
+	 */
+	types: CommitType[];
+	/**
+	 * A string to be used to format the auto-generated release commit message.
+	 * @default "chore(release): {{currentTag}}"
+	 */
+	releaseMessageFormat: string;
+	/**
+	 * Add a suffix to the release commit message.
+	 * @example "[skip ci]"
+	 */
+	releaseMessageSuffix?: string;
+	/**
 	 * Specify a prefix for the created tag.
 	 *
 	 * For instance if your version tag is prefixed by "version/" instead of "v" you have to specify
@@ -201,9 +191,9 @@ export interface ForkConfig {
 	 */
 	commitAll: boolean;
 	/**
-	 * By default the conventional-changelog spec will only add commit types of `feat` and `fix` to the generated changelog.
-	 * If this flag is set, all [default commit types](https://github.com/conventional-changelog/conventional-changelog-config-spec/blob/238093090c14bd7d5151eb5316e635623ce633f9/versions/2.2.0/schema.json#L18)
-	 * will be added to the changelog.
+	 * By default only commit types of `feat` and `fix` are added to the generated changelog (see the
+	 * default {@link ForkConfig.types}). If this flag is set, every hidden type is revealed under a
+	 * catch-all "Other Changes" section instead.
 	 * @default false
 	 */
 	changelogAll: boolean;
@@ -278,22 +268,18 @@ export interface ForkConfig {
 	 * - `GitLab`
 	 * - `Bitbucket`
 	 * - `Azure Devops`
-	 * - Or undefined if unknown or not detected.
+	 * - The remote's origin URL, for any other detected git host.
+	 * - Or undefined if there's no git remote at all.
 	 */
 	detectedGitHost?: string;
-	/**
-	 * Override the default "conventional-changelog-conventionalcommits" preset configuration.
-	 */
-	changelogPresetConfig?: Partial<ChangelogPresetConfig>;
-	/**
-	 * Add a suffix to the release commit message.
-	 * @example "[skip ci]"
-	 */
-	releaseMessageSuffix?: string;
 	/**
 	 * Options to pass to commits parser.
 	 */
 	commitParserOptions?: Partial<ParserOptions>;
+	/**
+	 * Override the commit types and URL formats used when generating the changelog.
+	 */
+	changelogWriterOptions?: Partial<WriterOptions>;
 }
 
 export type Config = Partial<ForkConfig>;

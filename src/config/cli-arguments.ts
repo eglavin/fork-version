@@ -22,6 +22,8 @@ Location Options:
 Options:
   --changelog                      Name of the changelog file. [Default: "CHANGELOG.md"]
   --header                         The header text for the changelog.
+  --release-message-format         Override the default release commit message format. [Default: "chore(release): {{currentTag}}"]
+  --release-message-suffix         Add a suffix to the end of the release message.
   --tag-prefix                     Specify a prefix for the created tag. [Default: "v"]
   --pre-release                    Mark this release as a pre-release.
   --pre-release-tag                Mark this release with a tagged pre-release. [Example: "alpha", "beta", "rc"]
@@ -49,13 +51,11 @@ Skip Steps:
   --skip-commit                    Skip committing the changes.
   --skip-tag                       Skip tagging the commit.
 
-Conventional Changelog Overrides:
+Changelog Overrides:
   --commit-url-format              Override the default commit URL format.
   --compare-url-format             Override the default compare URL format.
   --issue-url-format               Override the default issue URL format.
   --user-url-format                Override the default user URL format.
-  --release-commit-message-format  Override the default release commit message format.
-  --release-message-suffix         Add a suffix to the end of the release message.
 
 Exit Codes:
   0: Success
@@ -95,6 +95,8 @@ export function getCliArguments() {
 			path: { type: "string", shortFlag: "P" },
 			changelog: { type: "string" },
 			header: { type: "string" },
+			releaseMessageFormat: { type: "string" },
+			releaseMessageSuffix: { type: "string" },
 			tagPrefix: { type: "string" },
 			preRelease: { type: "boolean" },
 			preReleaseTag: { type: "string" },
@@ -125,8 +127,6 @@ export function getCliArguments() {
 			compareUrlFormat: { type: "string" },
 			issueUrlFormat: { type: "string" },
 			userUrlFormat: { type: "string" },
-			releaseCommitMessageFormat: { type: "string" },
-			releaseMessageSuffix: { type: "string" },
 		},
 	});
 }

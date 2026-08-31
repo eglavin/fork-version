@@ -32,7 +32,7 @@ export async function main(config: ForkConfig, logger: Logger, fileManager: File
 		await fileManager.write(outFile, next.version);
 	}
 
-	await updateChangelog(config, logger, next.version);
+	await updateChangelog(config, logger, commits.commits, commits.latestTag, next.version);
 	await commitChanges(config, logger, git, current.files, next.version);
 	await tagChanges(config, logger, git, next.version);
 

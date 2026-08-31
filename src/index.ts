@@ -1,3 +1,20 @@
+export { ChangelogWriter } from "./changelog-writer/changelog-writer";
+export {
+	CHANGELOG_ENTRY_TEMPLATE,
+	renderChangelogEntry,
+	type ChangelogTemplateContext,
+} from "./changelog-writer/templates";
+export type {
+	CommitGroup,
+	NoteGroup,
+	RenderableCommit,
+	RenderableCommitReference,
+	RenderableNote,
+	TransformedCommits,
+	WriterContext,
+} from "./changelog-writer/types";
+export { createWriterOptions, type WriterOptions } from "./changelog-writer/options";
+
 export { inspect } from "./commands/inspect";
 export { main } from "./commands/main";
 export { validateConfig } from "./commands/validate-config";
@@ -14,12 +31,7 @@ export type {
 } from "./commit-parser/types";
 
 export { ForkConfigJSONSchema, ForkConfigJSSchema } from "./config/schema";
-export type {
-	ChangelogPresetConfig,
-	ChangelogPresetConfigType,
-	ForkConfig,
-	Config,
-} from "./config/types";
+export type { ForkConfig, Config, CommitType } from "./config/types";
 export { defineConfig } from "./config/define-config";
 export { defineFileManager } from "./config/define-file-manager";
 export { getUserConfig } from "./config/user-config";

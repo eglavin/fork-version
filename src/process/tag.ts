@@ -26,6 +26,6 @@ export async function tagChanges(
 		"--annotate",
 		tag,
 		"--message",
-		formatCommitMessage(config.changelogPresetConfig?.releaseCommitMessageFormat, nextVersion),
+		formatCommitMessage(config?.releaseMessageFormat, nextVersion),
 	);
 }

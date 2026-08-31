@@ -1,5 +1,6 @@
 import { createParserOptions, type ParserOptions } from "./options";
 import { ParserError } from "./parser-error";
+import { splitRepository } from "../utils/split-repository";
 import type { Logger } from "../services/logger";
 import type { Commit, CommitNote, CommitReference } from "./types";
 
@@ -272,26 +273,15 @@ export class CommitParser {
 			}
 
 			const { repository = "", prefix = "", issue = "" } = issueMatch.groups ?? {};
+			const { owner, repository: parsedRepository } = splitRepository(repository);
 
-			const reference: CommitReference = {
+			references.push({
 				prefix,
 				issue,
 				action,
-				owner: null,
-				repository: null,
-			};
-
-			if (repository) {
-				const slashIndex = repository.indexOf("/");
-				if (slashIndex !== -1) {
-					reference.owner = repository.slice(0, slashIndex);
-					reference.repository = repository.slice(slashIndex + 1);
-				} else {
-					reference.repository = repository;
-				}
-			}
-
-			references.push(reference);
+				owner,
+				repository: parsedRepository,
+			});
 		}
 
 		if (references.length > 0) {
@@ -331,7 +321,15 @@ export class CommitParser {
 			}
 
 			for (const ref of parsedReferences) {
-				if (!outReferences.some((r) => r.prefix === ref.prefix && r.issue === ref.issue)) {
+				if (
+					!outReferences.some(
+						(r) =>
+							r.prefix === ref.prefix &&
+							r.issue === ref.issue &&
+							r.owner === ref.owner &&
+							r.repository === ref.repository,
+					)
+				) {
 					outReferences.push(ref);
 				}
 			}

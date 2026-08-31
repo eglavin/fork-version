@@ -7,18 +7,18 @@ describe("host-bitbucket", () => {
 		);
 
 		expect(gitHost?.hostName).toBe("Bitbucket");
-		expect(gitHost?.changelogOptions?.commitUrlFormat).toBe(
+		expect(gitHost?.changelogWriter?.commitUrlFormat).toBe(
 			"https://bitbucket.org/ORGANISATION/REPOSITORY/commits/{{hash}}",
 		);
-		expect(gitHost?.changelogOptions?.compareUrlFormat).toBe(
+		expect(gitHost?.changelogWriter?.compareUrlFormat).toBe(
 			"https://bitbucket.org/ORGANISATION/REPOSITORY/branches/compare/{{currentTag}}..{{previousTag}}",
 		);
-		expect(gitHost?.changelogOptions?.issueUrlFormat).toBe(
+		expect(gitHost?.changelogWriter?.issueUrlFormat).toBe(
 			"https://bitbucket.org/ORGANISATION/REPOSITORY/issues/{{id}}",
 		);
 
-		expect(gitHost?.commitParserOptions?.mergePattern).toBeDefined();
-		const parsed = gitHost?.commitParserOptions?.mergePattern?.exec(
+		expect(gitHost?.commitParser?.mergePattern).toBeDefined();
+		const parsed = gitHost?.commitParser?.mergePattern?.exec(
 			"Merged in some-branch (pull request #123)",
 		);
 		expect(parsed?.groups?.id).toBe("123");
@@ -31,18 +31,18 @@ describe("host-bitbucket", () => {
 		);
 
 		expect(gitHost?.hostName).toBe("Bitbucket");
-		expect(gitHost?.changelogOptions?.commitUrlFormat).toBe(
+		expect(gitHost?.changelogWriter?.commitUrlFormat).toBe(
 			"https://bitbucket.com/ORGANISATION/REPOSITORY/commits/{{hash}}",
 		);
-		expect(gitHost?.changelogOptions?.compareUrlFormat).toBe(
+		expect(gitHost?.changelogWriter?.compareUrlFormat).toBe(
 			"https://bitbucket.com/ORGANISATION/REPOSITORY/branches/compare/{{currentTag}}..{{previousTag}}",
 		);
-		expect(gitHost?.changelogOptions?.issueUrlFormat).toBe(
+		expect(gitHost?.changelogWriter?.issueUrlFormat).toBe(
 			"https://bitbucket.com/ORGANISATION/REPOSITORY/issues/{{id}}",
 		);
 
-		expect(gitHost?.commitParserOptions?.mergePattern).toBeDefined();
-		const parsed = gitHost?.commitParserOptions?.mergePattern?.exec(
+		expect(gitHost?.commitParser?.mergePattern).toBeDefined();
+		const parsed = gitHost?.commitParser?.mergePattern?.exec(
 			"Merged in some-branch (pull request #123)",
 		);
 		expect(parsed?.groups?.id).toBe("123");
@@ -53,18 +53,18 @@ describe("host-bitbucket", () => {
 		const gitHost = detectBitbucketOptions("https://bitbucket.org/ORGANISATION/REPOSITORY.git");
 
 		expect(gitHost?.hostName).toBe("Bitbucket");
-		expect(gitHost?.changelogOptions?.commitUrlFormat).toBe(
+		expect(gitHost?.changelogWriter?.commitUrlFormat).toBe(
 			"https://bitbucket.org/ORGANISATION/REPOSITORY/commits/{{hash}}",
 		);
-		expect(gitHost?.changelogOptions?.compareUrlFormat).toBe(
+		expect(gitHost?.changelogWriter?.compareUrlFormat).toBe(
 			"https://bitbucket.org/ORGANISATION/REPOSITORY/branches/compare/{{currentTag}}..{{previousTag}}",
 		);
-		expect(gitHost?.changelogOptions?.issueUrlFormat).toBe(
+		expect(gitHost?.changelogWriter?.issueUrlFormat).toBe(
 			"https://bitbucket.org/ORGANISATION/REPOSITORY/issues/{{id}}",
 		);
 
-		expect(gitHost?.commitParserOptions?.mergePattern).toBeDefined();
-		const parsed = gitHost?.commitParserOptions?.mergePattern?.exec(
+		expect(gitHost?.commitParser?.mergePattern).toBeDefined();
+		const parsed = gitHost?.commitParser?.mergePattern?.exec(
 			"Merged in some-branch (pull request #123)",
 		);
 		expect(parsed?.groups?.id).toBe("123");
@@ -75,18 +75,18 @@ describe("host-bitbucket", () => {
 		const gitHost = detectBitbucketOptions("git@bitbucket.org:ORGANISATION/REPOSITORY.git");
 
 		expect(gitHost?.hostName).toBe("Bitbucket");
-		expect(gitHost?.changelogOptions?.commitUrlFormat).toBe(
+		expect(gitHost?.changelogWriter?.commitUrlFormat).toBe(
 			"https://bitbucket.org/ORGANISATION/REPOSITORY/commits/{{hash}}",
 		);
-		expect(gitHost?.changelogOptions?.compareUrlFormat).toBe(
+		expect(gitHost?.changelogWriter?.compareUrlFormat).toBe(
 			"https://bitbucket.org/ORGANISATION/REPOSITORY/branches/compare/{{currentTag}}..{{previousTag}}",
 		);
-		expect(gitHost?.changelogOptions?.issueUrlFormat).toBe(
+		expect(gitHost?.changelogWriter?.issueUrlFormat).toBe(
 			"https://bitbucket.org/ORGANISATION/REPOSITORY/issues/{{id}}",
 		);
 
-		expect(gitHost?.commitParserOptions?.mergePattern).toBeDefined();
-		const parsed = gitHost?.commitParserOptions?.mergePattern?.exec(
+		expect(gitHost?.commitParser?.mergePattern).toBeDefined();
+		const parsed = gitHost?.commitParser?.mergePattern?.exec(
 			"Merged in some-branch (pull request #123)",
 		);
 		expect(parsed?.groups?.id).toBe("123");

@@ -1,10 +1,12 @@
 import { resolve } from "node:path";
 import { writeFile, readFile } from "node:fs/promises";
-import conventionalChangelog from "conventional-changelog";
 
+import { ChangelogWriter } from "../changelog-writer/changelog-writer";
 import { fileExists } from "../utils/file-state";
 import type { ForkConfig } from "../config/types";
 import type { Logger } from "../services/logger";
+import type { Commit } from "../commit-parser/types";
+import type { WriterOptions } from "../changelog-writer/options";
 
 /**
  * Matches the following changelog header formats:
@@ -35,45 +37,29 @@ async function getOldReleaseContent(filePath: string, exists: boolean): Promise<
  */
 function getNewReleaseContent(
 	config: ForkConfig,
-	logger: Logger,
+	commits: Commit[],
+	previousTag: string | undefined,
 	nextVersion: string,
-): Promise<string> {
-	return new Promise<string>((onResolve) => {
-		let newContent = "";
+): string {
+	// `changelogWriterOptions` is always fully resolved by `getUserConfig`, see `createWriterOptions`.
+	const changelogWriter = new ChangelogWriter(
+		config.changelogWriterOptions as WriterOptions,
+		config.types,
+		config.commitParserOptions,
+	);
 
-		conventionalChangelog(
-			{
-				preset: {
-					name: "conventionalcommits",
-					...config.changelogPresetConfig,
-				},
-				tagPrefix: config.tagPrefix,
-				warn: (...message: string[]) => logger.debug("[conventional-changelog] ", ...message),
-				cwd: config.path,
-			},
-			{
-				version: nextVersion,
-			},
-			{
-				merges: null,
-				path: config.path,
-			},
-		)
-			.on("error", (cause) => {
-				throw new Error("[conventional-changelog] Unable to parse changes", { cause });
-			})
-			.on("data", (chunk) => {
-				newContent += chunk.toString();
-			})
-			.on("end", () => {
-				onResolve(newContent);
-			});
+	return changelogWriter.generate(commits, {
+		version: nextVersion,
+		previousTag,
+		currentTag: `${config.tagPrefix}${nextVersion}`,
 	});
 }
 
 export async function updateChangelog(
 	config: ForkConfig,
 	logger: Logger,
+	commits: Commit[],
+	previousTag: string | undefined,
 	nextVersion: string,
 ): Promise<void> {
 	if (config.skipChangelog) {
@@ -97,7 +83,7 @@ export async function updateChangelog(
 	}
 
 	const oldContent = await getOldReleaseContent(changelogPath, fileExists(changelogPath));
-	const newContent = await getNewReleaseContent(config, logger, nextVersion);
+	const newContent = getNewReleaseContent(config, commits, previousTag, nextVersion);
 
 	if (!config.dryRun && newContent) {
 		await writeFile(

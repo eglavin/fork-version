@@ -3,6 +3,7 @@ import { defineConfig } from "vitest/config";
 export default defineConfig({
 	test: {
 		include: ["src/**/*.test.*"],
+		exclude: ["src/**/*.snap"],
 		globals: true,
 		restoreMocks: true,
 		coverage: {

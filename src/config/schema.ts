@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const ChangelogPresetConfigTypeSchema = z.object({
+export const CommitTypeSchema = z.object({
 	type: z.string().describe('The type of commit message, such as "feat", "fix", "chore".'),
 	scope: z.string().optional().describe("The scope of the commit message."),
 	section: z
@@ -10,20 +10,11 @@ export const ChangelogPresetConfigTypeSchema = z.object({
 	hidden: z.boolean().optional().describe("Should show in the generated changelog message?"),
 });
 
-export const ChangelogPresetConfigSchema = z.object({
-	types: z
-		.array(ChangelogPresetConfigTypeSchema)
-		.describe("List of explicitly supported commit message types."),
+export const WriterOptionsSchema = z.object({
 	commitUrlFormat: z.string().describe("A URL representing a specific commit at a hash."),
 	compareUrlFormat: z.string().describe("A URL representing the comparison between two git SHAs."),
 	issueUrlFormat: z.string().describe("A URL representing the issue format."),
 	userUrlFormat: z.string().describe("A URL representing a user's profile on GitHub, Gitlab, etc."),
-	releaseCommitMessageFormat: z
-		.string()
-		.describe("A string to be used to format the auto-generated release commit message."),
-	issuePrefixes: z
-		.array(z.string())
-		.describe("List of prefixes used to detect references to issues."),
 });
 
 export const ForkConfigJSONSchema = z.object({
@@ -48,6 +39,14 @@ export const ForkConfigJSONSchema = z.object({
 	path: z.string().describe('The path Fork-Version will run from. Defaults to "process.cwd()".'),
 	changelog: z.string().describe('Name of the changelog file. Defaults to "CHANGELOG.md".'),
 	header: z.string().describe("The header text for the changelog."),
+	types: z.array(CommitTypeSchema).describe("List of explicitly supported commit message types."),
+	releaseMessageFormat: z
+		.string()
+		.describe("A string to be used to format the auto-generated release commit message."),
+	releaseMessageSuffix: z
+		.string()
+		.optional()
+		.describe("Add a suffix to the release commit message."),
 	tagPrefix: z.string().describe('Specify a prefix for the created tag. Defaults to "v".'),
 	preRelease: z
 		.string()
@@ -110,18 +109,12 @@ export const ForkConfigJSONSchema = z.object({
 		.string()
 		.optional()
 		.describe(
-			"The detected git host, such as GitHub, GitLab, Bitbucket, Azure Devops, or undefined if unknown or not detected.",
+			"The detected git host, such as GitHub, GitLab, Bitbucket, Azure Devops, the remote's origin URL for any other git host, or undefined if there's no git remote at all.",
 		),
-	changelogPresetConfig: ChangelogPresetConfigSchema.partial()
-		.optional()
-		.describe(
-			'Override the default "conventional-changelog-conventionalcommits" preset configuration.',
-		),
-	releaseMessageSuffix: z
-		.string()
-		.optional()
-		.describe("Add a suffix to the release commit message."),
 	commitParserOptions: z.looseObject({}).optional().describe("Options to pass to commits parser."),
+	changelogWriterOptions: WriterOptionsSchema.partial()
+		.optional()
+		.describe("Override the commit types and URL formats used when generating the changelog."),
 });
 
 export const CustomFileManagerSchema = z.looseObject({

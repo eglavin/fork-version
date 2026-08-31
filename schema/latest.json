@@ -40,6 +40,43 @@
       "type": "string",
       "description": "The header text for the changelog."
     },
+    "types": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "The type of commit message, such as \"feat\", \"fix\", \"chore\"."
+          },
+          "scope": {
+            "description": "The scope of the commit message.",
+            "type": "string"
+          },
+          "section": {
+            "description": "The section of the `CHANGELOG` the commit should show up in.",
+            "type": "string"
+          },
+          "hidden": {
+            "description": "Should show in the generated changelog message?",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "type"
+        ],
+        "additionalProperties": false
+      },
+      "description": "List of explicitly supported commit message types."
+    },
+    "releaseMessageFormat": {
+      "type": "string",
+      "description": "A string to be used to format the auto-generated release commit message."
+    },
+    "releaseMessageSuffix": {
+      "description": "Add a suffix to the release commit message.",
+      "type": "string"
+    },
     "tagPrefix": {
       "type": "string",
       "description": "Specify a prefix for the created tag. Defaults to \"v\"."
@@ -137,42 +174,19 @@
       "description": "Skip the tag step."
     },
     "detectedGitHost": {
-      "description": "The detected git host, such as GitHub, GitLab, Bitbucket, Azure Devops, or undefined if unknown or not detected.",
+      "description": "The detected git host, such as GitHub, GitLab, Bitbucket, Azure Devops, the remote's origin URL for any other git host, or undefined if there's no git remote at all.",
       "type": "string"
     },
-    "changelogPresetConfig": {
-      "description": "Override the default \"conventional-changelog-conventionalcommits\" preset configuration.",
+    "commitParserOptions": {
+      "description": "Options to pass to commits parser.",
+      "type": "object",
+      "properties": {},
+      "additionalProperties": {}
+    },
+    "changelogWriterOptions": {
+      "description": "Override the commit types and URL formats used when generating the changelog.",
       "type": "object",
       "properties": {
-        "types": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "type": {
-                "type": "string",
-                "description": "The type of commit message, such as \"feat\", \"fix\", \"chore\"."
-              },
-              "scope": {
-                "description": "The scope of the commit message.",
-                "type": "string"
-              },
-              "section": {
-                "description": "The section of the `CHANGELOG` the commit should show up in.",
-                "type": "string"
-              },
-              "hidden": {
-                "description": "Should show in the generated changelog message?",
-                "type": "boolean"
-              }
-            },
-            "required": [
-              "type"
-            ],
-            "additionalProperties": false
-          },
-          "description": "List of explicitly supported commit message types."
-        },
         "commitUrlFormat": {
           "type": "string",
           "description": "A URL representing a specific commit at a hash."
@@ -188,30 +202,9 @@
         "userUrlFormat": {
           "type": "string",
           "description": "A URL representing a user's profile on GitHub, Gitlab, etc."
-        },
-        "releaseCommitMessageFormat": {
-          "type": "string",
-          "description": "A string to be used to format the auto-generated release commit message."
-        },
-        "issuePrefixes": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "List of prefixes used to detect references to issues."
         }
       },
       "additionalProperties": false
-    },
-    "releaseMessageSuffix": {
-      "description": "Add a suffix to the release commit message.",
-      "type": "string"
-    },
-    "commitParserOptions": {
-      "description": "Options to pass to commits parser.",
-      "type": "object",
-      "properties": {},
-      "additionalProperties": {}
     }
   },
   "required": [],

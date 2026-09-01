@@ -17,11 +17,20 @@ import { main } from "./commands/main";
 async function runFork() {
 	const startTime = Date.now();
 
+	const compatWarnings: string[] = [];
+
 	const cliArguments = getCliArguments();
-	const config = await getUserConfig(cliArguments);
+	const config = await getUserConfig(cliArguments, compatWarnings);
 	const logger = new Logger(config);
 	const fileManager = new FileManager(config, logger);
 	const git = new Git(config);
+
+	switch (config.command) {
+		case "validate-config":
+		case "main": {
+			compatWarnings.forEach((warning) => logger.compatWarn(warning));
+		}
+	}
 
 	switch (config.command) {
 		case "validate-config": {

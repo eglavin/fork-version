@@ -2,21 +2,28 @@ import { join, resolve } from "node:path";
 import { glob } from "node:fs/promises";
 
 import { createWriterOptions } from "../changelog-writer/options";
+import { applyLegacyCliFlags } from "./config-compatibility";
 import { DEFAULT_CONFIG } from "./defaults";
 import { detectGitHost } from "../detect-git-host/detect-git-host";
 import { loadConfigFile } from "./load-config";
 import { mergeFiles } from "./merge-files";
 import type { ForkVersionCLIArgs, ForkConfig } from "./types";
 
-export async function getUserConfig(cliArguments: ForkVersionCLIArgs): Promise<ForkConfig> {
+export async function getUserConfig(
+	cliArguments: ForkVersionCLIArgs,
+	compatWarnings: string[] = [],
+): Promise<ForkConfig> {
 	const cwd = cliArguments.flags.path ? resolve(cliArguments.flags.path) : process.cwd();
 
-	const configFile = await loadConfigFile(cwd);
+	const configFile = await loadConfigFile(cwd, compatWarnings);
+
+	const { flags, warnings } = applyLegacyCliFlags(cliArguments.flags);
+	compatWarnings.push(...warnings);
 
 	const mergedConfig = {
 		...DEFAULT_CONFIG,
 		...configFile,
-		...cliArguments.flags,
+		...flags,
 	} as ForkConfig;
 
 	const globResults: string[] = [];

@@ -1,5 +1,12 @@
 # Fork Version
 
+## [6.0.1](https://github.com/eglavin/fork-version/compare/v6.0.0...v6.0.1) (2026-09-01)
+
+
+### Refactor
+
+* add compatibility for deprecated options ([0a5ce3c](https://github.com/eglavin/fork-version/commit/0a5ce3cc44ab4b57e6bfeb0fd8f15db7f23099f2))
+
 ## [6.0.0](https://github.com/eglavin/fork-version/compare/v5.2.0...v6.0.0) (2026-08-31)
 
 ### ⚠ BREAKING CHANGES

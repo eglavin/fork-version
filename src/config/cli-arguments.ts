@@ -96,6 +96,8 @@ export function getCliArguments() {
 			changelog: { type: "string" },
 			header: { type: "string" },
 			releaseMessageFormat: { type: "string" },
+			/** @deprecated Use `--release-message-format` instead. */
+			releaseCommitMessageFormat: { type: "string" },
 			releaseMessageSuffix: { type: "string" },
 			tagPrefix: { type: "string" },
 			preRelease: { type: "boolean" },

@@ -4,13 +4,14 @@ import JoyCon from "joycon";
 import { bundleRequire } from "bundle-require";
 
 import { ForkConfigJSONSchema, ForkConfigJSSchema } from "./schema";
+import { applyLegacyChangelogPresetConfig } from "./config-compatibility";
 
 /**
  * Name of the key in the package.json file that contains the users configuration.
  */
 const PACKAGE_JSON_CONFIG_KEY = "fork-version";
 
-export async function loadConfigFile(cwd: string) {
+export async function loadConfigFile(cwd: string, compatWarnings: string[] = []) {
 	const joycon = new JoyCon({
 		cwd,
 		packageKey: PACKAGE_JSON_CONFIG_KEY,
@@ -39,9 +40,12 @@ export async function loadConfigFile(cwd: string) {
 				fileContent[PACKAGE_JSON_CONFIG_KEY] &&
 				typeof fileContent[PACKAGE_JSON_CONFIG_KEY] === "object"
 			) {
-				const parsed = ForkConfigJSONSchema.partial().safeParse(
+				const { config, warnings } = applyLegacyChangelogPresetConfig(
 					fileContent[PACKAGE_JSON_CONFIG_KEY],
 				);
+				compatWarnings.push(...warnings);
+
+				const parsed = ForkConfigJSONSchema.partial().safeParse(config);
 				if (!parsed.success) {
 					throw new Error(`Validation error in: ${configFilePath}`, { cause: parsed.error });
 				}
@@ -51,7 +55,10 @@ export async function loadConfigFile(cwd: string) {
 			return {};
 		}
 
-		const parsed = ForkConfigJSONSchema.partial().safeParse(fileContent);
+		const { config, warnings } = applyLegacyChangelogPresetConfig(fileContent);
+		compatWarnings.push(...warnings);
+
+		const parsed = ForkConfigJSONSchema.partial().safeParse(config);
 		if (!parsed.success) {
 			throw new Error(`Validation error in: ${configFilePath}`, { cause: parsed.error });
 		}
@@ -61,7 +68,12 @@ export async function loadConfigFile(cwd: string) {
 	// Otherwise expect config file to use js or ts.
 	const fileContent = await bundleRequire({ filepath: configFilePath });
 
-	const parsed = ForkConfigJSSchema.partial().safeParse(fileContent.mod.default || fileContent.mod);
+	const { config, warnings } = applyLegacyChangelogPresetConfig(
+		fileContent.mod.default || fileContent.mod,
+	);
+	compatWarnings.push(...warnings);
+
+	const parsed = ForkConfigJSSchema.partial().safeParse(config);
 	if (!parsed.success) {
 		throw new Error(`Validation error in: ${configFilePath}`, { cause: parsed.error });
 	}

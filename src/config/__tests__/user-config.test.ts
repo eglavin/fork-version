@@ -263,4 +263,99 @@ describe("user-config", () => {
 
 		expect(config.types).toStrictEqual([{ type: "feat", section: "New Features" }]);
 	});
+
+	describe("legacy config compatibility", () => {
+		it("should map a legacy changelogPresetConfig from a config file onto its new options", async () => {
+			const { testFolder, create } = await setupTest("user-config");
+			const compatibilityWarnings: string[] = [];
+
+			create.json(
+				{
+					changelogPresetConfig: {
+						types: [{ type: "feat", section: "New Features" }],
+						issuePrefixes: ["#", "gh-"],
+					},
+				},
+				"fork.config.json",
+			);
+			const config = await getUserConfig(
+				{
+					input: [],
+					flags: {
+						path: testFolder,
+					},
+				},
+				compatibilityWarnings,
+			);
+
+			expect(config.types).toStrictEqual([{ type: "feat", section: "New Features" }]);
+			expect(config.commitParserOptions?.issuePrefixes).toStrictEqual(["#", "gh-"]);
+			expect(compatibilityWarnings).toHaveLength(2);
+		});
+
+		it("should map the legacy --release-commit-message-format flag onto releaseMessageFormat", async () => {
+			const { testFolder } = await setupTest("user-config");
+			const compatibilityWarnings: string[] = [];
+
+			const config = await getUserConfig(
+				{
+					input: [],
+					flags: {
+						path: testFolder,
+						releaseCommitMessageFormat: "release: {{currentTag}}",
+					},
+				},
+				compatibilityWarnings,
+			);
+
+			expect(config.releaseMessageFormat).toBe("release: {{currentTag}}");
+			expect(compatibilityWarnings).toContainEqual(
+				expect.stringContaining("--release-commit-message-format"),
+			);
+		});
+
+		it("should prefer --release-message-format when both the old and new flags are set", async () => {
+			const { testFolder } = await setupTest("user-config");
+			const compatibilityWarnings: string[] = [];
+
+			const config = await getUserConfig(
+				{
+					input: [],
+					flags: {
+						path: testFolder,
+						releaseCommitMessageFormat: "old: {{currentTag}}",
+						releaseMessageFormat: "new: {{currentTag}}",
+					},
+				},
+				compatibilityWarnings,
+			);
+
+			expect(config.releaseMessageFormat).toBe("new: {{currentTag}}");
+			expect(compatibilityWarnings).toContainEqual(expect.stringContaining("is already set"));
+		});
+
+		it("should still map a legacy changelogPresetConfig when running an inspect command", async () => {
+			const { testFolder, create } = await setupTest("user-config");
+			const compatibilityWarnings: string[] = [];
+
+			create.json(
+				{ changelogPresetConfig: { types: [{ type: "feat", section: "New Features" }] } },
+				"fork.config.json",
+			);
+			const config = await getUserConfig(
+				{
+					input: ["inspect-version"],
+					flags: {
+						path: testFolder,
+					},
+				},
+				compatibilityWarnings,
+			);
+
+			// getUserConfig always collects compatibility warnings regardless of command - it's up to
+			// the caller (see `src/cli.ts`) to decide which commands are worth showing them for.
+			expect(config.types).toStrictEqual([{ type: "feat", section: "New Features" }]);
+			expect(compatibilityWarnings).toHaveLength(1);
+		});
+	});
 });

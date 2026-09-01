@@ -21,6 +21,7 @@ export class Logger {
 		this.error = this.error.bind(this);
 		this.debug = this.debug.bind(this);
 		this.skipping = this.skipping.bind(this);
+		this.compatWarn = this.compatWarn.bind(this);
 	}
 
 	log(message: string) {
@@ -54,5 +55,9 @@ export class Logger {
 		if (!this.#silent) {
 			console.log(styleText("magenta", message));
 		}
+	}
+
+	compatWarn(message: string) {
+		console.warn(styleText("yellowBright", message));
 	}
 }

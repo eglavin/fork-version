@@ -1,3 +1,4 @@
+import { ZodError } from "zod";
 import { setupTest } from "../../../tests/setup-tests";
 import { getUserConfig } from "../user-config";
 
@@ -356,6 +357,35 @@ describe("user-config", () => {
 			// the caller (see `src/cli.ts`) to decide which commands are worth showing them for.
 			expect(config.types).toStrictEqual([{ type: "feat", section: "New Features" }]);
 			expect(compatibilityWarnings).toHaveLength(1);
+		});
+	});
+
+	describe("resolved config validation", () => {
+		it("accepts a fully-populated valid config", async () => {
+			const { testFolder } = await setupTest("user-config");
+
+			await expect(
+				getUserConfig({ input: [], flags: { path: testFolder, releaseAs: "minor" } }),
+			).resolves.toMatchObject({ releaseAs: "minor" });
+		});
+
+		it("rejects an invalid value that only reaches the config via a CLI flag", async () => {
+			const { testFolder } = await setupTest("user-config");
+
+			let caught: unknown;
+			try {
+				await getUserConfig({
+					input: [],
+					flags: { path: testFolder, releaseAs: "bogus" as "major" },
+				});
+			} catch (error) {
+				caught = error;
+			}
+
+			expect(caught).toBeInstanceOf(Error);
+			expect((caught as Error).message).toBe("Invalid resolved configuration");
+			expect((caught as Error).cause).toBeInstanceOf(ZodError);
+			expect((caught as { cause: ZodError }).cause.issues[0].path).toContain("releaseAs");
 		});
 	});
 });

@@ -1,4 +1,3 @@
-import type { getCliArguments } from "./cli-arguments";
 import type { ParserOptions } from "../commit-parser/options";
 import type { IFileManager } from "../services/file-manager";
 import type { WriterOptions } from "../changelog-writer/options";
@@ -6,7 +5,7 @@ import type { WriterOptions } from "../changelog-writer/options";
 export interface CommitType {
 	/**
 	 * The type of commit message.
-	 * @example "feat", "fix", "chore", etc..
+	 * @example "feat", "fix", etc..
 	 */
 	type: string;
 	/**
@@ -15,10 +14,11 @@ export interface CommitType {
 	scope?: string;
 	/**
 	 * The section of the `CHANGELOG` the commit should show up in.
+	 * @example "Features", "Bug Fixes", etc..
 	 */
 	section?: string;
 	/**
-	 * Should show in the generated changelog message?
+	 * Boolean indication if this type should show in the generated changelog message.
 	 */
 	hidden?: boolean;
 }
@@ -65,8 +65,6 @@ export interface ForkConfig {
 	customFileManagers?: IFileManager[];
 	/**
 	 * Glob pattern to match files to be updated.
-	 *
-	 * Internally we're using [glob](https://github.com/isaacs/node-glob) to match files.
 	 *
 	 * Read more about the pattern syntax [here](https://github.com/isaacs/node-glob/tree/v10.3.12?tab=readme-ov-file#glob-primer).
 	 *
@@ -146,7 +144,7 @@ export interface ForkConfig {
 	 */
 	tagPrefix: string;
 	/**
-	 * Make a pre-release with optional label if given value is a string.
+	 * Make a pre-release with an optional label if the given value is a string.
 	 *
 	 * | Example Value | Produced Version |
 	 * |:--------------|:-----------------|
@@ -159,19 +157,19 @@ export interface ForkConfig {
 	 */
 	preRelease?: string | boolean;
 	/**
-	 * If set, Fork-Version will use this version instead of trying to determine one.
+	 * Override default version determination by setting the current version.
 	 * @example "1.0.0"
 	 * @default undefined
 	 */
 	currentVersion?: string;
 	/**
-	 * If set, Fork-Version will attempt to update to this version, instead of incrementing using "conventional-commit".
+	 * Override default version determination by setting the next version.
 	 * @example "2.0.0"
 	 * @default undefined
 	 */
 	nextVersion?: string;
 	/**
-	 * Release as increments the version by the specified level. Overrides the default behaviour of "conventional-commit".
+	 * Override version bumping to the targeted typed.
 	 * @example "major", "minor", "patch"
 	 * @default undefined
 	 */
@@ -191,9 +189,9 @@ export interface ForkConfig {
 	 */
 	commitAll: boolean;
 	/**
-	 * By default only commit types of `feat` and `fix` are added to the generated changelog (see the
-	 * default {@link ForkConfig.types}). If this flag is set, every hidden type is revealed under a
-	 * catch-all "Other Changes" section instead.
+	 * By default only commit types of `feat` and `fix` are added to the generated changelog
+	 * (see the default {@link ForkConfig.types}). If this flag is set, every hidden type without
+	 * a section label is revealed under a catch-all "Other Changes" section instead.
 	 * @default false
 	 */
 	changelogAll: boolean;
@@ -284,9 +282,53 @@ export interface ForkConfig {
 
 export type Config = Partial<ForkConfig>;
 
-type CLIArguments = ReturnType<typeof getCliArguments>;
+/**
+ * The CLI flags parsed by `getCliArguments()`. A flat, all-optional view of {@link ForkConfig} -
+ * every value is absent unless the user actually passed the flag, plus a few CLI-only entries.
+ */
+export interface ForkVersionCLIFlags {
+	/** @deprecated Use the `inspect-version` command instead. */
+	inspectVersion?: boolean;
+
+	files?: string[];
+	glob?: string;
+	path?: string;
+	changelog?: string;
+	header?: string;
+	releaseMessageFormat?: string;
+	/** @deprecated Use `releaseMessageFormat` instead. */
+	releaseCommitMessageFormat?: string;
+	releaseMessageSuffix?: string;
+	tagPrefix?: string;
+	preRelease?: boolean;
+	preReleaseTag?: string;
+	currentVersion?: string;
+	nextVersion?: string;
+	releaseAs?: ForkConfig["releaseAs"];
+
+	allowMultipleVersions?: boolean;
+	commitAll?: boolean;
+	changelogAll?: boolean;
+	debug?: boolean;
+	dryRun?: boolean;
+	silent?: boolean;
+	gitTagFallback?: boolean;
+	sign?: boolean;
+	verify?: boolean;
+	asJson?: boolean;
+
+	skipBump?: boolean;
+	skipChangelog?: boolean;
+	skipCommit?: boolean;
+	skipTag?: boolean;
+
+	commitUrlFormat?: string;
+	compareUrlFormat?: string;
+	issueUrlFormat?: string;
+	userUrlFormat?: string;
+}
 
 export interface ForkVersionCLIArgs {
-	input: CLIArguments["input"];
-	flags: Partial<CLIArguments["flags"]>;
+	input: string[];
+	flags: ForkVersionCLIFlags;
 }

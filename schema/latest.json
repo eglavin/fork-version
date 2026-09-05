@@ -11,10 +11,10 @@
         "inspect-tag",
         "validate-config"
       ],
-      "description": "The command to run. Can be one of: main, inspect, inspect-version, inspect-tag, validate-config. Defaults to main."
+      "description": "The command to run. Can be one of: main, inspect, inspect-version, inspect-tag, validate-config. Default: \"main\""
     },
     "inspectVersion": {
-      "description": "If set, Fork-Version will print the current version and exit.",
+      "description": "[Deprecated] If set, Fork-Version will print the current version and exit.",
       "type": "boolean"
     },
     "files": {
@@ -30,11 +30,11 @@
     },
     "path": {
       "type": "string",
-      "description": "The path Fork-Version will run from. Defaults to \"process.cwd()\"."
+      "description": "The path Fork-Version will run from. Default: `process.cwd()`"
     },
     "changelog": {
       "type": "string",
-      "description": "Name of the changelog file. Defaults to \"CHANGELOG.md\"."
+      "description": "Name of the changelog file. Default: \"CHANGELOG.md\""
     },
     "header": {
       "type": "string",
@@ -47,18 +47,18 @@
         "properties": {
           "type": {
             "type": "string",
-            "description": "The type of commit message, such as \"feat\", \"fix\", \"chore\"."
+            "description": "The type of commit message. Example: \"feat\", \"fix\", etc.."
           },
           "scope": {
             "description": "The scope of the commit message.",
             "type": "string"
           },
           "section": {
-            "description": "The section of the `CHANGELOG` the commit should show up in.",
+            "description": "The section of the `CHANGELOG` the commit should show up in. Example: \"Features\", \"Bug Fixes\", etc..",
             "type": "string"
           },
           "hidden": {
-            "description": "Should show in the generated changelog message?",
+            "description": "Boolean indication if this type should show in the generated changelog message.",
             "type": "boolean"
           }
         },
@@ -79,10 +79,10 @@
     },
     "tagPrefix": {
       "type": "string",
-      "description": "Specify a prefix for the created tag. Defaults to \"v\"."
+      "description": "Specify a prefix for the created tag. Default: \"v\""
     },
     "preRelease": {
-      "description": "Make a pre-release with optional label if given value is a string.",
+      "description": "Make a pre-release with an optional label if the given value is a string. Example: true, \"alpha\", \"beta\"",
       "anyOf": [
         {
           "type": "string"
@@ -93,15 +93,15 @@
       ]
     },
     "currentVersion": {
-      "description": "If set, Fork-Version will use this version instead of trying to determine one.",
+      "description": "Override default version determination by setting the current version.",
       "type": "string"
     },
     "nextVersion": {
-      "description": "If set, Fork-Version will attempt to update to this version, instead of incrementing using \"conventional-commit\".",
+      "description": "Override default version determination by setting the next version.",
       "type": "string"
     },
     "releaseAs": {
-      "description": "Release as increments the version by the specified level. Overrides the default behaviour of \"conventional-commit\".",
+      "description": "Override version bumping to the targeted typed.",
       "anyOf": [
         {
           "type": "string",
@@ -119,7 +119,7 @@
     },
     "allowMultipleVersions": {
       "type": "boolean",
-      "description": "Don't throw an error if multiple versions are found in the given files."
+      "description": "Don't throw an error if multiple versions are found in the given files. Default: `true`"
     },
     "commitAll": {
       "type": "boolean",
@@ -143,7 +143,7 @@
     },
     "gitTagFallback": {
       "type": "boolean",
-      "description": "If unable to find a version in the given files, fallback and attempt to use the latest git tag. Defaults to true."
+      "description": "If unable to find a version in the given files, fallback and attempt to use the latest git tag. Default: `true`"
     },
     "sign": {
       "type": "boolean",

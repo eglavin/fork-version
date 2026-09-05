@@ -2,7 +2,7 @@ import { parseArgs } from "node:util";
 
 import pkg from "../../package.json" with { type: "json" };
 import { helperText } from "./cli-help";
-import { deriveParseArgsOptions } from "./cli-schema";
+import { deriveParseArgsOptions, normalizeBooleanFlagValues } from "./cli-schema";
 import { NON_FLAG_ARG_KEYS } from "./constants";
 import { toCamelCase } from "../utils/case-transform";
 import type { ForkVersionCLIArgs, ForkVersionCLIFlags } from "./types";
@@ -14,11 +14,13 @@ import type { ForkVersionCLIArgs, ForkVersionCLIFlags } from "./types";
  * Handles `--help` / `--version` directly, and exits with code 2 on an un-parseable argument list.
  */
 export function getCliArguments(argv: string[] = process.argv.slice(2)): ForkVersionCLIArgs {
+	const options = deriveParseArgsOptions();
+
 	let parsed;
 	try {
 		parsed = parseArgs({
-			args: argv,
-			options: deriveParseArgsOptions(),
+			args: normalizeBooleanFlagValues(argv, options),
+			options,
 			allowPositionals: true,
 			allowNegative: true,
 			strict: true,

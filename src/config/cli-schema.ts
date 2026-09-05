@@ -105,3 +105,58 @@ export function deriveParseArgsOptions(): ParseArgsOptions {
 
 	return options;
 }
+
+/**
+ * `node:util`'s `parseArgs` never consumes the token after a boolean flag, so `--debug true` leaves
+ * `true` behind as a positional (which then gets read as the command name). `meow` / `yargs-parser`
+ * used to fold a trailing `true` / `false` into the flag, and CI scripts that pass a computed
+ * `--flag $value` rely on that.
+ */
+export function normalizeBooleanFlagValues(argv: string[], options: ParseArgsOptions): string[] {
+	const booleanFlags = new Set(
+		Object.entries(options).reduce((acc, [name, options]) => {
+			if (options?.type === "boolean") {
+				acc.push(name);
+			}
+			return acc;
+		}, [] as string[]),
+	);
+
+	const normalized: string[] = [];
+
+	for (let index = 0; index < argv.length; index++) {
+		const arg = argv[index];
+
+		if (arg === "--") {
+			normalized.push(...argv.slice(index));
+			break;
+		}
+
+		const inlineMatch = /^--([^=]+)=(.*)$/.exec(arg);
+		if (inlineMatch && booleanFlags.has(inlineMatch[1])) {
+			const [, name, value] = inlineMatch;
+			if (value === "true") normalized.push(`--${name}`);
+			else if (value === "false") normalized.push(`--no-${name}`);
+			else normalized.push(arg); // Leave it for parseArgs to reject.
+			continue;
+		}
+
+		if (arg.startsWith("--") && booleanFlags.has(arg.slice(2))) {
+			const next = argv[index + 1];
+			if (next === "true") {
+				normalized.push(arg);
+				index++;
+				continue;
+			}
+			if (next === "false") {
+				normalized.push(`--no-${arg.slice(2)}`);
+				index++;
+				continue;
+			}
+		}
+
+		normalized.push(arg);
+	}
+
+	return normalized;
+}

@@ -1,4 +1,8 @@
-import { deriveParseArgsOptions, type ParseArgsOptions } from "../cli-schema";
+import {
+	deriveParseArgsOptions,
+	normalizeBooleanFlagValues,
+	type ParseArgsOptions,
+} from "../cli-schema";
 
 /**
  * The exact `parseArgs` options `getCliArguments()` runs on. Locking the full object here means a
@@ -86,5 +90,53 @@ describe("deriveParseArgsOptions", () => {
 		expect(options["pre-release"]).toStrictEqual({ type: "boolean" });
 		expect(options["pre-release-tag"]).toStrictEqual({ type: "string" });
 		expect(options).not.toHaveProperty("preRelease");
+	});
+});
+
+describe("normalizeBooleanFlagValues", () => {
+	const options: ParseArgsOptions = {
+		debug: { type: "boolean" },
+		"dry-run": { type: "boolean" },
+		changelog: { type: "string" },
+	};
+	const normalize = (argv: string[]) => normalizeBooleanFlagValues(argv, options);
+
+	it("folds a trailing true/false into a boolean flag", () => {
+		expect(normalize(["--debug", "true"])).toStrictEqual(["--debug"]);
+		expect(normalize(["--debug", "false"])).toStrictEqual(["--no-debug"]);
+		expect(normalize(["--dry-run", "true", "--debug", "false"])).toStrictEqual([
+			"--dry-run",
+			"--no-debug",
+		]);
+	});
+
+	it("folds the inline --flag=true/false form", () => {
+		expect(normalize(["--debug=true"])).toStrictEqual(["--debug"]);
+		expect(normalize(["--debug=false"])).toStrictEqual(["--no-debug"]);
+	});
+
+	it("leaves a non-boolean inline value for parseArgs to reject", () => {
+		expect(normalize(["--debug=maybe"])).toStrictEqual(["--debug=maybe"]);
+	});
+
+	it("keeps a real positional that follows a bare boolean flag", () => {
+		expect(normalize(["--debug", "inspect"])).toStrictEqual(["--debug", "inspect"]);
+	});
+
+	it("does not touch values that belong to a string flag", () => {
+		expect(normalize(["--changelog", "false"])).toStrictEqual(["--changelog", "false"]);
+	});
+
+	it("ignores unknown flags and bare positionals", () => {
+		expect(normalize(["true", "--other", "false"])).toStrictEqual(["true", "--other", "false"]);
+	});
+
+	it("passes everything after -- through untouched", () => {
+		expect(normalize(["--debug", "true", "--", "--dry-run", "false"])).toStrictEqual([
+			"--debug",
+			"--",
+			"--dry-run",
+			"false",
+		]);
 	});
 });

@@ -70,6 +70,29 @@ describe("getCliArguments", () => {
 		expect(getCliArguments(["--git-tag-fallback"]).flags.gitTagFallback).toBe(true);
 	});
 
+	it("folds a trailing true/false into the boolean flag instead of leaving a positional", () => {
+		const enabled = getCliArguments(["--debug", "true"]);
+		expect(enabled.flags.debug).toBe(true);
+		expect(enabled.input).toStrictEqual([]);
+
+		const disabled = getCliArguments(["--debug", "false"]);
+		expect(disabled.flags.debug).toBe(false);
+		expect(disabled.input).toStrictEqual([]);
+
+		expect(getCliArguments(["--debug=true"]).flags.debug).toBe(true);
+		expect(getCliArguments(["--debug=false"]).flags.debug).toBe(false);
+	});
+
+	it("keeps a command positional that follows a bare boolean flag", () => {
+		const { flags, input } = getCliArguments(["--debug", "inspect"]);
+		expect(flags.debug).toBe(true);
+		expect(input).toStrictEqual(["inspect"]);
+	});
+
+	it("does not treat a value after a string flag as a boolean literal", () => {
+		expect(getCliArguments(["--changelog", "false"]).flags.changelog).toBe("false");
+	});
+
 	it("omits flags the user did not pass", () => {
 		const { flags } = getCliArguments(["--dry-run"]);
 

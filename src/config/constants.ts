@@ -32,6 +32,13 @@ export const CONFIG_FILE_NAMES = [
 export const IGNORE_DIRS = new Set(["node_modules", ".git"]);
 
 /**
+ * Commands that only print information and exit. These are commonly used in scripts, e.g.
+ * `VERSION=$(fork-version inspect-version)`, so we suppress Node's `ExperimentalWarning`s (for
+ * `util.styleText` and `fs.promises.glob`) to keep their output clean.
+ */
+export const INSPECT_COMMANDS = new Set(["inspect", "inspect-version", "inspect-tag"]);
+
+/**
  * Keys on the `parseArgs` result that are not copied onto the resolved `flags` object: `help` and
  * `version` are actioned before the config is built, and `file` / `files` are merged together by
  * hand.

@@ -3,12 +3,13 @@ import { glob } from "node:fs/promises";
 
 import { createWriterOptions } from "../changelog-writer/options";
 import { applyLegacyCliFlags } from "./config-compatibility";
-import { IGNORE_DIRS } from "./constants";
+import { IGNORE_DIRS, INSPECT_COMMANDS } from "./constants";
 import { DEFAULT_CONFIG } from "./defaults";
 import { detectGitHost } from "../detect-git-host/detect-git-host";
 import { loadConfigFile } from "./load-config";
 import { mergeFiles } from "./merge-files";
 import { UserConfigSchema } from "./schema";
+import { suppressExperimentalWarnings } from "../utils/suppress-experimental-warnings";
 import type { ForkVersionCLIArgs, ForkConfig } from "./types";
 
 export async function getUserConfig(
@@ -28,6 +29,22 @@ export async function getUserConfig(
 		...flags,
 	} as ForkConfig;
 
+	let command: ForkConfig["command"] = DEFAULT_CONFIG.command;
+	if (cliArguments.input.length > 0 && cliArguments.input[0].trim()) {
+		command = cliArguments.input[0].trim().toLowerCase() as ForkConfig["command"];
+	} else if (mergedConfig.command.trim()) {
+		command = mergedConfig.command.trim().toLowerCase() as ForkConfig["command"];
+	}
+
+	// Support deprecated `--inspect-version` flag. Will be removed in a future major release.
+	if (mergedConfig.inspectVersion) {
+		command = "inspect-version";
+	}
+
+	if (INSPECT_COMMANDS.has(command)) {
+		suppressExperimentalWarnings();
+	}
+
 	const globResults: string[] = [];
 	if (mergedConfig.glob) {
 		const entries = glob(mergedConfig.glob, {
@@ -45,18 +62,6 @@ export async function getUserConfig(
 
 	const files = mergeFiles(configFile?.files, cliArguments.flags.files, globResults);
 	const detectedGitHost = await detectGitHost(cwd);
-
-	let command: ForkConfig["command"] = DEFAULT_CONFIG.command;
-	if (cliArguments.input.length > 0 && cliArguments.input[0].trim()) {
-		command = cliArguments.input[0].trim().toLowerCase() as ForkConfig["command"];
-	} else if (mergedConfig.command.trim()) {
-		command = mergedConfig.command.trim().toLowerCase() as ForkConfig["command"];
-	}
-
-	// Support deprecated `--inspect-version` flag. Will be removed in a future major release.
-	if (mergedConfig.inspectVersion) {
-		command = "inspect-version";
-	}
 
 	// Force silent mode to avoid printing unnecessary information when running other commands.
 	const shouldBeSilent = ![DEFAULT_CONFIG.command].includes(command);

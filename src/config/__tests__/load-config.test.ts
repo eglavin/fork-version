@@ -24,6 +24,29 @@ describe("load-config", async () => {
 		await expect(loadConfigFile(testFolder)).resolves.toStrictEqual({ commitAll: true });
 	});
 
+	it("should load fork.config.mjs", async () => {
+		const { create, testFolder } = await setupTest("load-config");
+
+		create.file(`export default { commitAll: true };`, "fork.config.mjs");
+
+		await expect(loadConfigFile(testFolder)).resolves.toStrictEqual({ commitAll: true });
+	});
+
+	it("should load a fork.config.ts that imports a sibling .ts file", async () => {
+		const { create, testFolder } = await setupTest("load-config");
+
+		create.file(`export const files = ["from-helper.json"];`, "fork.helper.ts");
+		create.file(
+			`import { files } from "./fork.helper.ts";\nexport default { files, commitAll: true };`,
+			"fork.config.ts",
+		);
+
+		await expect(loadConfigFile(testFolder)).resolves.toStrictEqual({
+			files: ["from-helper.json"],
+			commitAll: true,
+		});
+	});
+
 	it("should validate fork.config.ts", async () => {
 		const { create, testFolder } = await setupTest("load-config");
 

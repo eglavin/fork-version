@@ -30,7 +30,7 @@
   },
   "packageManager": "pnpm@10.30.3",
   "engines": {
-    "node": ">=22.0.0"
+    "node": ">=22.4.0"
   },
   "private": false,
   "type": "module",
@@ -53,7 +53,6 @@
     "dev": "tsdown --watch",
     "build": "tsdown",
     "update-json-schema": "node scripts/update-json-schema.ts",
-    "update-readme-cli-options": "node scripts/update-readme-cli-options.ts",
     "lint": "eslint --fix \"src/**/*.{js,ts}\"",
     "lint:check": "eslint \"src/**/*.{js,ts}\"",
     "lint:format": "prettier --write \"src/**/*.{js,ts}\"",
@@ -65,13 +64,10 @@
     "test:cleanup": "rimraf -g ../fork-version.tests/*"
   },
   "dependencies": {
-    "bundle-require": "5.1.0",
     "cheerio": "1.2.0",
-    "esbuild": "0.28.2",
     "handlebars": "4.7.9",
-    "joycon": "3.1.1",
+    "jiti": "2.7.0",
     "jsonc-parser": "3.3.1",
-    "meow": "14.1.0",
     "semver": "7.8.5",
     "yaml": "2.9.0",
     "zod": "4.4.3"

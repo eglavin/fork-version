@@ -3,10 +3,12 @@ import { glob } from "node:fs/promises";
 
 import { createWriterOptions } from "../changelog-writer/options";
 import { applyLegacyCliFlags } from "./config-compatibility";
+import { IGNORE_DIRS } from "./constants";
 import { DEFAULT_CONFIG } from "./defaults";
 import { detectGitHost } from "../detect-git-host/detect-git-host";
 import { loadConfigFile } from "./load-config";
 import { mergeFiles } from "./merge-files";
+import { UserConfigSchema } from "./schema";
 import type { ForkVersionCLIArgs, ForkConfig } from "./types";
 
 export async function getUserConfig(
@@ -28,12 +30,10 @@ export async function getUserConfig(
 
 	const globResults: string[] = [];
 	if (mergedConfig.glob) {
-		const IGNORE_LIST = new Set(["node_modules", ".git"]);
-
 		const entries = glob(mergedConfig.glob, {
 			cwd,
 			withFileTypes: true,
-			exclude: (entry) => IGNORE_LIST.has(entry.name),
+			exclude: (entry) => IGNORE_DIRS.has(entry.name),
 		});
 
 		for await (const entry of entries) {
@@ -61,7 +61,7 @@ export async function getUserConfig(
 	// Force silent mode to avoid printing unnecessary information when running other commands.
 	const shouldBeSilent = ![DEFAULT_CONFIG.command].includes(command);
 
-	return {
+	const resolvedConfig: ForkConfig = {
 		...mergedConfig,
 
 		command,
@@ -81,7 +81,8 @@ export async function getUserConfig(
 			? `${mergedConfig.releaseMessageFormat} ${mergedConfig.releaseMessageSuffix}`
 			: mergedConfig.releaseMessageFormat,
 		preRelease:
-			// Meow doesn't support multiple flags with the same name, so we need to check both.
+			// `--pre-release` (boolean) and `--pre-release-tag` (string) are separate flags as
+			// one flag can't accept both.
 			cliArguments.flags.preReleaseTag ?? cliArguments.flags.preRelease ?? configFile.preRelease,
 
 		//Flags
@@ -99,4 +100,10 @@ export async function getUserConfig(
 			detectedGitHost?.changelogWriter,
 		),
 	};
+
+	const validation = UserConfigSchema.safeParse(resolvedConfig);
+	if (!validation.success) {
+		throw new Error("Invalid resolved configuration", { cause: validation.error });
+	}
+	return resolvedConfig;
 }

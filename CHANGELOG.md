@@ -1,5 +1,13 @@
 # Fork Version
 
+## [6.1.1](https://github.com/eglavin/fork-version/compare/v6.1.0...v6.1.1) (2026-09-05)
+
+
+### Bug Fixes
+
+* implement normalizeBooleanFlagValues to handle boolean flag parsing ([166c9ae](https://github.com/eglavin/fork-version/commit/166c9ae595a6fe2553837c9eac70c80d61e138ab))
+* implement normalizeBooleanFlagValues to handle boolean flag parsing ([#140](https://github.com/eglavin/fork-version/issues/140)) ([7abc78a](https://github.com/eglavin/fork-version/commit/7abc78ac8dfcc5835902b646ef27d14fb0fdc404))
+
 ## [6.1.0](https://github.com/eglavin/fork-version/compare/v6.0.1...v6.1.0) (2026-09-05)
 
 

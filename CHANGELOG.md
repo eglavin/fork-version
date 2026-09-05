@@ -1,5 +1,12 @@
 # Fork Version
 
+## [6.1.0](https://github.com/eglavin/fork-version/compare/v6.0.1...v6.1.0) (2026-09-05)
+
+
+### Features
+
+* replace meow, joycon, and bundle-require with parseArgs and jiti ([#139](https://github.com/eglavin/fork-version/issues/139)) ([52c2fea](https://github.com/eglavin/fork-version/commit/52c2fea67db477e5749c9c4ab0b958d3d318815c))
+
 ## [6.0.1](https://github.com/eglavin/fork-version/compare/v6.0.0...v6.0.1) (2026-09-01)
 
 

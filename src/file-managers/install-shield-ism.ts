@@ -1,11 +1,12 @@
 import { readFile, writeFile } from "node:fs/promises";
-import * as cheerio from "cheerio/slim";
 
 import {
 	MissingPropertyException,
 	type FileState,
 	type IFileManager,
 } from "../services/file-manager";
+import { applyEdits, findChildren, parseMarkup, replaceText, textOf } from "../utils/xml-document";
+import type { Document, Element } from "domhandler";
 
 /**
  * An InstallShield ISM file can be either XML or binary, only the XML format is supported
@@ -29,19 +30,30 @@ import {
  * ```
  */
 export class InstallShieldISM implements IFileManager {
-	#cheerioOptions: cheerio.CheerioOptions = {
-		xmlMode: true,
-		xml: { decodeEntities: false },
-	};
+	/**
+	 * The cells holding the value of the ProductVersion property.
+	 *
+	 * Each row of the Property table is a name cell followed by its value cell, so the version is
+	 * the cell after the one naming it.
+	 */
+	#findVersionCells(document: Document): Element[] {
+		return findChildren(document, "msi")
+			.flatMap((msi) => findChildren(msi, "table"))
+			.filter((table) => table.attribs.name === "Property")
+			.flatMap((table) => findChildren(table, "row"))
+			.flatMap((row) => {
+				const cells = findChildren(row, "td");
+				const nameCell = cells.findIndex((cell) => textOf(cell).includes("ProductVersion"));
+
+				return nameCell === -1 ? [] : cells.slice(nameCell + 1, nameCell + 2);
+			});
+	}
 
 	async read(filePath: string): Promise<FileState | undefined> {
 		const fileContents = await readFile(filePath, "utf8");
+		const document = parseMarkup(fileContents);
 
-		const $ = cheerio.load(fileContents, this.#cheerioOptions);
-		const version = $('msi > table[name="Property"] > row > td:contains("ProductVersion")')
-			.next()
-			.text()
-			.trim();
+		const version = textOf(this.#findVersionCells(document)[0]).trim();
 		if (version) {
 			return {
 				path: filePath,
@@ -54,20 +66,13 @@ export class InstallShieldISM implements IFileManager {
 
 	async write(fileState: FileState, newVersion: string): Promise<void> {
 		const fileContents = await readFile(fileState.path, "utf8");
+		const document = parseMarkup(fileContents);
 
-		const $ = cheerio.load(fileContents, this.#cheerioOptions);
-		const versionCell = $(
-			'msi > table[name="Property"] > row > td:contains("ProductVersion")',
-		).next();
-		if (versionCell.length > 0) {
-			versionCell.text(newVersion);
-		}
+		const edits = this.#findVersionCells(document).map((versionCell) =>
+			replaceText(fileContents, versionCell, newVersion),
+		);
 
-		// Cheerio doesn't handle self-closing tags well,
-		// so we're manually adding a space before any closing tags.
-		const updatedContent = $.xml().replaceAll('"/>', '" />');
-
-		await writeFile(fileState.path, updatedContent, "utf8");
+		await writeFile(fileState.path, applyEdits(fileContents, edits), "utf8");
 	}
 
 	isSupportedFile(fileName: string): boolean {

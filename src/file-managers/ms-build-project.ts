@@ -1,5 +1,4 @@
 import { readFile, writeFile } from "node:fs/promises";
-import * as cheerio from "cheerio/slim";
 
 import {
 	MissingPropertyException,
@@ -7,6 +6,18 @@ import {
 	type IFileManager,
 } from "../services/file-manager";
 import { extractPrerelease } from "../utils/extract-prerelease";
+import {
+	applyEdits,
+	findChildren,
+	insertAfter,
+	parseMarkup,
+	escapeText,
+	removeElement,
+	replaceText,
+	textOf,
+	type MarkupEdit,
+} from "../utils/xml-document";
+import type { Document, Element } from "domhandler";
 
 /**
  * A ms-build file is an xml file with a version property under the Project > PropertyGroup node.
@@ -36,17 +47,26 @@ import { extractPrerelease } from "../utils/extract-prerelease";
  * ```
  */
 export class MSBuildProject implements IFileManager {
-	#cheerioOptions: cheerio.CheerioOptions = {
-		xmlMode: true,
-		xml: { decodeEntities: false },
-	};
+	/**
+	 * Collect a property from every PropertyGroup in the project, in document order.
+	 *
+	 * Projects commonly declare more than one PropertyGroup - a general one alongside a
+	 * configuration specific `<PropertyGroup Condition="...">` - and the version can live in any
+	 * of them, so every group has to be searched rather than just the first.
+	 */
+	#findProperties(document: Document, name: string): Element[] {
+		return findChildren(document, "Project")
+			.flatMap((project) => findChildren(project, "PropertyGroup"))
+			.flatMap((propertyGroup) => findChildren(propertyGroup, name));
+	}
 
 	async read(filePath: string): Promise<FileState | undefined> {
 		const fileContents = await readFile(filePath, "utf8");
+		const document = parseMarkup(fileContents);
 
-		const $ = cheerio.load(fileContents, this.#cheerioOptions);
-
-		const version = $("Project > PropertyGroup > Version").text();
+		// A well formed project declares each property once. If one has been duplicated across
+		// PropertyGroups the first is taken as the current version, rather than joining them.
+		const version = textOf(this.#findProperties(document, "Version")[0]);
 		if (version) {
 			return {
 				path: filePath,
@@ -54,8 +74,8 @@ export class MSBuildProject implements IFileManager {
 			};
 		}
 
-		const versionPrefix = $("Project > PropertyGroup > VersionPrefix").text();
-		const versionSuffix = $("Project > PropertyGroup > VersionSuffix").text();
+		const versionPrefix = textOf(this.#findProperties(document, "VersionPrefix")[0]);
+		const versionSuffix = textOf(this.#findProperties(document, "VersionSuffix")[0]);
 		if (versionPrefix) {
 			return {
 				path: filePath,
@@ -68,40 +88,56 @@ export class MSBuildProject implements IFileManager {
 
 	async write(fileState: FileState, newVersion: string): Promise<void> {
 		const fileContents = await readFile(fileState.path, "utf8");
+		const document = parseMarkup(fileContents);
+		const edits: MarkupEdit[] = [];
 
-		const $ = cheerio.load(fileContents, this.#cheerioOptions);
-
-		const version = $("Project > PropertyGroup > Version");
-		if (version.length) {
-			version.text(newVersion);
+		// Where a property has been duplicated every copy is updated, so the project doesn't end
+		// up with PropertyGroups disagreeing about the version.
+		const versions = this.#findProperties(document, "Version");
+		if (versions.length) {
+			edits.push(...versions.map((version) => replaceText(fileContents, version, newVersion)));
 		} else {
-			const versionPrefix = $("Project > PropertyGroup > VersionPrefix");
-			const versionSuffix = $("Project > PropertyGroup > VersionSuffix");
+			const versionPrefixes = this.#findProperties(document, "VersionPrefix");
+			const versionSuffixes = this.#findProperties(document, "VersionSuffix");
 
-			if (versionPrefix.length) {
+			if (versionPrefixes.length) {
 				const { prefix, suffix } = extractPrerelease(newVersion);
 
-				versionPrefix.text(prefix);
+				edits.push(
+					...versionPrefixes.map((versionPrefix) =>
+						replaceText(fileContents, versionPrefix, prefix),
+					),
+				);
 
 				// Depending of if there is a suffix in the new version, we either need to update,
 				// add or remove the VersionSuffix property.
 				if (suffix) {
-					if (versionSuffix.length) {
-						versionSuffix.text(suffix);
+					if (versionSuffixes.length) {
+						edits.push(
+							...versionSuffixes.map((versionSuffix) =>
+								replaceText(fileContents, versionSuffix, suffix),
+							),
+						);
 					} else {
-						$(`\n<VersionSuffix>${suffix}</VersionSuffix>`).insertAfter(versionPrefix);
+						edits.push(
+							...versionPrefixes.map((versionPrefix) =>
+								insertAfter(
+									fileContents,
+									versionPrefix,
+									`<VersionSuffix>${escapeText(suffix)}</VersionSuffix>`,
+								),
+							),
+						);
 					}
 				} else {
-					versionSuffix.remove();
+					edits.push(
+						...versionSuffixes.map((versionSuffix) => removeElement(fileContents, versionSuffix)),
+					);
 				}
 			}
 		}
 
-		// Cheerio doesn't handle self-closing tags well,
-		// so we're manually adding a space before the closing tag.
-		const updatedContent = $.xml().replaceAll('"/>', '" />');
-
-		await writeFile(fileState.path, updatedContent, "utf8");
+		await writeFile(fileState.path, applyEdits(fileContents, edits), "utf8");
 	}
 
 	isSupportedFile(fileName: string): boolean {

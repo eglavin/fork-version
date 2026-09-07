@@ -28,6 +28,13 @@
       "description": "Glob pattern to match files to be updated.",
       "type": "string"
     },
+    "commitPath": {
+      "description": "Limit the commits considered for the changelog and version bump to those that touched one or more of the given paths.",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
     "path": {
       "type": "string",
       "description": "The path Fork-Version will run from. Default: `process.cwd()`"

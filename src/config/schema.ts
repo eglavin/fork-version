@@ -72,6 +72,12 @@ export const ForkConfigJSONSchema = z.object({
 		.optional()
 		.describe("Glob pattern to match files to be updated.")
 		.register(cliOptionRegistry, { short: "G" }),
+	commitPath: z
+		.array(z.string())
+		.optional()
+		.describe(
+			"Limit the commits considered for the changelog and version bump to those that touched one or more of the given paths.",
+		),
 	path: z
 		.string()
 		.describe("The path Fork-Version will run from. Default: `process.cwd()`")

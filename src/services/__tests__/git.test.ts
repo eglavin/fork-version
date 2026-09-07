@@ -271,7 +271,7 @@ test/**
 	});
 
 	it("should read commits", async () => {
-		const { config, create } = await setupTest("execute-file");
+		const { config, create, relativeTo } = await setupTest("execute-file");
 		const git = new Git(config);
 
 		// Create a commit in the root src folder
@@ -321,7 +321,12 @@ system so we'll see what happens.`,
 		await git.tag("v1.0.4");
 
 		// Get commits in specific folders
-		const filteredCommits = await git.getCommits("v1.0.1", "HEAD", "src/libs", "src/utils");
+		const filteredCommits = await git.getCommits(
+			"v1.0.1",
+			"HEAD",
+			relativeTo("src", "libs"),
+			relativeTo("src", "utils"),
+		);
 		expect(filteredCommits[0].includes("refactor: add util file")).toBe(true);
 		expect(filteredCommits.length).toBe(1);
 

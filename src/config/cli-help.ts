@@ -15,6 +15,7 @@ General Options:
 Location Options:
   --files, --file, -F         List of the files to be updated. [Default: ["bower.json", "deno.json", "deno.jsonc", "jsr.json", "jsr.jsonc", "manifest.json", "npm-shrinkwrap.json", "package-lock.json", "package.json"]]
   --glob, -G                  Glob pattern to match files to be updated.
+  --commit-path               Limit considered commits to those that touched the given path. Repeatable.
   --path, -P                  The path Fork-Version will run from. [Default: process.cwd()]
 
 Options:

@@ -32,8 +32,10 @@ describe("get-commits", () => {
 		expect(commits[0]?.title).toBe("an amazing new feature");
 	});
 
-	it("should return commits only for the given sub directory", async () => {
-		const { config, execGit, create, git, logger } = await setupTest("get-commits");
+	it("should return commits only for the given commit path", async () => {
+		const { config, execGit, create, git, logger, relativeTo } = await setupTest("get-commits");
+
+		config.commitPath = [relativeTo("packages", "package-2")];
 
 		execGit.commit("chore: init");
 		execGit.tag("v0.0.0", "chore: init");
@@ -56,9 +58,37 @@ describe("get-commits", () => {
 		expect(latestTag).toBe("v0.0.0");
 		expect(latestTagVersion).toBe("0.0.0");
 
-		expect(commits).toHaveLength(2);
+		expect(commits).toHaveLength(1);
 		expect(commits[0]?.subject).toBe("feat: package-2 feat");
-		expect(commits[1]?.subject).toBe("feat: package-1 feat");
+	});
+
+	it("should return commits for any of the given commit paths", async () => {
+		const { config, execGit, create, git, logger, relativeTo } = await setupTest("get-commits");
+
+		config.commitPath = [relativeTo("packages", "package-1"), relativeTo("packages", "package-3")];
+
+		execGit.commit("chore: init");
+		execGit.tag("v0.0.0", "chore: init");
+
+		create.directory("packages/package-1");
+		create.file("", "packages/package-1/package.json").add();
+		execGit.commit("feat: package-1 feat");
+
+		create.directory("packages/package-2");
+		create.file("", "packages/package-2/package.json").add();
+		execGit.commit("feat: package-2 feat");
+
+		create.directory("packages/package-3");
+		create.file("", "packages/package-3/package.json").add();
+		execGit.commit("feat: package-3 feat");
+
+		const { commits } = await getCommitsSinceTag(config, logger, git);
+
+		expect(commits).toHaveLength(2);
+		expect(commits.map((commit) => commit.subject)).toStrictEqual([
+			"feat: package-3 feat",
+			"feat: package-1 feat",
+		]);
 	});
 
 	it("should log a warning if no previous tag is found", async () => {

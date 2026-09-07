@@ -24,6 +24,7 @@ const EXPECTED: ParseArgsOptions = {
 	files: { type: "string", multiple: true, short: "F" },
 	file: { type: "string", multiple: true },
 	glob: { type: "string", short: "G" },
+	"commit-path": { type: "string", multiple: true },
 	path: { type: "string", short: "P" },
 	changelog: { type: "string" },
 	header: { type: "string" },

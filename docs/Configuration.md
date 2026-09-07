@@ -108,6 +108,7 @@ Alternatively you can define your config using a key in your `package.json` file
 | [files](#configfiles)                                                   | Array\<string>       | `["package.json", ...]`          | List of the files to be updated                                                                                    |
 | [customFileManagers](./Supported-File-Managers.md#custom-file-updaters) | Array\<IFileManager> | -                                | Support for user provided custom file managers                                                                     |
 | [glob](#configglob)                                                     | string               | -                                | Glob pattern to match files to be updated                                                                          |
+| [commitPath](#configcommitpath)                                         | Array\<string>       | -                                | Limit the commits considered to those that touched one of the given paths                                          |
 | changelog                                                               | string               | `CHANGELOG.md`                   | Name of the changelog file                                                                                         |
 | header                                                                  | string               | `# Changelog...`                 | The header text for the changelog                                                                                  |
 | [types](#configtypes)                                                   | Array\<Type>         | `[{ type: "feat", ... }, ...]`   | List of explicitly supported commit message types                                                                  |
@@ -156,6 +157,25 @@ Running `npx fork-version -G "{*/*.csproj,*/package.json}"` will update both csp
 
 > [!WARNING]
 > Ensure you wrap your glob pattern in quotes to prevent shell expansion.
+
+#### config.commitPath
+
+By default Fork-Version looks at every commit since the last tag when determining the next version and generating the changelog. `commitPath` narrows that down to commits that touched one or more of the given paths, which is useful in a monorepo where each package is released from the commits under its own directory.
+
+Each entry is passed through to `git log` as a [pathspec](https://git-scm.com/docs/gitglossary#Documentation/gitglossary.txt-aiddefpathspecapathspec) and is resolved relative to `config.path`.
+
+```js
+export default {
+  path: "./packages/my-package",
+  commitPath: ["packages/my-package"],
+};
+```
+
+On the command line the flag is repeatable:
+
+```sh
+npx fork-version --commit-path packages/my-package --commit-path shared/utils
+```
 
 #### config.types
 

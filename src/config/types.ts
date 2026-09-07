@@ -73,6 +73,18 @@ export interface ForkConfig {
 	 */
 	glob?: string;
 	/**
+	 * Limit the commits considered for the changelog and version bump to those that touched one or
+	 * more of the given paths.
+	 *
+	 * Useful in a monorepo where each package is released from the commits under its own directory.
+	 * Each entry is passed through to `git log` as a pathspec, resolved relative to
+	 * {@link ForkConfig.path}.
+	 *
+	 * @default undefined
+	 * @example ["packages/my-package"], ["src", "package.json"]
+	 */
+	commitPath?: string[];
+	/**
 	 * The path Fork-Version will run from.
 	 * @default
 	 * ```js
@@ -292,6 +304,7 @@ export interface ForkVersionCLIFlags {
 
 	files?: string[];
 	glob?: string;
+	commitPath?: string[];
 	path?: string;
 	changelog?: string;
 	header?: string;

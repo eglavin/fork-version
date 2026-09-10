@@ -110,7 +110,7 @@ Alternatively you can define your config using a key in your `package.json` file
 | [glob](#configglob)                                                     | string               | -                                | Glob pattern to match files to be updated                                                                          |
 | [commitPath](#configcommitpath)                                         | Array\<string>       | -                                | Limit the commits considered to those that touched one of the given paths                                          |
 | changelog                                                               | string               | `CHANGELOG.md`                   | Name of the changelog file                                                                                         |
-| header                                                                  | string               | `# Changelog...`                 | The header text for the changelog                                                                                  |
+| [header](#configheader)                                                 | string               | `# Changelog...`                 | The header text for the changelog (front-matter in the existing file is retained)                                  |
 | [types](#configtypes)                                                   | Array\<Type>         | `[{ type: "feat", ... }, ...]`   | List of explicitly supported commit message types                                                                  |
 | [releaseMessageFormat](#configreleasemessageformat)                     | string               | `chore(release): {{currentTag}}` | A string to be used to format the auto-generated release commit message                                            |
 | [releaseMessageSuffix](#configreleasemessagesuffix)                     | string               | -                                | Add a suffix to the end of the release message                                                                     |
@@ -175,6 +175,22 @@ On the command line the flag is repeatable:
 
 ```sh
 npx fork-version --commit-path packages/my-package --commit-path shared/utils
+```
+
+#### config.header
+
+The text written to the top of the changelog file, above the generated release sections.
+
+When Fork-Version regenerates the changelog it replaces everything before the latest release entry with `header`. The one exception is a [YAML front-matter](https://jekyllrb.com/docs/front-matter/) block at the very start of the file (opened and closed by a `---` line), if present it is detected and kept in place above the header, so metadata used by static site generators (Docusaurus, Jekyll, etc.) survives each release.
+
+```txt
+---
+title: Changelog
+---
+
+# Changelog
+
+<!-- generated release sections follow -->
 ```
 
 #### config.types

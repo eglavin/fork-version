@@ -16,20 +16,44 @@ import type { WriterOptions } from "../changelog-writer/options";
 const RELEASE_PATTERN = /(^#+ \[?[0-9]+\.[0-9]+\.[0-9]+|<a name=)/m;
 
 /**
- * Get the existing changelog content from the latest release onwards.
+ * Matches a YAML front-matter block at the very start of the file.
+ *
+ * @example
+ * ```
+ * ---
+ * title: Changelog
+ * ---
+ * ```
+ */
+const FRONTMATTER_PATTERN = /^---\r?\n[\s\S]*?\r?\n---[ \t]*\r?\n/;
+
+/**
+ * Read the existing changelog and split out the parts we want to keep when the file is regenerated:
+ * - `frontmatter`: a YAML front-matter block at the very start of the file, if present.
+ * - `oldContent`: everything from the latest release onwards.
+ * @see {@link FRONTMATTER_PATTERN}
  * @see {@link RELEASE_PATTERN}
  */
-async function getOldReleaseContent(filePath: string, exists: boolean): Promise<string> {
-	if (exists) {
-		const fileContents = await readFile(filePath, "utf8");
-		const oldContentStart = fileContents.search(RELEASE_PATTERN);
-
-		if (oldContentStart !== -1) {
-			return fileContents.substring(oldContentStart);
-		}
+async function getExistingContent(
+	filePath: string,
+	exists: boolean,
+): Promise<{ frontmatter: string; oldContent: string }> {
+	if (!exists) {
+		return { frontmatter: "", oldContent: "" };
 	}
 
-	return "";
+	const fileContents = await readFile(filePath, "utf8");
+
+	const frontmatterMatch = FRONTMATTER_PATTERN.exec(fileContents);
+	const frontmatter = frontmatterMatch ? `${frontmatterMatch[0].trimEnd()}\n\n` : "";
+
+	const oldContentStart = fileContents.search(RELEASE_PATTERN);
+	const oldContent = oldContentStart !== -1 ? fileContents.substring(oldContentStart) : "";
+
+	return {
+		frontmatter,
+		oldContent,
+	};
 }
 
 /**
@@ -82,17 +106,18 @@ export async function updateChangelog(
 		logger.log(`Updating changelog: ${changelogPath}`);
 	}
 
-	const oldContent = await getOldReleaseContent(changelogPath, fileExists(changelogPath));
+	const { frontmatter, oldContent } = await getExistingContent(
+		changelogPath,
+		fileExists(changelogPath),
+	);
 	const newContent = getNewReleaseContent(config, commits, previousTag, nextVersion);
 
 	if (!config.dryRun && newContent) {
-		await writeFile(
-			changelogPath,
-			`${config.header}
+		const updatedFileContent = `${frontmatter}${config.header}
 ${newContent}
 ${oldContent}
-`.trim(),
-			"utf8",
-		);
+`.trim();
+
+		await writeFile(changelogPath, updatedFileContent, "utf8");
 	}
 }

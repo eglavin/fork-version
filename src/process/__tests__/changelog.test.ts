@@ -42,6 +42,36 @@ describe("changelog", () => {
 		expect(changelog).toContain("A breaking change message");
 	});
 
+	it("should retain frontmatter if present", async () => {
+		const { config, create, execGit, git, logger, relativeTo } = await setupTest("changelog");
+
+		create
+			.file(
+				`---
+title: Changelog
+sidebar_position: 1
+---
+
+# Test Header
+
+## 1.2.3 (2000-01-01)
+`,
+				"CHANGELOG.md",
+			)
+			.add();
+		execGit.commit("feat: A feature commit");
+		const { commits, latestTag } = await getCommitsSinceTag(config, logger, git);
+
+		await updateChangelog(config, logger, commits, latestTag, "1.2.4");
+
+		const changelog = readFileSync(relativeTo("CHANGELOG.md"), "utf8");
+		expect(changelog).toMatch(/^---\ntitle: Changelog\nsidebar_position: 1\n---\n/);
+		expect(changelog).toContain("## 1.2.3");
+		expect(changelog).toContain("## 1.2.4");
+		// Frontmatter should only appear once, at the very start
+		expect(changelog.match(/^---$/gm)?.length).toBe(2);
+	});
+
 	it("should throw an error if header contains a release pattern", async () => {
 		const { config, create, execGit, git, logger } = await setupTest("changelog");
 		config.header = "# [1.2.3]\n";

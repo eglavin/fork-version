@@ -1,7 +1,6 @@
 import { basename, dirname, join, parse } from "node:path";
 import { existsSync } from "node:fs";
 import { readFile } from "node:fs/promises";
-import { createJiti } from "jiti";
 
 import { CONFIG_FILE_NAMES, IGNORE_DIRS, PACKAGE_JSON_CONFIG_KEY } from "./constants";
 import { ForkConfigJSONSchema, ForkConfigJSSchema } from "./schema";
@@ -83,6 +82,7 @@ export async function loadConfigFile(cwd: string, compatWarnings: string[] = [])
 	}
 
 	// Otherwise expect config file to be a javascript or typescript file.
+	const { createJiti } = await import("jiti");
 	const jiti = createJiti(import.meta.url);
 	const loaded = (await jiti.import(configFilePath)) as Record<string, unknown>;
 

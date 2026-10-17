@@ -1,9 +1,9 @@
 import semver, { type ReleaseType } from "semver";
 
-import { getReleaseType } from "../utils/release-type";
+import type { Commit } from "../commit-parser/types";
 import type { ForkConfig } from "../config/types";
 import type { Logger } from "../services/logger";
-import type { Commit } from "../commit-parser/types";
+import { getReleaseType } from "../utils/release-type";
 
 export interface NextVersion {
 	version: string;
@@ -18,12 +18,12 @@ export interface NextVersion {
 	};
 }
 
-export async function getNextVersion(
+export function getNextVersion(
 	config: ForkConfig,
 	logger: Logger,
 	commits: Commit[],
 	currentVersion: string,
-): Promise<NextVersion> {
+): NextVersion {
 	if (config.skipBump) {
 		logger.skipping(`Skipping bump, using ${currentVersion} as the next version`);
 		return {
@@ -61,7 +61,7 @@ export async function getNextVersion(
 		 * - 2 = patch
 		 */
 		let level = 2;
-		const MINOR_TYPES = ["feat", "feature"];
+		const MINOR_TYPES = new Set(["feat", "feature"]);
 
 		for (const commit of commits) {
 			// We shouldn't consider merge commits or reverts as changes.
@@ -77,7 +77,7 @@ export async function getNextVersion(
 			if (commit.notes.length > 0 || commit.breakingChange) {
 				changes.major += commit.notes.length + (commit.breakingChange ? 1 : 0);
 				level = 0;
-			} else if (MINOR_TYPES.includes(commit.type.toLowerCase())) {
+			} else if (MINOR_TYPES.has(commit.type.toLowerCase())) {
 				changes.minor += 1;
 				if (level === 2) {
 					level = 1;
@@ -117,12 +117,16 @@ export async function getNextVersion(
 
 	if (commits.length > 0) {
 		logger.log(
-			`  - Commits: ${commits.length}` +
-				(changes.major > 0 ? `, Majors: ${changes.major}` : "") +
-				(changes.minor > 0 ? `, Minors: ${changes.minor}` : "") +
-				(changes.patch > 0 ? `, Patches: ${changes.patch}` : "") +
-				(changes.reverts > 0 ? `, Reverts: ${changes.reverts}` : "") +
-				(changes.merges > 0 ? `, Merges: ${changes.merges}` : ""),
+			[
+				`  - Commits: ${commits.length}`,
+				changes.major > 0 ? `Majors: ${changes.major}` : undefined,
+				changes.minor > 0 ? `Minors: ${changes.minor}` : undefined,
+				changes.patch > 0 ? `Patches: ${changes.patch}` : undefined,
+				changes.reverts > 0 ? `Reverts: ${changes.reverts}` : undefined,
+				changes.merges > 0 ? `Merges: ${changes.merges}` : undefined,
+			]
+				.filter(Boolean)
+				.join(", "),
 		);
 	} else {
 		logger.log("  - No commits found.");

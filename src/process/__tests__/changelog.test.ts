@@ -1,8 +1,8 @@
 import { existsSync, readFileSync } from "node:fs";
 
 import { setupTest } from "../../../tests/setup-tests";
-import { getCommitsSinceTag } from "../get-commits";
 import { updateChangelog } from "../changelog";
+import { getCommitsSinceTag } from "../get-commits";
 
 describe("changelog", () => {
 	it("should create changelog file", async () => {

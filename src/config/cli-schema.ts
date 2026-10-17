@@ -36,20 +36,27 @@ function scalarKind(schema: unknown): ScalarKind | undefined {
 	}
 
 	switch (def.type) {
-		case "string":
+		case "string": {
 			return "string";
-		case "boolean":
+		}
+		case "boolean": {
 			return "boolean";
-		case "enum":
+		}
+		case "enum": {
 			return "string";
-		case "literal":
+		}
+		case "literal": {
 			return def.values?.every((value) => typeof value === "string") ? "string" : undefined;
-		case "array":
+		}
+		case "array": {
 			return def.element && scalarKind(def.element) === "string" ? "array" : undefined;
-		case "union":
+		}
+		case "union": {
 			return def.options?.every((option) => scalarKind(option) === "string") ? "string" : undefined;
-		default:
+		}
+		default: {
 			return undefined;
+		}
 	}
 }
 
@@ -114,8 +121,8 @@ export function deriveParseArgsOptions(): ParseArgsOptions {
  */
 export function normalizeBooleanFlagValues(argv: string[], options: ParseArgsOptions): string[] {
 	const booleanFlags = new Set(
-		Object.entries(options).reduce((acc, [name, options]) => {
-			if (options?.type === "boolean") {
+		Object.entries(options).reduce((acc, [name, opts]) => {
+			if (opts?.type === "boolean") {
 				acc.push(name);
 			}
 			return acc;

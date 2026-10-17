@@ -1,10 +1,11 @@
 import { resolve } from "node:path";
-import { formatCommitMessage } from "../utils/format-commit-message";
-import { fileExists } from "../utils/file-state";
+
 import type { ForkConfig } from "../config/types";
 import type { FileState } from "../services/file-manager";
-import type { Logger } from "../services/logger";
 import type { Git } from "../services/git";
+import type { Logger } from "../services/logger";
+import { fileExists } from "../utils/file-state";
+import { formatCommitMessage } from "../utils/format-commit-message";
 
 export async function commitChanges(
 	config: ForkConfig,

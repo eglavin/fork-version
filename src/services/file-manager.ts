@@ -1,15 +1,14 @@
 import { isAbsolute, relative, resolve } from "node:path";
 
-import { fileExists } from "../utils/file-state";
-import { JSONPackage } from "../file-managers/json-package";
-import { YAMLPackage } from "../file-managers/yaml-package";
-import { PlainText } from "../file-managers/plain-text";
-import { MSBuildProject } from "../file-managers/ms-build-project";
+import type { ForkConfig } from "../config/types";
 import { ARMBicep } from "../file-managers/arm-bicep";
 import { InstallShieldISM } from "../file-managers/install-shield-ism";
-
+import { JSONPackage } from "../file-managers/json-package";
+import { MSBuildProject } from "../file-managers/ms-build-project";
+import { PlainText } from "../file-managers/plain-text";
+import { YAMLPackage } from "../file-managers/yaml-package";
 import { extractBuildMetadata } from "../utils/extract-build-metadata";
-import type { ForkConfig } from "../config/types";
+import { fileExists } from "../utils/file-state";
 import type { Logger } from "./logger";
 
 /**
@@ -149,7 +148,7 @@ export class FileManager {
 						);
 					} else {
 						// Rethrow any unexpected errors.
-						throw new Error(`An unexpected error occurred while reading file: ${filePath}`, {
+						throw new TypeError(`An unexpected error occurred while reading file: ${filePath}`, {
 							cause: error,
 						});
 					}

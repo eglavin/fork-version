@@ -1,10 +1,10 @@
 import { parseArgs } from "node:util";
 
 import pkg from "../../package.json" with { type: "json" };
+import { toCamelCase } from "../utils/case-transform";
 import { helperText } from "./cli-help";
 import { deriveParseArgsOptions, normalizeBooleanFlagValues } from "./cli-schema";
 import { NON_FLAG_ARG_KEYS } from "./constants";
-import { toCamelCase } from "../utils/case-transform";
 import type { ForkVersionCLIArgs, ForkVersionCLIFlags } from "./types";
 
 /**

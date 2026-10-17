@@ -1,5 +1,5 @@
-import { DomUtils, parseDocument } from "htmlparser2";
 import { isTag, type Document, type Element, type ParentNode } from "domhandler";
+import { DomUtils, parseDocument } from "htmlparser2";
 
 /**
  * A pending change to a source document, expressed as a range of the *original* text to
@@ -165,7 +165,7 @@ export function applyEdits(source: string, edits: MarkupEdit[]): string {
  * Escape a value for use as element text.
  */
 export function escapeText(value: string): string {
-	return value.replace(/&/g, "&amp;").replace(/</g, "&lt;");
+	return value.replaceAll("&", "&amp;").replaceAll("<", "&lt;");
 }
 
 /**

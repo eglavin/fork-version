@@ -108,7 +108,7 @@ version: 1.2.3 # Comment about the version number
 		expect(file?.version).toBe("2.4.6");
 	});
 
-	it("should match known yaml files", async () => {
+	it("should match known yaml files", () => {
 		const fileManager = new YAMLPackage();
 
 		// Supported

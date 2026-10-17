@@ -1,8 +1,9 @@
-import { createParserOptions } from "../commit-parser/options";
-import { renderChangelogEntry } from "./templates";
-import { splitRepository } from "../utils/split-repository";
-import type { ParserOptions } from "../commit-parser/options";
+import { createParserOptions, type ParserOptions } from "../commit-parser/options";
 import type { Commit, CommitReference } from "../commit-parser/types";
+import type { CommitType } from "../config/types";
+import { splitRepository } from "../utils/split-repository";
+import type { WriterOptions } from "./options";
+import { renderChangelogEntry } from "./templates";
 import type {
 	CommitGroup,
 	NoteGroup,
@@ -12,8 +13,6 @@ import type {
 	TransformedCommits,
 	WriterContext,
 } from "./types";
-import type { CommitType } from "../config/types";
-import type { WriterOptions } from "./options";
 
 export class ChangelogWriter {
 	#options: WriterOptions;
@@ -137,7 +136,7 @@ export class ChangelogWriter {
 			);
 		}
 
-		result = result.replace(/\B@([a-z0-9](?:-?[a-z0-9/]){0,38})/g, (match, user: string) => {
+		result = result.replaceAll(/\B@([a-z0-9](?:-?[a-z0-9/]){0,38})/g, (match, user: string) => {
 			// Skip team/org mentions, e.g. `@org/team`.
 			if (user.includes("/")) return match;
 
@@ -210,7 +209,7 @@ export class ChangelogWriter {
 				groupTitle: entry?.section || "Other Changes",
 				scope,
 				displaySubject: this.resolveSubjectUrls(commit.title || commit.subject, seenIssues),
-				shortHash: commit.hash ? commit.hash.substring(0, 7) : "",
+				shortHash: commit.hash ? commit.hash.slice(0, 7) : "",
 				commitUrl: this.resolveCommitUrl(commit.hash),
 				references: commit.references
 					.filter((reference) => !seenIssues.has(this.buildReferenceLabel(reference)))

@@ -2,17 +2,17 @@
 
 import { writeFileSync } from "node:fs";
 import { join } from "node:path";
+
 import { ZodError } from "zod";
 
-import { getCliArguments } from "./config/cli-arguments";
-import { getUserConfig } from "./config/user-config";
-import { Logger } from "./services/logger";
-import { FileManager } from "./services/file-manager";
-import { Git } from "./services/git";
-
-import { validateConfig } from "./commands/validate-config";
 import { inspect } from "./commands/inspect";
 import { main } from "./commands/main";
+import { validateConfig } from "./commands/validate-config";
+import { getCliArguments } from "./config/cli-arguments";
+import { getUserConfig } from "./config/user-config";
+import { FileManager } from "./services/file-manager";
+import { Git } from "./services/git";
+import { Logger } from "./services/logger";
 
 async function runFork() {
 	const startTime = Date.now();

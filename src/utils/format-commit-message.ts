@@ -9,5 +9,5 @@ export function formatCommitMessage(message: string | undefined, version: string
 		message = "chore(release): {{currentTag}}";
 	}
 
-	return message.replace(new RegExp("{{currentTag}}", "g"), version);
+	return message.replaceAll(new RegExp("{{currentTag}}", "g"), version);
 }

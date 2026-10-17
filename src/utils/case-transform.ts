@@ -10,7 +10,7 @@
  * @returns
  */
 export function toCamelCase(value: string): string {
-	return value.replace(/-([a-z])/g, (_match, char: string) => char.toUpperCase());
+	return value.replaceAll(/-([a-z])/g, (_match, char: string) => char.toUpperCase());
 }
 
 /**
@@ -25,5 +25,5 @@ export function toCamelCase(value: string): string {
  * @returns
  */
 export function toKebabCase(value: string): string {
-	return value.replace(/[A-Z]/g, (char) => `-${char.toLowerCase()}`);
+	return value.replaceAll(/[A-Z]/g, (char) => `-${char.toLowerCase()}`);
 }

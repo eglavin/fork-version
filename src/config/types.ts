@@ -1,6 +1,6 @@
+import type { WriterOptions } from "../changelog-writer/options";
 import type { ParserOptions } from "../commit-parser/options";
 import type { IFileManager } from "../services/file-manager";
-import type { WriterOptions } from "../changelog-writer/options";
 
 export interface CommitType {
 	/**

@@ -1,5 +1,5 @@
-import { setupTest } from "../../../tests/setup-tests";
 import { IS_E2E } from "../../../tests/options";
+import { setupTest } from "../../../tests/setup-tests";
 import { CommitParser } from "../../commit-parser/commit-parser";
 import { Git } from "../git";
 

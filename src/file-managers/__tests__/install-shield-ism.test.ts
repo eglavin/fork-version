@@ -92,7 +92,7 @@ describe("files install-shield-ism", () => {
 		expect(file?.version).toBe("4.5.6");
 	});
 
-	it("should match supported files correctly", async () => {
+	it("should match supported files correctly", () => {
 		const fileManager = new InstallShieldISM();
 
 		expect(fileManager.isSupportedFile("setup.ism")).toBe(true);

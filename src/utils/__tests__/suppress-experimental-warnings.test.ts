@@ -8,22 +8,25 @@ describe("suppress-experimental-warnings", () => {
 	});
 
 	it("should drop an ExperimentalWarning", () => {
-		const emitWarning = vi.fn();
-		process.emitWarning = emitWarning;
+		const emitWarningMock = vi.fn<typeof process.emitWarning>();
+		process.emitWarning = emitWarningMock as typeof process.emitWarning;
 
 		suppressExperimentalWarnings();
 		process.emitWarning("glob is an experimental feature", "ExperimentalWarning");
 
-		expect(emitWarning).not.toHaveBeenCalled();
+		expect(emitWarningMock).not.toHaveBeenCalled();
 	});
 
 	it("should let other warnings through unchanged", () => {
-		const emitWarning = vi.fn();
-		process.emitWarning = emitWarning;
+		const emitWarningMock = vi.fn<typeof process.emitWarning>();
+		process.emitWarning = emitWarningMock as typeof process.emitWarning;
 
 		suppressExperimentalWarnings();
 		process.emitWarning("a genuine deprecation notice", "DeprecationWarning");
 
-		expect(emitWarning).toHaveBeenCalledWith("a genuine deprecation notice", "DeprecationWarning");
+		expect(emitWarningMock).toHaveBeenCalledWith(
+			"a genuine deprecation notice",
+			"DeprecationWarning",
+		);
 	});
 });

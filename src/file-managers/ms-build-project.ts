@@ -1,5 +1,7 @@
 import { readFile, writeFile } from "node:fs/promises";
 
+import type { Document, Element } from "domhandler";
+
 import {
 	MissingPropertyException,
 	type FileState,
@@ -17,7 +19,6 @@ import {
 	textOf,
 	type MarkupEdit,
 } from "../utils/xml-document";
-import type { Document, Element } from "domhandler";
 
 /**
  * A ms-build file is an xml file with a version property under the Project > PropertyGroup node.
@@ -70,7 +71,7 @@ export class MSBuildProject implements IFileManager {
 		if (version) {
 			return {
 				path: filePath,
-				version: version,
+				version,
 			};
 		}
 

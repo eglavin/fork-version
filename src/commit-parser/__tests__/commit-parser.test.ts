@@ -1,4 +1,5 @@
 import type { MockInstance } from "vitest";
+
 import { setupTest } from "../../../tests/setup-tests";
 import { Git } from "../../services/git";
 import { Logger } from "../../services/logger";
@@ -20,7 +21,7 @@ function createCommit(
 	_name = name,
 	_email = email,
 ): string {
-	return [subject, "\n" + body, _hash, _refNames, _date, _name, _email].join("\n");
+	return [subject, `\n${body}`, _hash, _refNames, _date, _name, _email].join("\n");
 }
 
 describe("commit-parser", () => {

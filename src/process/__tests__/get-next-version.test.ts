@@ -1,12 +1,12 @@
 import { setupTest } from "../../../tests/setup-tests";
-import { getNextVersion } from "../get-next-version";
 import type { Commit } from "../../commit-parser/types";
+import { getNextVersion } from "../get-next-version";
 
 describe("getNextVersion", () => {
 	it("should recommend a patch bump when no commits found", async () => {
 		const { config, logger } = await setupTest("version getNextVersion");
 
-		const result = await getNextVersion(config, logger, [], "1.2.3");
+		const result = getNextVersion(config, logger, [], "1.2.3");
 		expect(result).toStrictEqual({
 			version: "1.2.4",
 			releaseType: "patch",
@@ -30,7 +30,7 @@ describe("getNextVersion", () => {
 			notes: [],
 		} as unknown as Commit;
 
-		const result = await getNextVersion(config, logger, [commit], "1.2.3");
+		const result = getNextVersion(config, logger, [commit], "1.2.3");
 		expect(result).toStrictEqual({
 			version: "1.2.4",
 			releaseType: "patch",
@@ -54,7 +54,7 @@ describe("getNextVersion", () => {
 			notes: [],
 		} as unknown as Commit;
 
-		const result = await getNextVersion(config, logger, [commit], "1.2.3");
+		const result = getNextVersion(config, logger, [commit], "1.2.3");
 		expect(result).toStrictEqual({
 			version: "1.3.0",
 			releaseType: "minor",
@@ -78,7 +78,7 @@ describe("getNextVersion", () => {
 			notes: [],
 		} as unknown as Commit;
 
-		const result = await getNextVersion(config, logger, [commit], "1.2.3");
+		const result = getNextVersion(config, logger, [commit], "1.2.3");
 		expect(result).toStrictEqual({
 			version: "2.0.0",
 			releaseType: "major",
@@ -107,7 +107,7 @@ describe("getNextVersion", () => {
 			],
 		} as unknown as Commit;
 
-		const result = await getNextVersion(config, logger, [commit], "1.2.3");
+		const result = getNextVersion(config, logger, [commit], "1.2.3");
 		expect(result).toStrictEqual({
 			version: "2.0.0",
 			releaseType: "major",
@@ -131,7 +131,7 @@ describe("getNextVersion", () => {
 			notes: [],
 		} as unknown as Commit;
 
-		const result = await getNextVersion(config, logger, [commit], "0.1.0");
+		const result = getNextVersion(config, logger, [commit], "0.1.0");
 		expect(result).toStrictEqual({
 			version: "0.1.1",
 			releaseType: "patch",
@@ -155,7 +155,7 @@ describe("getNextVersion", () => {
 			notes: [],
 		} as unknown as Commit;
 
-		const result = await getNextVersion(config, logger, [commit], "0.1.0");
+		const result = getNextVersion(config, logger, [commit], "0.1.0");
 		expect(result).toStrictEqual({
 			version: "0.2.0",
 			releaseType: "minor",
@@ -184,7 +184,7 @@ describe("getNextVersion", () => {
 			],
 		} as unknown as Commit;
 
-		const result = await getNextVersion(config, logger, [commit], "0.1.0");
+		const result = getNextVersion(config, logger, [commit], "0.1.0");
 		expect(result).toStrictEqual({
 			version: "0.2.0",
 			releaseType: "minor",
@@ -203,7 +203,7 @@ describe("getNextVersion", () => {
 		const { config, logger } = await setupTest("version getNextVersion");
 		config.releaseAs = "patch";
 
-		const result = await getNextVersion(config, logger, [], "1.2.3");
+		const result = getNextVersion(config, logger, [], "1.2.3");
 		expect(result).toStrictEqual({
 			version: "1.2.4",
 			releaseType: "patch",
@@ -222,7 +222,7 @@ describe("getNextVersion", () => {
 		const { config, logger } = await setupTest("version getNextVersion");
 		config.releaseAs = "minor";
 
-		const result = await getNextVersion(config, logger, [], "1.2.3");
+		const result = getNextVersion(config, logger, [], "1.2.3");
 		expect(result).toStrictEqual({
 			version: "1.3.0",
 			releaseType: "minor",
@@ -241,7 +241,7 @@ describe("getNextVersion", () => {
 		const { config, logger } = await setupTest("version getNextVersion");
 		config.releaseAs = "major";
 
-		const result = await getNextVersion(config, logger, [], "1.2.3");
+		const result = getNextVersion(config, logger, [], "1.2.3");
 		expect(result).toStrictEqual({
 			version: "2.0.0",
 			releaseType: "major",
@@ -261,7 +261,7 @@ describe("getNextVersion", () => {
 		config.releaseAs = "major";
 		config.preRelease = "alpha";
 
-		const result = await getNextVersion(config, logger, [], "1.2.3");
+		const result = getNextVersion(config, logger, [], "1.2.3");
 		expect(result).toStrictEqual({
 			version: "2.0.0-alpha.0",
 			releaseType: "premajor",
@@ -275,7 +275,7 @@ describe("getNextVersion", () => {
 			},
 		});
 
-		const result2 = await getNextVersion(config, logger, [], "2.0.0-alpha.0");
+		const result2 = getNextVersion(config, logger, [], "2.0.0-alpha.0");
 		expect(result2).toStrictEqual({
 			version: "2.0.0-alpha.1",
 			releaseType: "prerelease",
@@ -293,7 +293,7 @@ describe("getNextVersion", () => {
 	it("should bump from a preRelease current version", async () => {
 		const { config, logger } = await setupTest("version getNextVersion");
 
-		expect(await getNextVersion(config, logger, [], "1.2.3-alpha.0")).toStrictEqual({
+		expect(getNextVersion(config, logger, [], "1.2.3-alpha.0")).toStrictEqual({
 			version: "1.2.3",
 			releaseType: "patch",
 			preMajor: false,
@@ -306,7 +306,7 @@ describe("getNextVersion", () => {
 			},
 		});
 
-		expect(await getNextVersion(config, logger, [], "1.2.3-0")).toStrictEqual({
+		expect(getNextVersion(config, logger, [], "1.2.3-0")).toStrictEqual({
 			version: "1.2.3",
 			releaseType: "patch",
 			preMajor: false,
@@ -324,7 +324,7 @@ describe("getNextVersion", () => {
 		const { config, logger } = await setupTest("version getNextVersion");
 		config.skipBump = true;
 
-		const result = await getNextVersion(config, logger, [], "1.2.3");
+		const result = getNextVersion(config, logger, [], "1.2.3");
 		expect(result).toStrictEqual({ version: "1.2.3" });
 	});
 
@@ -332,7 +332,7 @@ describe("getNextVersion", () => {
 		const { config, logger } = await setupTest("version getNextVersion");
 		config.nextVersion = "2.0.0";
 
-		const result = await getNextVersion(config, logger, [], "1.2.3");
+		const result = getNextVersion(config, logger, [], "1.2.3");
 		expect(result).toStrictEqual({ version: "2.0.0" });
 	});
 
@@ -340,17 +340,13 @@ describe("getNextVersion", () => {
 		const { config, logger } = await setupTest("version getNextVersion");
 		config.nextVersion = "invalid";
 
-		await expect(getNextVersion(config, logger, [], "1.2.3")).rejects.toThrow(
-			"Invalid Version: invalid",
-		);
+		expect(() => getNextVersion(config, logger, [], "1.2.3")).toThrow("Invalid Version: invalid");
 	});
 
 	it("should handle an invalid current version", async () => {
 		const { config, logger } = await setupTest("version getNextVersion");
 
-		await expect(getNextVersion(config, logger, [], "invalid")).rejects.toThrow(
-			"Invalid Version: invalid",
-		);
+		expect(() => getNextVersion(config, logger, [], "invalid")).toThrow("Invalid Version: invalid");
 	});
 
 	it("should handle capitalized feat commit types", async () => {
@@ -362,7 +358,7 @@ describe("getNextVersion", () => {
 			notes: [],
 		} as unknown as Commit;
 
-		const result = await getNextVersion(config, logger, [commit], "1.2.3");
+		const result = getNextVersion(config, logger, [commit], "1.2.3");
 		expect(result).toStrictEqual({
 			version: "1.3.0",
 			releaseType: "minor",
@@ -400,8 +396,7 @@ describe("getNextVersion", () => {
 			},
 		} as unknown as Commit;
 
-		const result = await getNextVersion(config, logger, [mergeCommit, revertCommit], "1.2.3");
-
+		const result = getNextVersion(config, logger, [mergeCommit, revertCommit], "1.2.3");
 		expect(result).toStrictEqual({
 			version: "1.2.4",
 			releaseType: "patch",

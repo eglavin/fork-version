@@ -1,7 +1,9 @@
 import { execFile } from "node:child_process";
+
 import semver from "semver";
-import { cleanTag } from "../utils/clean-tag";
+
 import type { ForkConfig } from "../config/types";
+import { cleanTag } from "../utils/clean-tag";
 
 interface GitConfig {
 	path: ForkConfig["path"];
@@ -28,7 +30,7 @@ export class Git {
 	}
 
 	async #execGit(command: string, args: string[]): Promise<string> {
-		return new Promise((onResolve, onReject) => {
+		return await new Promise((onResolve, onReject) => {
 			execFile(
 				"git",
 				[command, ...args],
@@ -62,7 +64,7 @@ export class Git {
 			return "";
 		}
 
-		return this.#execGit("add", args.filter(Boolean) as string[]);
+		return await this.#execGit("add", args.filter(Boolean) as string[]);
 	}
 
 	/**
@@ -80,7 +82,7 @@ export class Git {
 			return "";
 		}
 
-		return this.#execGit("commit", args.filter(Boolean) as string[]);
+		return await this.#execGit("commit", args.filter(Boolean) as string[]);
 	}
 
 	/**
@@ -98,7 +100,7 @@ export class Git {
 			return "";
 		}
 
-		return this.#execGit("tag", args.filter(Boolean) as string[]);
+		return await this.#execGit("tag", args.filter(Boolean) as string[]);
 	}
 
 	/**
@@ -135,7 +137,7 @@ export class Git {
 			await this.#execGit("check-ignore", ["--no-index", file]);
 
 			return true;
-		} catch (_error) {
+		} catch {
 			return false;
 		}
 	}
@@ -175,7 +177,7 @@ export class Git {
 			const remoteUrl = await this.#execGit("config", ["--get", "remote.origin.url"]);
 
 			return remoteUrl.trim();
-		} catch (_error) {
+		} catch {
 			return "";
 		}
 	}
@@ -341,7 +343,7 @@ export class Git {
 			splitCommits.shift();
 		}
 
-		if (splitCommits[splitCommits.length - 1] === "") {
+		if (splitCommits.at(-1) === "") {
 			splitCommits.pop();
 		}
 

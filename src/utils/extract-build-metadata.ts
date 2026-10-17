@@ -37,7 +37,7 @@ export function extractBuildMetadata(version: string): BuildMetadata {
 	}
 
 	return {
-		version: version.substring(0, plusIndex),
-		buildMetadata: version.substring(plusIndex + 1) || undefined,
+		version: version.slice(0, plusIndex),
+		buildMetadata: version.slice(plusIndex + 1) || undefined,
 	};
 }

@@ -12,7 +12,7 @@ The `6.0.0` release replaces the `conventional-changelog` based changelog genera
   - The list of commit types shown in the changelog.
 - **`changelogWriterOptions`**
   - The commit/compare/issue/user URL formats. This replaces
-  `changelogPresetConfig`, now containing only the URL formats.
+    `changelogPresetConfig`, now containing only the URL formats.
 
 `releaseCommitMessageFormat` and `issuePrefixes` have also moved out, onto the top-level config and `commitParserOptions` respectively (see below).
 
@@ -91,7 +91,7 @@ export default defineConfig({
 
 Previously, `changelogAll` (reveal hidden commit types under an "Other Changes" section) only ever affected the built-in default `types` list, if you supplied your own `types` array, `changelogAll` had no effect on it.
 
-Now that `types` is resolved the same way as every other config option, `changelogAll` applies uniformly: any `hidden: true` entry in *your* `types` list will also be revealed under "Other Changes" when `changelogAll` is set.
+Now that `types` is resolved the same way as every other config option, `changelogAll` applies uniformly: any `hidden: true` entry in _your_ `types` list will also be revealed under "Other Changes" when `changelogAll` is set.
 
 > [!NOTE] If you rely on `changelogAll` having no effect on a custom `types` list, remove the `hidden: true` flags from it instead, or avoid setting `changelogAll`.
 

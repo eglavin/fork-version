@@ -1,4 +1,5 @@
 import Handlebars from "handlebars";
+
 import type { CommitGroup, NoteGroup } from "./types";
 
 export interface ChangelogTemplateContext {

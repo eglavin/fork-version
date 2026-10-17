@@ -1,9 +1,9 @@
 import { CommitParser } from "../../commit-parser/commit-parser";
-import { ChangelogWriter } from "../changelog-writer";
 import type { Commit, CommitReference } from "../../commit-parser/types";
-import type { RenderableCommit, RenderableNote } from "../types";
 import type { CommitType } from "../../config/types";
+import { ChangelogWriter } from "../changelog-writer";
 import type { WriterOptions } from "../options";
+import type { RenderableCommit, RenderableNote } from "../types";
 
 const hash = "4ef2c86d393a9660aa9f753144256b1f200c16bd";
 const date = "2024-12-22T17:36:50Z";
@@ -473,7 +473,7 @@ describe("changelog-writer", () => {
 				renderableCommit({ groupTitle: "Features", scope: "a", displaySubject: "first" }),
 			]);
 
-			expect(groups[0].commits.map((commit) => commit.scope)).toStrictEqual(["a", "b"]);
+			expect(groups[0].commits.map((c) => c.scope)).toStrictEqual(["a", "b"]);
 		});
 
 		it("sorts by scope first even when the concatenation of scope and subject would collide", () => {
@@ -485,7 +485,7 @@ describe("changelog-writer", () => {
 
 			// Concatenated, both commits produce "abx", sorting on the concatenation would leave
 			// them in input order instead of ordering by `scope` first.
-			expect(groups[0].commits.map((commit) => commit.scope)).toStrictEqual(["a", "ab"]);
+			expect(groups[0].commits.map((c) => c.scope)).toStrictEqual(["a", "ab"]);
 		});
 	});
 
@@ -567,7 +567,7 @@ describe("changelog-writer", () => {
 				date: "2024-01-01",
 			});
 
-			expect(output).toContain(`* add new feature ${hash.substring(0, 7)}`);
+			expect(output).toContain(`* add new feature ${hash.slice(0, 7)}`);
 			expect(output).not.toContain("{{host}}");
 		});
 
@@ -601,11 +601,11 @@ describe("changelog-writer", () => {
 
 			expect(output).toContain("### Features");
 			expect(output).toContain(
-				`* **scope:** add new feature ([${hash.substring(0, 7)}](https://example.com/owner/repo/commit/${hash})), closes [#123](https://example.com/owner/repo/issues/123)`,
+				`* **scope:** add new feature ([${hash.slice(0, 7)}](https://example.com/owner/repo/commit/${hash})), closes [#123](https://example.com/owner/repo/issues/123)`,
 			);
 			expect(output).toContain("### Bug Fixes");
 			expect(output).toContain(
-				`* a bug fix ([${hash.substring(0, 7)}](https://example.com/owner/repo/commit/${hash})), closes [#124](https://example.com/owner/repo/issues/124)`,
+				`* a bug fix ([${hash.slice(0, 7)}](https://example.com/owner/repo/commit/${hash})), closes [#124](https://example.com/owner/repo/issues/124)`,
 			);
 			// Features should be listed before Bug Fixes, matching the order in `types`.
 			expect(output.indexOf("### Features")).toBeLessThan(output.indexOf("### Bug Fixes"));

@@ -133,7 +133,7 @@ describe("files ms-build-project", () => {
 		);
 	});
 
-	it("should match known ms-build project file extensions", async () => {
+	it("should match known ms-build project file extensions", () => {
 		const fileManager = new MSBuildProject();
 
 		// Supported
@@ -396,20 +396,18 @@ describe("files ms-build-project", () => {
 		const { create, relativeTo } = await setupTest("files ms-build-project");
 		const fileManager = new MSBuildProject();
 
-		const original =
-			"﻿" +
-			[
-				`<?xml version="1.0" encoding="utf-8"?>`,
-				`<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">`,
-				`\t<ItemGroup Label="ProjectConfigurations">`,
-				`\t\t<ProjectConfiguration Include="Debug|Win32" />`,
-				"\t</ItemGroup>",
-				"\t<PropertyGroup>",
-				"\t\t<Version>1.2.3</Version>",
-				"\t</PropertyGroup>",
-				"</Project>",
-				"",
-			].join("\r\n");
+		const original = `﻿${[
+			`<?xml version="1.0" encoding="utf-8"?>`,
+			`<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">`,
+			`\t<ItemGroup Label="ProjectConfigurations">`,
+			`\t\t<ProjectConfiguration Include="Debug|Win32" />`,
+			"\t</ItemGroup>",
+			"\t<PropertyGroup>",
+			"\t\t<Version>1.2.3</Version>",
+			"\t</PropertyGroup>",
+			"</Project>",
+			"",
+		].join("\r\n")}`;
 		create.file(original, "API.vcxproj");
 
 		const file = await fileManager.read(relativeTo("API.vcxproj"));

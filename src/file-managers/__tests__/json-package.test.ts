@@ -142,7 +142,7 @@ describe("files json-package", () => {
 		expect(content).toBe('{\n\t"version": "4.5.6"\n}');
 	});
 
-	it("should match json files", async () => {
+	it("should match json files", () => {
 		const fileManager = new JSONPackage();
 
 		// Supported

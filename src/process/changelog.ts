@@ -1,12 +1,12 @@
-import { resolve } from "node:path";
 import { writeFile, readFile } from "node:fs/promises";
+import { resolve } from "node:path";
 
 import { ChangelogWriter } from "../changelog-writer/changelog-writer";
-import { fileExists } from "../utils/file-state";
+import type { WriterOptions } from "../changelog-writer/options";
+import type { Commit } from "../commit-parser/types";
 import type { ForkConfig } from "../config/types";
 import type { Logger } from "../services/logger";
-import type { Commit } from "../commit-parser/types";
-import type { WriterOptions } from "../changelog-writer/options";
+import { fileExists } from "../utils/file-state";
 
 /**
  * Matches the following changelog header formats:
@@ -48,7 +48,7 @@ async function getExistingContent(
 	const frontmatter = frontmatterMatch ? `${frontmatterMatch[0].trimEnd()}\n\n` : "";
 
 	const oldContentStart = fileContents.search(RELEASE_PATTERN);
-	const oldContent = oldContentStart !== -1 ? fileContents.substring(oldContentStart) : "";
+	const oldContent = oldContentStart !== -1 ? fileContents.slice(oldContentStart) : "";
 
 	return {
 		frontmatter,

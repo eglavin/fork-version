@@ -35,7 +35,7 @@ export function extractPrerelease(version: string): VersionComponents {
 	}
 
 	return {
-		prefix: version.substring(0, hyphenIndex),
-		suffix: version.substring(hyphenIndex + 1) || undefined,
+		prefix: version.slice(0, hyphenIndex),
+		suffix: version.slice(hyphenIndex + 1) || undefined,
 	};
 }

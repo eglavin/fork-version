@@ -1,11 +1,10 @@
-import { Git } from "../services/git";
 import type { ForkConfig } from "../config/types";
-
+import { Git } from "../services/git";
+import { detectAzureDevopsOptions } from "./host-azure-devops";
+import { detectBitbucketOptions } from "./host-bitbucket";
+import { detectGenericGitHost } from "./host-generic";
 import { detectGitHubOptions } from "./host-github";
 import { detectGitlabOptions } from "./host-gitlab";
-import { detectBitbucketOptions } from "./host-bitbucket";
-import { detectAzureDevopsOptions } from "./host-azure-devops";
-import { detectGenericGitHost } from "./host-generic";
 
 export interface DetectedGitHost {
 	hostName: string;

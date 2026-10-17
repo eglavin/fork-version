@@ -45,7 +45,7 @@ describe("files plain-text", () => {
 		expect(newVersion).toBe("1.2.4");
 	});
 
-	it('should match "version.txt" file name', async () => {
+	it('should match "version.txt" file name', () => {
 		const fileManager = new PlainText();
 
 		// Supported

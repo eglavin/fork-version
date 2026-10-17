@@ -1,12 +1,13 @@
 import { readFile, writeFile } from "node:fs/promises";
 
+import type { Document, Element } from "domhandler";
+
 import {
 	MissingPropertyException,
 	type FileState,
 	type IFileManager,
 } from "../services/file-manager";
 import { applyEdits, findChildren, parseMarkup, replaceText, textOf } from "../utils/xml-document";
-import type { Document, Element } from "domhandler";
 
 /**
  * An InstallShield ISM file can be either XML or binary, only the XML format is supported
@@ -57,7 +58,7 @@ export class InstallShieldISM implements IFileManager {
 		if (version) {
 			return {
 				path: filePath,
-				version: version,
+				version,
 			};
 		}
 

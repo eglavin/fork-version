@@ -1,10 +1,10 @@
 import { CommitParser } from "../commit-parser/commit-parser";
 import { filterRevertedCommits } from "../commit-parser/filter-reverted-commits";
-import { cleanTag } from "../utils/clean-tag";
-import type { ForkConfig } from "../config/types";
-import type { Logger } from "../services/logger";
-import type { Git } from "../services/git";
 import type { Commit } from "../commit-parser/types";
+import type { ForkConfig } from "../config/types";
+import type { Git } from "../services/git";
+import type { Logger } from "../services/logger";
+import { cleanTag } from "../utils/clean-tag";
 
 export interface CommitsSinceTag {
 	tags: string[];

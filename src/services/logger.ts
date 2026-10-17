@@ -1,6 +1,5 @@
-/* oxlint-disable typescript/no-explicit-any */
-
 import { styleText } from "node:util";
+
 import type { ForkConfig } from "../config/types";
 
 interface LoggerConfig {
@@ -42,6 +41,7 @@ export class Logger {
 		}
 	}
 
+	// oxlint-disable-next-line typescript/no-explicit-any
 	debug(message: string, ...optionalParams: any[]) {
 		if (!this.#silent && this.#debug) {
 			console.debug(styleText("cyanBright", message));

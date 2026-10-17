@@ -78,5 +78,5 @@ export function createWriterOptions(
 		initialOptions.userUrlFormat = cliArguments.userUrlFormat;
 	}
 
-	return WriterOptionsSchema.passthrough().parse(initialOptions);
+	return WriterOptionsSchema.loose().parse(initialOptions);
 }

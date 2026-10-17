@@ -4,7 +4,6 @@ import { setupTest } from "../../../tests/setup-tests";
 import { Git } from "../../services/git";
 import { Logger } from "../../services/logger";
 import { CommitParser } from "../commit-parser";
-import { type Commit } from "../types";
 
 const hash = "4ef2c86d393a9660aa9f753144256b1f200c16bd";
 const refNames = " (HEAD -> main, origin/main, origin/HEAD)";
@@ -63,7 +62,7 @@ describe("commit-parser", () => {
 				mentions: [],
 				references: [],
 				tags: [],
-			} as Commit);
+			});
 			expect(parsedCommits[1]).toStrictEqual({
 				raw: "refactor: add test file",
 				subject: "refactor: add test file",
@@ -85,7 +84,7 @@ describe("commit-parser", () => {
 				mentions: [],
 				references: [],
 				tags: [],
-			} as Commit);
+			});
 			expect(parsedCommits[2]).toStrictEqual({
 				raw: "feat: initial commit\nBREAKING CHANGE: this is a breaking change",
 				subject: "feat: initial commit",
@@ -112,7 +111,7 @@ describe("commit-parser", () => {
 				mentions: [],
 				references: [],
 				tags: [],
-			} as Commit);
+			});
 		});
 
 		it("should parse with no name or email", () => {
@@ -141,7 +140,7 @@ describe("commit-parser", () => {
 				mentions: [],
 				references: [],
 				tags: [],
-			} as Commit);
+			});
 		});
 
 		it("should interface with getCommits method from the git class", async () => {
@@ -190,7 +189,7 @@ describe("commit-parser", () => {
 				mentions: [],
 				references: [],
 				tags: [],
-			} as Commit);
+			});
 			expect(parsedCommits[1]).toStrictEqual({
 				raw: "feat: initial commit\nBREAKING CHANGE: this is a breaking change",
 				subject: "feat: initial commit",
@@ -217,7 +216,7 @@ describe("commit-parser", () => {
 				mentions: [],
 				references: [],
 				tags: [],
-			} as Commit);
+			});
 		});
 
 		it("should parse type with capital letters", () => {
@@ -330,7 +329,7 @@ describe("commit-parser", () => {
 				mentions: [],
 				references: [],
 				tags: [],
-			} as Commit);
+			});
 		});
 
 		it("should parse type, scope and title", () => {
@@ -359,7 +358,7 @@ describe("commit-parser", () => {
 				mentions: [],
 				references: [],
 				tags: [],
-			} as Commit);
+			});
 		});
 
 		it("should parse type, bang and title", () => {
@@ -388,7 +387,7 @@ describe("commit-parser", () => {
 				mentions: [],
 				references: [],
 				tags: [],
-			} as Commit);
+			});
 		});
 
 		it("should parse type, scope, bang and title", () => {
@@ -417,7 +416,7 @@ describe("commit-parser", () => {
 				mentions: [],
 				references: [],
 				tags: [],
-			} as Commit);
+			});
 		});
 
 		it("should parse empty scope", () => {
@@ -446,7 +445,7 @@ describe("commit-parser", () => {
 				mentions: [],
 				references: [],
 				tags: [],
-			} as Commit);
+			});
 		});
 
 		it("should parse empty scope and bang", () => {
@@ -475,7 +474,7 @@ describe("commit-parser", () => {
 				mentions: [],
 				references: [],
 				tags: [],
-			} as Commit);
+			});
 		});
 	});
 
@@ -727,7 +726,7 @@ Content that will be kept
 				mentions: [],
 				references: [],
 				tags: [],
-			} as Commit);
+			});
 		});
 
 		it("should not parse commented out lines with custom pattern", () => {
@@ -767,7 +766,7 @@ Content that will be kept
 				mentions: [],
 				references: [],
 				tags: [],
-			} as Commit);
+			});
 		});
 
 		it("should parse commented out lines if commentPattern option is null", () => {

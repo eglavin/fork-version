@@ -80,7 +80,7 @@ describe("git", () => {
 		create.json({ version: "1.0.0" }, "package.json").add();
 		execGit.commits();
 
-		await expect(async () => await git.add("non-existing-file")).rejects.toThrowError(
+		await expect(async () => await git.add("non-existing-file")).rejects.toThrow(
 			"Command failed: git add non-existing-file\nfatal: pathspec 'non-existing-file' did not match any files",
 		);
 	});

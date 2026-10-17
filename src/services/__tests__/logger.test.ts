@@ -1,12 +1,12 @@
-import type { styleText } from "node:util";
+import type * as NodeUtil from "node:util";
 
 import type { MockInstance } from "vitest";
 
 import { Logger } from "../../services/logger";
 
-vi.mock("node:util", () => ({
-	...vi.importActual("node:util"),
-	styleText: vi.fn<typeof styleText>((_format, text) => text),
+vi.mock("node:util", async (importOriginal) => ({
+	...(await importOriginal<typeof NodeUtil>()),
+	styleText: vi.fn<typeof NodeUtil.styleText>((_format, text) => text),
 }));
 
 describe("logger", () => {

@@ -122,7 +122,7 @@ export class FileManager {
 		const fileNameLower = relativePath.toLocaleLowerCase();
 
 		if (!fileExists(filePath)) {
-			return;
+			return undefined;
 		}
 
 		for (const fileManager of this.#fileManagers) {
@@ -154,11 +154,12 @@ export class FileManager {
 					}
 				}
 
-				return;
+				return undefined;
 			}
 		}
 
 		this.#logger.error(`[File Manager] Unsupported file: ${relativePath}`);
+		return undefined;
 	}
 
 	/**

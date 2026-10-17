@@ -41,8 +41,7 @@ export class Logger {
 		}
 	}
 
-	// oxlint-disable-next-line typescript/no-explicit-any
-	debug(message: string, ...optionalParams: any[]) {
+	debug(message: string, ...optionalParams: unknown[]) {
 		if (!this.#silent && this.#debug) {
 			console.debug(styleText("cyanBright", message));
 			if (optionalParams.length > 0) {

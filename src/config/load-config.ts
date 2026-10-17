@@ -86,9 +86,7 @@ export async function loadConfigFile(cwd: string, compatWarnings: string[] = [])
 	const jiti = createJiti(import.meta.url);
 	const loaded = (await jiti.import(configFilePath)) as Record<string, unknown>;
 
-	const { config, warnings } = applyLegacyChangelogPresetConfig(
-		(loaded.default as Record<string, unknown>) || loaded,
-	);
+	const { config, warnings } = applyLegacyChangelogPresetConfig(loaded.default || loaded);
 	compatWarnings.push(...warnings);
 
 	const parsed = ForkConfigJSSchema.partial().safeParse(config);

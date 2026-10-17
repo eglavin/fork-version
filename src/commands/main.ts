@@ -22,7 +22,7 @@ export async function main(config: ForkConfig, logger: Logger, fileManager: File
 		config.files,
 		commits.latestTagVersion,
 	);
-	const next = await getNextVersion(config, logger, commits.commits, current.version);
+	const next = getNextVersion(config, logger, commits.commits, current.version);
 
 	logger.log("Updating files: ");
 	for (const outFile of current.files) {

@@ -163,12 +163,15 @@ export function createParserOptions(userOptions?: Partial<ParserOptions>): Parse
 			if (initialOptions[key] instanceof RegExp) {
 				// User has provided a RegExp, so we can directly assign it
 				if (userValue instanceof RegExp) {
+					// The write type of `initialOptions[key]` is the intersection of every option type, so the assertion is required.
+					// oxlint-disable-next-line typescript/no-unnecessary-type-assertion
 					(initialOptions[key] as RegExp) = userValue;
 				}
 				// User has provided a string that may represent a RegExp pattern
 				else if (typeof userValue === "string") {
 					const parsed = parseRegExpString(userValue);
 					if (parsed) {
+						// oxlint-disable-next-line typescript/no-unnecessary-type-assertion
 						(initialOptions[key] as RegExp) = parsed;
 					}
 				}

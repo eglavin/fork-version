@@ -121,12 +121,12 @@ export function deriveParseArgsOptions(): ParseArgsOptions {
  */
 export function normalizeBooleanFlagValues(argv: string[], options: ParseArgsOptions): string[] {
 	const booleanFlags = new Set(
-		Object.entries(options).reduce((acc, [name, opts]) => {
+		Object.entries(options).reduce<string[]>((acc, [name, opts]) => {
 			if (opts?.type === "boolean") {
 				acc.push(name);
 			}
 			return acc;
-		}, [] as string[]),
+		}, []),
 	);
 
 	const normalized: string[] = [];

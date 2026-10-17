@@ -213,7 +213,7 @@ export class ChangelogWriter {
 				commitUrl: this.resolveCommitUrl(commit.hash),
 				references: commit.references
 					.filter((reference) => !seenIssues.has(this.buildReferenceLabel(reference)))
-					.map(this.resolveReference),
+					.map((reference) => this.resolveReference(reference)),
 			});
 
 			for (const note of commitNotes) {

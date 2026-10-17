@@ -28,13 +28,13 @@ export async function getCommitsSinceTag(
 	}
 
 	const foundCommits = await git.getCommits(latestTag, "HEAD", ...(config.commitPath ?? []));
-	const commits = foundCommits.reduce((acc, commit) => {
+	const commits = foundCommits.reduce<Commit[]>((acc, commit) => {
 		const parsed = commitParser.parse(commit);
 		if (parsed) {
 			acc.push(parsed);
 		}
 		return acc;
-	}, [] as Commit[]);
+	}, []);
 	const filteredCommits = filterRevertedCommits(commits);
 
 	logger.debug(

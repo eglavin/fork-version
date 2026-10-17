@@ -37,6 +37,7 @@ export async function getUserConfig(
 	}
 
 	// Support deprecated `--inspect-version` flag. Will be removed in a future major release.
+	// oxlint-disable-next-line typescript/no-deprecated
 	if (mergedConfig.inspectVersion) {
 		command = "inspect-version";
 	}

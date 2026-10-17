@@ -25,11 +25,8 @@ async function runFork() {
 	const fileManager = new FileManager(config, logger);
 	const git = new Git(config);
 
-	switch (config.command) {
-		case "validate-config":
-		case "main": {
-			compatWarnings.forEach((warning) => logger.compatWarn(warning));
-		}
+	if (config.command === "validate-config" || config.command === "main") {
+		compatWarnings.forEach((warning) => logger.compatWarn(warning));
 	}
 
 	switch (config.command) {
@@ -77,7 +74,7 @@ async function runFork() {
 		}
 
 		default: {
-			logger.error(`Unknown command: ${config.command}`);
+			logger.error(`Unknown command: ${String(config.command)}`);
 			process.exit(2);
 		}
 	}

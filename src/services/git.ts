@@ -40,6 +40,8 @@ export class Git {
 				},
 				(error, stdout, stderr) => {
 					if (error) {
+						// `ExecFileException` is an `Error`, but its `Omit`-based type hides that from the checker.
+						// oxlint-disable-next-line typescript/prefer-promise-reject-errors
 						onReject(error);
 					} else {
 						onResolve(stdout ? stdout : stderr);
@@ -234,11 +236,7 @@ export class Git {
 		}
 
 		// If preRelease is true, include all pre-release tags that do not have a specific identifier (e.g., `1.2.3-0`)
-		if (preRelease === true) {
-			return prereleaseParts.length === 1;
-		}
-
-		return false;
+		return prereleaseParts.length === 1;
 	}
 
 	/**

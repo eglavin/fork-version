@@ -8,7 +8,6 @@ export default defineConfig({
 		restoreMocks: true,
 		coverage: {
 			include: ["src/**/*"],
-			all: true,
 			reporter: ["cobertura", "html", "text", "json-summary", "json"],
 			reportOnFailure: true,
 		},

@@ -304,6 +304,7 @@ describe("user-config", () => {
 					input: [],
 					flags: {
 						path: testFolder,
+						// oxlint-disable-next-line typescript/no-deprecated
 						releaseCommitMessageFormat: "release: {{currentTag}}",
 					},
 				},
@@ -325,6 +326,7 @@ describe("user-config", () => {
 					input: [],
 					flags: {
 						path: testFolder,
+						// oxlint-disable-next-line typescript/no-deprecated
 						releaseCommitMessageFormat: "old: {{currentTag}}",
 						releaseMessageFormat: "new: {{currentTag}}",
 					},

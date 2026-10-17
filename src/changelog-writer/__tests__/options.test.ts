@@ -2,7 +2,7 @@ import { createWriterOptions } from "../options";
 
 describe("changelog-writer options", () => {
 	it("should return the default config", () => {
-		const config = createWriterOptions({}, {} as never, undefined);
+		const config = createWriterOptions({}, {}, undefined);
 
 		expect(config).toStrictEqual({
 			commitUrlFormat: "{{host}}/{{owner}}/{{repository}}/commit/{{hash}}",
@@ -22,7 +22,7 @@ describe("changelog-writer options", () => {
 						"{{host}}/fork-version/branchCompare?baseVersion=GT{{previousTag}}&targetVersion=GT{{currentTag}}",
 				},
 			},
-			{} as never,
+			{},
 			undefined,
 		);
 
@@ -44,7 +44,7 @@ describe("changelog-writer options", () => {
 					"{{host}}/fork-version/branchCompare?baseVersion=GT{{previousTag}}&targetVersion=GT{{currentTag}}",
 				issueUrlFormat: "{{host}}/fork-version/issues/{{id}}",
 				userUrlFormat: "{{host}}/fork-version/user/{{user}}",
-			} as never,
+			},
 			undefined,
 		);
 
@@ -57,12 +57,16 @@ describe("changelog-writer options", () => {
 	});
 
 	it("should be able to detect the git host", () => {
-		const config = createWriterOptions({}, {} as never, {
-			commitUrlFormat:
-				"{{host}}/ORGANISATION/PROJECT/_git/REPOSITORY/branchCompare?baseVersion=GT{{previousTag}}&targetVersion=GT{{currentTag}}",
-			compareUrlFormat: "{{host}}/ORGANISATION/PROJECT/_git/REPOSITORY/commit/{{hash}}",
-			issueUrlFormat: "{{host}}/ORGANISATION/PROJECT/_workitems/edit/{{id}}",
-		});
+		const config = createWriterOptions(
+			{},
+			{},
+			{
+				commitUrlFormat:
+					"{{host}}/ORGANISATION/PROJECT/_git/REPOSITORY/branchCompare?baseVersion=GT{{previousTag}}&targetVersion=GT{{currentTag}}",
+				compareUrlFormat: "{{host}}/ORGANISATION/PROJECT/_git/REPOSITORY/commit/{{hash}}",
+				issueUrlFormat: "{{host}}/ORGANISATION/PROJECT/_workitems/edit/{{id}}",
+			},
+		);
 
 		expect(config.commitUrlFormat).toBe(
 			"{{host}}/ORGANISATION/PROJECT/_git/REPOSITORY/branchCompare?baseVersion=GT{{previousTag}}&targetVersion=GT{{currentTag}}",
@@ -83,7 +87,7 @@ describe("changelog-writer options", () => {
 			{
 				compareUrlFormat:
 					"{{host}}/fork-version/branchCompare?baseVersion=GT{{previousTag}}&targetVersion=GT{{currentTag}}",
-			} as never,
+			},
 			{
 				commitUrlFormat:
 					"{{host}}/ORGANISATION/PROJECT/_git/REPOSITORY/branchCompare?baseVersion=GT{{previousTag}}&targetVersion=GT{{currentTag}}",

@@ -3,6 +3,27 @@ import { defineConfig } from "vite-plus";
 const ignorePatterns = ["coverage/**/*", "dist/**/*", "node_modules/**/*"];
 
 export default defineConfig({
+	pack: {
+		entry: ["src/index.ts", "src/cli.ts"],
+		unbundle: true,
+		fixedExtension: false,
+		exports: true,
+		attw: {
+			profile: "esm-only",
+		},
+		publint: true,
+	},
+	test: {
+		include: ["src/**/*.test.*"],
+		exclude: ["src/**/*.snap"],
+		globals: true,
+		restoreMocks: true,
+		coverage: {
+			include: ["src/**/*"],
+			reporter: ["cobertura", "html", "text", "json-summary", "json"],
+			reportOnFailure: true,
+		},
+	},
 	fmt: {
 		endOfLine: "lf",
 		printWidth: 100,
@@ -99,26 +120,5 @@ export default defineConfig({
 				},
 			},
 		],
-	},
-	pack: {
-		entry: ["src/index.ts", "src/cli.ts"],
-		unbundle: true,
-		fixedExtension: false,
-		exports: true,
-		attw: {
-			profile: "esm-only",
-		},
-		publint: true,
-	},
-	test: {
-		include: ["src/**/*.test.*"],
-		exclude: ["src/**/*.snap"],
-		globals: true,
-		restoreMocks: true,
-		coverage: {
-			include: ["src/**/*"],
-			reporter: ["cobertura", "html", "text", "json-summary", "json"],
-			reportOnFailure: true,
-		},
 	},
 });

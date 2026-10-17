@@ -1,7 +1,7 @@
+import type { Logger } from "../services/logger";
+import { splitRepository } from "../utils/split-repository";
 import { createParserOptions, type ParserOptions } from "./options";
 import { ParserError } from "./parser-error";
-import { splitRepository } from "../utils/split-repository";
-import type { Logger } from "../services/logger";
 import type { Commit, CommitNote, CommitReference } from "./types";
 
 export class CommitParser {
@@ -133,7 +133,7 @@ export class CommitParser {
 			.trim();
 
 		const raw = parts.join("\n").trim();
-		if (raw) parsedCommit.raw += "\n" + raw;
+		if (raw) parsedCommit.raw += `\n${raw}`;
 
 		return parsedCommit;
 	}
@@ -409,10 +409,10 @@ export class CommitParser {
 			commit.references = references;
 		}
 		if (notes.length > 0) {
-			commit.notes = notes.map((note) => ({
-				...note,
-				text: note.text.trim(),
-			}));
+			for (const note of notes) {
+				note.text = note.text.trim();
+			}
+			commit.notes = notes;
 		}
 	}
 

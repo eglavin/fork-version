@@ -1,8 +1,9 @@
 {
-	"js/ts.tsdk.path": "./node_modules/typescript/lib",
+	"js/ts.experimental.useTsgo": true,
+	"js/ts.tsdk.path": "./node_modules/typescript",
 	"[javascript][typescript]": {
 		"editor.formatOnSave": true,
-		"editor.defaultFormatter": "esbenp.prettier-vscode"
+		"editor.defaultFormatter": "oxc.oxc-vscode"
 	},
 	"markdown.extension.toc.levels": "2..6"
 }

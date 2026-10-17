@@ -1,11 +1,11 @@
 import { styleText } from "node:util";
-import { getCommitsSinceTag } from "../process/get-commits";
-import { getCurrentVersion } from "../process/get-current-version";
 
 import type { ForkConfig } from "../config/types";
-import type { Logger } from "../services/logger";
+import { getCommitsSinceTag } from "../process/get-commits";
+import { getCurrentVersion } from "../process/get-current-version";
 import type { FileManager } from "../services/file-manager";
 import type { Git } from "../services/git";
+import type { Logger } from "../services/logger";
 
 export async function inspect(
 	config: ForkConfig,
@@ -62,7 +62,7 @@ export async function inspect(
 						)
 					: latestVersion,
 			);
-			return;
+			break;
 		}
 		case "inspect-tag": {
 			console.log(
@@ -76,7 +76,7 @@ export async function inspect(
 						)
 					: latestTag,
 			);
-			return;
+			break;
 		}
 		default: {
 			console.log(
@@ -94,7 +94,6 @@ Version: ${latestVersion}
 Tag: ${latestTag}
 `.trim(),
 			);
-			return;
 		}
 	}
 }

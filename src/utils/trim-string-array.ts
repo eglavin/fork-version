@@ -13,10 +13,10 @@ export function trimStringArray(
 	const items = [];
 
 	if (Array.isArray(array)) {
-		for (const item of array) {
-			const _item = item.trim();
-			if (_item) {
-				items.push(transformFn ? transformFn(_item) : _item);
+		for (let item of array) {
+			item = item.trim();
+			if (item) {
+				items.push(transformFn ? transformFn(item) : item);
 			}
 		}
 	}

@@ -1,10 +1,10 @@
 import { CommitParser } from "../commit-parser/commit-parser";
 import { filterRevertedCommits } from "../commit-parser/filter-reverted-commits";
-import { cleanTag } from "../utils/clean-tag";
-import type { ForkConfig } from "../config/types";
-import type { Logger } from "../services/logger";
-import type { Git } from "../services/git";
 import type { Commit } from "../commit-parser/types";
+import type { ForkConfig } from "../config/types";
+import type { Git } from "../services/git";
+import type { Logger } from "../services/logger";
+import { cleanTag } from "../utils/clean-tag";
 
 export interface CommitsSinceTag {
 	tags: string[];
@@ -28,13 +28,13 @@ export async function getCommitsSinceTag(
 	}
 
 	const foundCommits = await git.getCommits(latestTag, "HEAD", ...(config.commitPath ?? []));
-	const commits = foundCommits.reduce((acc, commit) => {
+	const commits = foundCommits.reduce<Commit[]>((acc, commit) => {
 		const parsed = commitParser.parse(commit);
 		if (parsed) {
 			acc.push(parsed);
 		}
 		return acc;
-	}, [] as Commit[]);
+	}, []);
 	const filteredCommits = filterRevertedCommits(commits);
 
 	logger.debug(

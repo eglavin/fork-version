@@ -1,10 +1,10 @@
-import { basename, dirname, join, parse } from "node:path";
 import { existsSync } from "node:fs";
 import { readFile } from "node:fs/promises";
+import { basename, dirname, join, parse } from "node:path";
 
+import { applyLegacyChangelogPresetConfig } from "./config-compatibility";
 import { CONFIG_FILE_NAMES, IGNORE_DIRS, PACKAGE_JSON_CONFIG_KEY } from "./constants";
 import { ForkConfigJSONSchema, ForkConfigJSSchema } from "./schema";
-import { applyLegacyChangelogPresetConfig } from "./config-compatibility";
 
 /**
  * Walks up from `cwd` looking for the first config file it finds.
@@ -86,9 +86,7 @@ export async function loadConfigFile(cwd: string, compatWarnings: string[] = [])
 	const jiti = createJiti(import.meta.url);
 	const loaded = (await jiti.import(configFilePath)) as Record<string, unknown>;
 
-	const { config, warnings } = applyLegacyChangelogPresetConfig(
-		(loaded.default as Record<string, unknown>) || loaded,
-	);
+	const { config, warnings } = applyLegacyChangelogPresetConfig(loaded.default || loaded);
 	compatWarnings.push(...warnings);
 
 	const parsed = ForkConfigJSSchema.partial().safeParse(config);

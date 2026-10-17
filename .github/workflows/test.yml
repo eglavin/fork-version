@@ -14,7 +14,7 @@ jobs:
     strategy:
       matrix:
         include:
-          - node: "22.12"
+          - node: "22.18"
             os: ubuntu-latest
           - node: 24
             os: windows-latest
@@ -26,20 +26,12 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v6
 
-      - name: Install PNPM
-        uses: pnpm/action-setup@v5
+      - name: Setup PNPM, Node.js and Install Dependencies
+        uses: pnpm/setup@v3
         with:
-          run_install: false
-
-      - name: Install Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: ${{ matrix.node }}
-          cache: 'pnpm'
-
-      - name: Install Dependencies
-        run: |
-          pnpm install --frozen-lockfile
+          runtime: node@${{ matrix.node }}
+          cache: true
+          require-lockfile: true
 
       - name: Run Typecheck
         run: |
@@ -49,6 +41,10 @@ jobs:
         run: |
           pnpm lint:check
 
+      - name: Run Format Check
+        run: |
+          pnpm format:check
+
       - name: Run Tests
         run: |
           git config --global user.name "GitHub Actions Bot"
@@ -56,5 +52,5 @@ jobs:
           pnpm test:ci
 
       - name: Report Coverage
-        if: matrix.node == '22.12' && matrix.os == 'ubuntu-latest' && github.event_name == 'pull_request' && always()
+        if: matrix.node == '22.18' && matrix.os == 'ubuntu-latest' && github.event_name == 'pull_request' && always()
         uses:  davelosert/vitest-coverage-report-action@v2

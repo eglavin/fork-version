@@ -1,7 +1,7 @@
 // @ts-nocheck
 
 import { readFile, writeFile } from "node:fs/promises";
-import { defineFileManager, MissingPropertyException, type FileState } from "fork-version";
+import { defineFileManager, MissingPropertyException } from "fork-version";
 
 export const customFileManager = defineFileManager({
 	read: async (filePath) => {

@@ -1,4 +1,5 @@
 import { ZodError } from "zod";
+
 import { setupTest } from "../../../tests/setup-tests";
 import { getUserConfig } from "../user-config";
 
@@ -303,6 +304,7 @@ describe("user-config", () => {
 					input: [],
 					flags: {
 						path: testFolder,
+						// oxlint-disable-next-line typescript/no-deprecated
 						releaseCommitMessageFormat: "release: {{currentTag}}",
 					},
 				},
@@ -324,6 +326,7 @@ describe("user-config", () => {
 					input: [],
 					flags: {
 						path: testFolder,
+						// oxlint-disable-next-line typescript/no-deprecated
 						releaseCommitMessageFormat: "old: {{currentTag}}",
 						releaseMessageFormat: "new: {{currentTag}}",
 					},

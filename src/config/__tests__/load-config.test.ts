@@ -1,7 +1,7 @@
 import { setupTest } from "../../../tests/setup-tests";
 import { loadConfigFile } from "../load-config";
 
-describe("load-config", async () => {
+describe("load-config", () => {
 	it("should return empty object if no config file found", async () => {
 		const { testFolder } = await setupTest("load-config");
 

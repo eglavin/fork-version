@@ -117,7 +117,7 @@ var contentVersion = '2.3.4'`,
 		);
 	});
 
-	it("should match bicep files", async () => {
+	it("should match bicep files", () => {
 		const fileManager = new ARMBicep();
 
 		// Supported

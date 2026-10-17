@@ -1,15 +1,14 @@
-import { defineFileManager } from "../define-file-manager";
 import type { IFileManager } from "../../services/file-manager";
+import { defineFileManager } from "../define-file-manager";
 
 describe("define-file-manager", () => {
 	it("should return the given file manager", () => {
 		const TEST_FILE_MANAGER: IFileManager = {
-			read: async (filePath) => {
-				return {
+			read: (filePath) =>
+				Promise.resolve({
 					path: filePath,
 					version: "1.2.3",
-				};
-			},
+				}),
 			write: async (_fileState, _newVersion) => {
 				// no-op
 			},

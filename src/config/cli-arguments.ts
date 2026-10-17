@@ -1,11 +1,11 @@
 import { parseArgs } from "node:util";
 
 import pkg from "../../package.json" with { type: "json" };
+import { toCamelCase } from "../utils/case-transform";
 import { helperText } from "./cli-help";
 import { deriveParseArgsOptions, normalizeBooleanFlagValues } from "./cli-schema";
 import { NON_FLAG_ARG_KEYS } from "./constants";
-import { toCamelCase } from "../utils/case-transform";
-import type { ForkVersionCLIArgs, ForkVersionCLIFlags } from "./types";
+import type { ForkVersionCLIArgs } from "./types";
 
 /**
  * Parses the given arguments (defaulting to `process.argv`) into `{ input, flags }` using
@@ -59,6 +59,6 @@ export function getCliArguments(argv: string[] = process.argv.slice(2)): ForkVer
 
 	return {
 		input: parsed.positionals,
-		flags: flags as ForkVersionCLIFlags,
+		flags,
 	};
 }

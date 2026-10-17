@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
+/* oxlint-disable typescript/no-non-null-assertion */
 
 import { CommitParser } from "../commit-parser";
 import { filterRevertedCommits } from "../filter-reverted-commits";

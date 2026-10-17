@@ -1,6 +1,5 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import { styleText } from "node:util";
+
 import type { ForkConfig } from "../config/types";
 
 interface LoggerConfig {
@@ -42,7 +41,7 @@ export class Logger {
 		}
 	}
 
-	debug(message: string, ...optionalParams: any[]) {
+	debug(message: string, ...optionalParams: unknown[]) {
 		if (!this.#silent && this.#debug) {
 			console.debug(styleText("cyanBright", message));
 			if (optionalParams.length > 0) {

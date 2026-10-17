@@ -8,10 +8,9 @@
 export function suppressExperimentalWarnings() {
 	const emitWarning = process.emitWarning.bind(process);
 
-	process.emitWarning = ((warning: string | Error, ...args: unknown[]) => {
+	process.emitWarning = (warning: string | Error, ...args: unknown[]) => {
 		const name = typeof warning === "object" ? warning.name : args[0];
 		if (name === "ExperimentalWarning") return;
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		(emitWarning as any)(warning, ...args);
-	}) as typeof process.emitWarning;
+		(emitWarning as (...args: unknown[]) => void)(warning, ...args);
+	};
 }

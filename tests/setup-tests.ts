@@ -1,11 +1,13 @@
-import { randomBytes } from "node:crypto";
-import { join } from "node:path";
-import { existsSync, mkdirSync, writeFileSync } from "node:fs";
+// oxlint-disable unicorn/consistent-function-scoping
+
 import { type ExecSyncOptionsWithBufferEncoding, execFile, execSync } from "node:child_process";
+import { randomBytes } from "node:crypto";
+import { existsSync, mkdirSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
 
 import { getUserConfig } from "../src/config/user-config";
-import { Logger } from "../src/services/logger";
 import { Git } from "../src/services/git";
+import { Logger } from "../src/services/logger";
 
 interface ISetupTestOptions {
 	/**
@@ -184,6 +186,7 @@ export async function setupTest(testName: string, options?: Partial<ISetupTestOp
 						},
 						(error, stdout, stderr) => {
 							if (error) {
+								// oxlint-disable-next-line typescript/prefer-promise-reject-errors
 								onReject(error);
 							} else {
 								onResolve(stdout ? stdout : stderr);

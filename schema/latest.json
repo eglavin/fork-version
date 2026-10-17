@@ -90,13 +90,9 @@
     },
     "preRelease": {
       "description": "Make a pre-release with an optional label if the given value is a string. Example: true, \"alpha\", \"beta\"",
-      "anyOf": [
-        {
-          "type": "string"
-        },
-        {
-          "type": "boolean"
-        }
+      "type": [
+        "string",
+        "boolean"
       ]
     },
     "currentVersion": {

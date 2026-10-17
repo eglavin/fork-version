@@ -1,15 +1,15 @@
-import { join, resolve } from "node:path";
 import { glob } from "node:fs/promises";
+import { join, resolve } from "node:path";
 
 import { createWriterOptions } from "../changelog-writer/options";
+import { detectGitHost } from "../detect-git-host/detect-git-host";
+import { suppressExperimentalWarnings } from "../utils/suppress-experimental-warnings";
 import { applyLegacyCliFlags } from "./config-compatibility";
 import { IGNORE_DIRS, INSPECT_COMMANDS } from "./constants";
 import { DEFAULT_CONFIG } from "./defaults";
-import { detectGitHost } from "../detect-git-host/detect-git-host";
 import { loadConfigFile } from "./load-config";
 import { mergeFiles } from "./merge-files";
 import { UserConfigSchema } from "./schema";
-import { suppressExperimentalWarnings } from "../utils/suppress-experimental-warnings";
 import type { ForkVersionCLIArgs, ForkConfig } from "./types";
 
 export async function getUserConfig(
@@ -37,6 +37,7 @@ export async function getUserConfig(
 	}
 
 	// Support deprecated `--inspect-version` flag. Will be removed in a future major release.
+	// oxlint-disable-next-line typescript/no-deprecated
 	if (mergedConfig.inspectVersion) {
 		command = "inspect-version";
 	}

@@ -1,7 +1,10 @@
-# https://pnpm.io/supply-chain-security
+allowBuilds:
+  esbuild: true
+
+# Supply chain security mitigations, see https://pnpm.io/supply-chain-security
 blockExoticSubdeps: true
 minimumReleaseAge: 4320
-trustPolicy: "no-downgrade"
+trustPolicy: no-downgrade
 
-onlyBuiltDependencies:
-  - esbuild
+# Always save exact versions when adding new dependencies.
+savePrefix: ""

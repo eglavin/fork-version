@@ -25,7 +25,7 @@ A json package is a json file which contains a version property, such as a npm `
 {
   "name": "my-project",
   "version": "1.2.3",
-  "private": false,
+  "private": false
 }
 ```
 
@@ -36,7 +36,7 @@ A yaml package is a yaml file which contains a version property, such as a dart 
 ```yaml
 name: wordionary
 description: "My project"
-publish_to: 'none'
+publish_to: "none"
 version: 1.2.3
 ```
 
@@ -90,7 +90,7 @@ An Install Shield `*.ism` file can be either binary or an xml file. Fork-Version
 
 ## Custom File Updater's
 
-***Released in version 5.1.0***
+_**Released in version 5.1.0**_
 
 If you have a file type that isn't supported by one of the built-in file managers, you can create a custom file manager to read and write the updated version to that file.
 
@@ -115,7 +115,13 @@ Example Custom File Manager implementation:
 ```ts
 // fork.config.ts
 import { readFile, writeFile } from "node:fs/promises";
-import { defineConfig, MissingPropertyException, type FileState, type IFileManager } from "fork-version";
+
+import {
+  defineConfig,
+  MissingPropertyException,
+  type FileState,
+  type IFileManager,
+} from "fork-version";
 
 class CustomFileManager implements IFileManager {
   async read(filePath: string): Promise<FileState | undefined> {

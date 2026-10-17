@@ -72,10 +72,7 @@ If you still want intellisense information you can use the following schema in y
 {
   "$schema": "https://raw.githubusercontent.com/eglavin/fork-version/main/schema/latest.json",
   "header": "# My Changelog",
-  "files": [
-    "package.json",
-    "package-lock.json"
-  ]
+  "files": ["package.json", "package-lock.json"]
 }
 ```
 
@@ -90,10 +87,7 @@ Alternatively you can define your config using a key in your `package.json` file
   "version": "1.2.3",
   "fork-version": {
     "header": "# My Changelog",
-    "files": [
-      "package.json",
-      "package-lock.json"
-    ]
+    "files": ["package.json", "package-lock.json"]
   }
 }
 ```
@@ -323,9 +317,9 @@ Otherwise it will fall back to a generic, best-effort host/owner/repository dete
 
 Controls the URL formats used to link commits, comparisons, issues, and user mentions in the generated changelog. See [config.types](#configtypes) to control which commit types show up in the changelog.
 
-| Property          | Type   | Default                                                                      | Description                                            |
-| :---------------- | :----- | :--------------------------------------------------------------------------- | :----------------------------------------------------- |
-| commitUrlFormat   | string | `{{host}}/{{owner}}/{{repository}}/commit/{{hash}}`                          | A URL representing a specific commit at a hash         |
-| compareUrlFormat  | string | `{{host}}/{{owner}}/{{repository}}/compare/{{previousTag}}...{{currentTag}}` | A URL representing the comparison between two git SHAs |
-| issueUrlFormat    | string | `{{host}}/{{owner}}/{{repository}}/issues/{{id}}`                            | A URL representing the issue format                    |
-| userUrlFormat     | string | `{{host}}/{{user}}`                                                          | A URL representing a user's profile                    |
+| Property         | Type   | Default                                                                      | Description                                            |
+| :--------------- | :----- | :--------------------------------------------------------------------------- | :----------------------------------------------------- |
+| commitUrlFormat  | string | `{{host}}/{{owner}}/{{repository}}/commit/{{hash}}`                          | A URL representing a specific commit at a hash         |
+| compareUrlFormat | string | `{{host}}/{{owner}}/{{repository}}/compare/{{previousTag}}...{{currentTag}}` | A URL representing the comparison between two git SHAs |
+| issueUrlFormat   | string | `{{host}}/{{owner}}/{{repository}}/issues/{{id}}`                            | A URL representing the issue format                    |
+| userUrlFormat    | string | `{{host}}/{{user}}`                                                          | A URL representing a user's profile                    |

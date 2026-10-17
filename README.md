@@ -96,13 +96,13 @@ For example if you use npm you can now use `npm run release` to run Fork-Version
 
 Fork-Version has a number of command modes which will make the program behave differently. The default "command" is the `main` mode, this mode will be used when no other command is defined.
 
-| Command             | Description                                                            |
-| ------------------- | ---------------------------------------------------------------------- |
-| `main`              | Bumps the version, update files, generate changelog, commits, and tag. |
-| `inspect`           | Print the current version and git tag, then exit.                      |
-| `inspect-version`   | Print the current version then exit.                                   |
-| `inspect-tag`       | Print the current git tag then exit.                                   |
-| `validate-config`   | Validates the configuration and exit.                                  |
+| Command           | Description                                                            |
+| ----------------- | ---------------------------------------------------------------------- |
+| `main`            | Bumps the version, update files, generate changelog, commits, and tag. |
+| `inspect`         | Print the current version and git tag, then exit.                      |
+| `inspect-version` | Print the current version then exit.                                   |
+| `inspect-tag`     | Print the current git tag then exit.                                   |
+| `validate-config` | Validates the configuration and exit.                                  |
 
 ### Exit Codes
 

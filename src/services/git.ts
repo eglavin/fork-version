@@ -1,7 +1,9 @@
 import { execFile } from "node:child_process";
+
 import semver from "semver";
-import { cleanTag } from "../utils/clean-tag";
+
 import type { ForkConfig } from "../config/types";
+import { cleanTag } from "../utils/clean-tag";
 
 interface GitConfig {
 	path: ForkConfig["path"];
@@ -28,7 +30,7 @@ export class Git {
 	}
 
 	async #execGit(command: string, args: string[]): Promise<string> {
-		return new Promise((onResolve, onReject) => {
+		return await new Promise((onResolve, onReject) => {
 			execFile(
 				"git",
 				[command, ...args],
@@ -38,6 +40,8 @@ export class Git {
 				},
 				(error, stdout, stderr) => {
 					if (error) {
+						// `ExecFileException` is an `Error`, but its `Omit`-based type hides that from the checker.
+						// oxlint-disable-next-line typescript/prefer-promise-reject-errors
 						onReject(error);
 					} else {
 						onResolve(stdout ? stdout : stderr);
@@ -62,7 +66,7 @@ export class Git {
 			return "";
 		}
 
-		return this.#execGit("add", args.filter(Boolean) as string[]);
+		return await this.#execGit("add", args.filter(Boolean) as string[]);
 	}
 
 	/**
@@ -80,7 +84,7 @@ export class Git {
 			return "";
 		}
 
-		return this.#execGit("commit", args.filter(Boolean) as string[]);
+		return await this.#execGit("commit", args.filter(Boolean) as string[]);
 	}
 
 	/**
@@ -98,7 +102,7 @@ export class Git {
 			return "";
 		}
 
-		return this.#execGit("tag", args.filter(Boolean) as string[]);
+		return await this.#execGit("tag", args.filter(Boolean) as string[]);
 	}
 
 	/**
@@ -135,7 +139,7 @@ export class Git {
 			await this.#execGit("check-ignore", ["--no-index", file]);
 
 			return true;
-		} catch (_error) {
+		} catch {
 			return false;
 		}
 	}
@@ -175,7 +179,7 @@ export class Git {
 			const remoteUrl = await this.#execGit("config", ["--get", "remote.origin.url"]);
 
 			return remoteUrl.trim();
-		} catch (_error) {
+		} catch {
 			return "";
 		}
 	}
@@ -232,11 +236,7 @@ export class Git {
 		}
 
 		// If preRelease is true, include all pre-release tags that do not have a specific identifier (e.g., `1.2.3-0`)
-		if (preRelease === true) {
-			return prereleaseParts.length === 1;
-		}
-
-		return false;
+		return prereleaseParts.length === 1;
 	}
 
 	/**
@@ -341,7 +341,7 @@ export class Git {
 			splitCommits.shift();
 		}
 
-		if (splitCommits[splitCommits.length - 1] === "") {
+		if (splitCommits.at(-1) === "") {
 			splitCommits.pop();
 		}
 

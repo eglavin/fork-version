@@ -1,5 +1,5 @@
-import { setupTest } from "../../../tests/setup-tests";
 import { IS_E2E } from "../../../tests/options";
+import { setupTest } from "../../../tests/setup-tests";
 import { CommitParser } from "../../commit-parser/commit-parser";
 import { Git } from "../git";
 
@@ -80,7 +80,7 @@ describe("git", () => {
 		create.json({ version: "1.0.0" }, "package.json").add();
 		execGit.commits();
 
-		await expect(async () => await git.add("non-existing-file")).rejects.toThrowError(
+		await expect(async () => await git.add("non-existing-file")).rejects.toThrow(
 			"Command failed: git add non-existing-file\nfatal: pathspec 'non-existing-file' did not match any files",
 		);
 	});

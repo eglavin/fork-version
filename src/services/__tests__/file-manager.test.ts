@@ -1,16 +1,16 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
+/* oxlint-disable typescript/no-non-null-assertion */
 
-import { readFile, writeFile } from "node:fs/promises";
 import { readFileSync } from "node:fs";
+import { readFile, writeFile } from "node:fs/promises";
 
 import { setupTest } from "../../../tests/setup-tests";
+import { defineFileManager } from "../../config/define-file-manager";
 import {
 	FileManager,
 	MissingPropertyException,
 	type FileState,
 	type IFileManager,
 } from "../../services/file-manager";
-import { defineFileManager } from "../../config/define-file-manager";
 
 describe("files file-manager", () => {
 	describe("json file", () => {
@@ -436,7 +436,7 @@ environment:
 				"1.2.3",
 			);
 
-			expect(() => readFileSync(relativeTo("package.json"))).toThrow();
+			expect(() => readFileSync(relativeTo("package.json"))).toThrow(Error);
 		});
 
 		it("should return early if file doesn't exist", async () => {

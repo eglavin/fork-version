@@ -18,21 +18,12 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v6
 
-      - name: Install PNPM
-        uses: pnpm/action-setup@v5
-        with:
-          run_install: false
-
-      - name: Install Node.js
-        uses: actions/setup-node@v6
+      - name: Setup PNPM, Node.js and Install Dependencies
+        uses: pnpm/setup@v3
         with:
           node-version-file: .node-version
-          registry-url: "https://registry.npmjs.org"
-          cache: 'pnpm'
-
-      - name: Install Dependencies
-        run: |
-          pnpm install --frozen-lockfile
+          cache: true
+          require-lockfile: true
 
       - name: Build
         run: |

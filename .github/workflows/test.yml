@@ -26,20 +26,12 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v6
 
-      - name: Install PNPM
-        uses: pnpm/action-setup@v5
+      - name: Setup PNPM, Node.js and Install Dependencies
+        uses: pnpm/setup@v3
         with:
-          run_install: false
-
-      - name: Install Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: ${{ matrix.node }}
-          cache: 'pnpm'
-
-      - name: Install Dependencies
-        run: |
-          pnpm install --frozen-lockfile
+          runtime: node@${{ matrix.node }}
+          cache: true
+          require-lockfile: true
 
       - name: Run Typecheck
         run: |

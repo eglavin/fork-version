@@ -1,6 +1,6 @@
 import type * as NodeUtil from "node:util";
 
-import type { MockInstance } from "vitest";
+import type { MockInstance } from "vite-plus/test";
 
 import { Logger } from "../../services/logger";
 

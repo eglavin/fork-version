@@ -50,19 +50,18 @@
   ],
   "scripts": {
     "fork-version": "node dist/cli.js",
-    "dev": "tsdown --watch",
-    "build": "tsdown",
+    "dev": "vp pack --watch",
+    "build": "vp pack",
     "update-json-schema": "node scripts/update-json-schema.ts",
-    "lint": "oxlint --fix src",
-    "lint:check": "oxlint src",
-    "format": "oxfmt src",
-    "format:check": "oxfmt --check src",
+    "lint": "vp lint --fix src",
+    "lint:check": "vp lint src",
+    "format": "vp fmt src",
+    "format:check": "vp fmt --check src",
     "typecheck": "tsc --noEmit",
-    "check": "tsc --noEmit && oxlint src && oxfmt --check src",
-    "test": "vitest",
-    "test:cover": "vitest --coverage",
-    "test:ci": "vitest run --coverage --no-file-parallelism",
-    "test:ui": "vitest --ui",
+    "check": "vp check src",
+    "test": "vp test",
+    "test:cover": "vp test --coverage",
+    "test:ci": "vp test run --coverage --no-file-parallelism",
     "test:cleanup": "rimraf -g ../fork-version.tests/*"
   },
   "dependencies": {
@@ -79,15 +78,11 @@
     "@arethetypeswrong/core": "0.18.5",
     "@types/node": "24.11.0",
     "@types/semver": "7.8.0",
-    "@vitest/coverage-v8": "5.0.4",
-    "@vitest/ui": "5.0.4",
-    "oxfmt": "0.73.0",
-    "oxlint": "1.88.0",
-    "oxlint-tsgolint": "7.0.2004",
+    "@vitest/coverage-v8": "catalog:",
     "publint": "0.3.25",
     "rimraf": "6.1.3",
-    "tsdown": "0.23.1",
     "typescript": "7.0.2",
-    "vitest": "5.0.4"
+    "vite-plus": "catalog:",
+    "vitest": "catalog:"
   }
 }

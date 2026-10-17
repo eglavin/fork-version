@@ -1,9 +1,21 @@
 {
-	"js/ts.experimental.useTsgo": true,
-	"js/ts.tsdk.path": "./node_modules/typescript",
-	"[javascript][typescript]": {
-		"editor.formatOnSave": true,
-		"editor.defaultFormatter": "oxc.oxc-vscode"
-	},
-	"markdown.extension.toc.levels": "2..6"
+  "editor.codeActionsOnSave": {
+    "source.fixAll.oxc": "explicit"
+  },
+  "editor.defaultFormatter": "oxc.oxc-vscode",
+  "js/ts.experimental.useTsgo": true,
+  "js/ts.tsdk.path": "./node_modules/typescript",
+  "markdown.extension.toc.levels": "2..6",
+  "oxc.disableNestedConfig": true,
+  "oxc.fmt.disableNestedConfig": true,
+  "[javascript][typescript]": {
+    "editor.formatOnSave": true,
+    "editor.formatOnSaveMode": "file",
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode"
+  }
 }

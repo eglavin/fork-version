@@ -1,4 +1,5 @@
-**/.temp
-**/coverage
-**/dist
-**/node_modules
+.temp/
+.vitest/
+coverage/
+dist/
+node_modules/

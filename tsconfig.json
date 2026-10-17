@@ -23,13 +23,10 @@
 		"types": ["node", "vitest/globals"]
 	},
 	"include": [
-		"oxfmt.config.ts",
-		"oxlint.config.ts",
 		"scripts",
 		"src",
 		"tests",
-		"tsdown.config.ts",
-		"vitest.config.ts"
+		"vite.config.ts"
 	],
 	"exclude": [
 		"example"

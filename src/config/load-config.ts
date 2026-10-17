@@ -84,7 +84,7 @@ export async function loadConfigFile(cwd: string, compatWarnings: string[] = [])
 	// Otherwise expect config file to be a javascript or typescript file.
 	const { createJiti } = await import("jiti");
 	const jiti = createJiti(import.meta.url);
-	const loaded = (await jiti.import(configFilePath)) as Record<string, unknown>;
+	const loaded = await jiti.import<Record<string, unknown>>(configFilePath);
 
 	const { config, warnings } = applyLegacyChangelogPresetConfig(loaded.default || loaded);
 	compatWarnings.push(...warnings);

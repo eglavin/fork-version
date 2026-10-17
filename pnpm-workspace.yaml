@@ -8,3 +8,22 @@ trustPolicy: no-downgrade
 
 # Always save exact versions when adding new dependencies.
 savePrefix: ""
+
+# Vite+ bundles its own Vite and Vitest, keep every package on those versions.
+catalog:
+  vite: npm:@voidzero-dev/vite-plus-core@1.2.0
+  vitest: 5.0.4
+  vite-plus: 1.2.0
+  "@vitest/coverage-v8": 5.0.4
+
+overrides:
+  vite@*: "catalog:"
+  vitest@*: "catalog:"
+
+peerDependencyRules:
+  allowAny:
+    - vite
+    - vitest
+  allowedVersions:
+    vite: "*"
+    vitest: "*"

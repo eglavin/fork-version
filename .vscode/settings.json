@@ -2,7 +2,7 @@
 	"js/ts.tsdk.path": "./node_modules/typescript/lib",
 	"[javascript][typescript]": {
 		"editor.formatOnSave": true,
-		"editor.defaultFormatter": "esbenp.prettier-vscode"
+		"editor.defaultFormatter": "oxc.oxc-vscode"
 	},
 	"markdown.extension.toc.levels": "2..6"
 }

@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
+/* oxlint-disable typescript/no-non-null-assertion */
 
 import { readFile, writeFile } from "node:fs/promises";
 import { readFileSync } from "node:fs";

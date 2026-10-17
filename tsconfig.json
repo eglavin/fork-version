@@ -23,6 +23,8 @@
 		"types": ["node", "vitest/globals"]
 	},
 	"include": [
+		"oxfmt.config.ts",
+		"oxlint.config.ts",
 		"scripts",
 		"src",
 		"tests",

@@ -49,6 +49,10 @@ jobs:
         run: |
           pnpm lint:check
 
+      - name: Run Format Check
+        run: |
+          pnpm format:check
+
       - name: Run Tests
         run: |
           git config --global user.name "GitHub Actions Bot"

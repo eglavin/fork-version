@@ -18,20 +18,19 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v6
 
-      - name: Setup PNPM, Node.js and Install Dependencies
-        uses: pnpm/setup@v3
+      - name: Setup Vite+, Node.js and Install Dependencies
+        uses: voidzero-dev/setup-vp@68f39c78aaf39be468cabd2afb09c162574c84af # v1.21.2
         with:
           node-version-file: .node-version
           cache: true
-          require-lockfile: true
 
       - name: Build
         run: |
-          pnpm build
+          vp run build
 
       - name: Publish NPM Package
         run: |
-          pnpm publish --no-git-checks
+          vp pm publish --no-git-checks
 
       - name: Publish JSR Package
         run: |

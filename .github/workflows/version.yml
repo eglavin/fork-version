@@ -14,6 +14,12 @@ on:
 # The default GITHUB_TOKEN isn't used, pushes are authenticated with the GitHub App token below.
 permissions: {}
 
+# Run one version bump at a time so quick successive pushes can't race to commit and tag. Queued
+# runs aren't cancelled, as cancelling mid-run could leave a commit or tag unpushed.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   version:
     name: Version
@@ -30,9 +36,10 @@ jobs:
 
       - name: Get GitHub App User ID
         id: get-user-id
-        run: echo "user-id=$(gh api "/users/${{ steps.app-token.outputs.app-slug }}[bot]" --jq .id)" >> "$GITHUB_OUTPUT"
+        run: echo "user-id=$(gh api "/users/${APP_SLUG}[bot]" --jq .id)" >> "$GITHUB_OUTPUT"
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          APP_SLUG: ${{ steps.app-token.outputs.app-slug }}
 
       - name: Checkout Repository
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
@@ -43,9 +50,12 @@ jobs:
           persist-credentials: true
 
       - name: Configure Git User
+        env:
+          APP_SLUG: ${{ steps.app-token.outputs.app-slug }}
+          APP_USER_ID: ${{ steps.get-user-id.outputs.user-id }}
         run: |
-          name="${{ steps.app-token.outputs.app-slug }}[bot]"
-          email="${{ steps.get-user-id.outputs.user-id }}+${{ steps.app-token.outputs.app-slug }}[bot]@users.noreply.github.com"
+          name="${APP_SLUG}[bot]"
+          email="${APP_USER_ID}+${APP_SLUG}[bot]@users.noreply.github.com"
 
           echo "Name: $name"
           echo "Email: $email"
@@ -75,4 +85,4 @@ jobs:
       - name: Update Summary
         run: |
           version=$(node ./dist/cli.js inspect-version)
-          echo "## Version bumped to $version" >> $GITHUB_STEP_SUMMARY
+          echo "## Version bumped to $version" >> "$GITHUB_STEP_SUMMARY"

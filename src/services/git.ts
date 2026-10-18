@@ -25,6 +25,7 @@ export class Git {
 		this.isIgnored = this.isIgnored.bind(this);
 		this.getBranchName = this.getBranchName.bind(this);
 		this.getRemoteUrl = this.getRemoteUrl.bind(this);
+		this.isShallowRepository = this.isShallowRepository.bind(this);
 		this.getTags = this.getTags.bind(this);
 		this.getCommits = this.getCommits.bind(this);
 	}
@@ -181,6 +182,26 @@ export class Git {
 			return remoteUrl.trim();
 		} catch {
 			return "";
+		}
+	}
+
+	/**
+	 * Check if the repository is a shallow clone (e.g. a CI checkout using `--depth 1`)
+	 *
+	 * [git-rev-parse Documentation](https://git-scm.com/docs/git-rev-parse#Documentation/git-rev-parse.txt---is-shallow-repository)
+	 *
+	 * @example
+	 * ```ts
+	 * await git.isShallowRepository(); // false
+	 * ```
+	 */
+	async isShallowRepository(): Promise<boolean> {
+		try {
+			const isShallow = await this.#execGit("rev-parse", ["--is-shallow-repository"]);
+
+			return isShallow.trim() === "true";
+		} catch {
+			return false;
 		}
 	}
 

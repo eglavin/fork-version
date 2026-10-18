@@ -128,6 +128,19 @@ Fork-Version supports a number of built in file managers for popular file types,
 
 [Read more about the supported file managers and how to create your own custom file managers.](./docs/Supported-File-Managers.md)
 
+### Running In CI
+
+> [!WARNING]
+> Fork-Version reads your git history and tags to determine the current version and generate your changelog, so it should always be ran against a checkout with the full commit history and tags. Many CI/CD environments use a shallow checkout by default, which can result in previous tags not being found and the wrong version or changelog being generated.
+
+| Platform       | Full History Checkout                                          |
+| -------------- | -------------------------------------------------------------- |
+| GitHub Actions | `actions/checkout` with `fetch-depth: 0`                       |
+| GitLab CI      | Set the `GIT_DEPTH: 0` variable                                |
+| Azure DevOps   | `checkout` step with `fetchDepth: 0` and `fetchTags: true`     |
+| Bitbucket      | `clone: depth: full`                                           |
+| Other          | Run `git fetch --unshallow --tags` before running Fork-Version |
+
 ### Code Usage
 
 > [!WARNING]

@@ -1,3 +1,5 @@
+import { pathToFileURL } from "node:url";
+
 import { IS_E2E } from "../../../tests/options";
 import { setupTest } from "../../../tests/setup-tests";
 import { CommitParser } from "../../commit-parser/commit-parser";
@@ -128,6 +130,30 @@ describe("git", () => {
 
 		// No commits, so no remote url
 		await expect(git.getRemoteUrl()).resolves.toBe("");
+	});
+
+	it("should detect if the repository is a shallow clone", async () => {
+		const { config, create, execGit } = await setupTest("execute-file");
+		const git = new Git(config);
+
+		create.json({ version: "1.0.0" }, "package.json").add();
+		execGit.commits();
+		await git.commit("--allow-empty", "-m", "test: second commit");
+
+		await expect(git.isShallowRepository()).resolves.toBe(false);
+
+		const shallowPath = `${config.path}-shallow`;
+		await execGit.raw("clone", "--depth", "1", pathToFileURL(config.path).href, shallowPath);
+
+		const shallowGit = new Git({ ...config, path: shallowPath });
+		await expect(shallowGit.isShallowRepository()).resolves.toBe(true);
+	});
+
+	it("should handle checking if a non repository is a shallow clone", async () => {
+		const { config } = await setupTest("execute-file");
+		const git = new Git({ ...config, path: `${config.path}-missing` });
+
+		await expect(git.isShallowRepository()).resolves.toBe(false);
 	});
 
 	it("should check if a file is ignored by git", async () => {

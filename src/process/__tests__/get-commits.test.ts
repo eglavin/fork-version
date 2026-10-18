@@ -116,6 +116,34 @@ describe("get-commits", () => {
 		expect(warnSpy).toHaveBeenCalledWith("No previous tag found, using all commits");
 	});
 
+	it("should log a shallow clone warning if no previous tag is found in a shallow repository", async () => {
+		const { config, execGit, git, logger } = await setupTest("get-commits");
+
+		const warnSpy = vi.spyOn(logger, "warn").mockImplementation(() => {});
+		vi.spyOn(git, "isShallowRepository").mockResolvedValue(true);
+
+		execGit.commit("chore: init");
+
+		await getCommitsSinceTag(config, logger, git);
+
+		expect(warnSpy).toHaveBeenCalledTimes(1);
+		expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("shallow clone"));
+		expect(warnSpy).not.toHaveBeenCalledWith("No previous tag found, using all commits");
+	});
+
+	it("should not check for a shallow repository if a previous tag is found", async () => {
+		const { config, execGit, git, logger } = await setupTest("get-commits");
+
+		const shallowSpy = vi.spyOn(git, "isShallowRepository");
+
+		execGit.commit("chore: init");
+		execGit.tag("v1.0.0", "chore: init");
+
+		await getCommitsSinceTag(config, logger, git);
+
+		expect(shallowSpy).not.toHaveBeenCalled();
+	});
+
 	it("should filter out unrelated pre-release tags if preRelease config is true", async () => {
 		const { config, execGit, git, logger } = await setupTest("get-commits");
 		config.preRelease = true;

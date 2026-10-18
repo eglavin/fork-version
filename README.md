@@ -30,6 +30,9 @@ By following the [conventional commit](https://www.conventionalcommits.org) stan
 
 Fork-Version won't attempt to push changes to git or to a package manager, this allows you to decide how you publish your changes.
 
+> [!TIP]
+> New to versioning pipelines? The [Getting Started guide](./docs/Getting-Started.md) walks through setting up Fork-Version step by step, from your first release through to automating it in CI.
+
 ## Using Fork-Version
 
 Primarily designed to be used with `npx`, Fork-Version can also be installed globally or directly to the node package you're working on. The only software prerequisites you need are [git](https://git-scm.com) and [node](https://nodejs.org) or a node compatible runtime.

@@ -16,13 +16,14 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
 
       - name: Setup PNPM, Node.js and Install Dependencies
-        uses: pnpm/setup@v3
+        uses: pnpm/setup@a0881977cd8ea73b1ed212236c99ca10dcc80cf4 # v3.1.1
         with:
           node-version-file: .node-version
-          cache: true
+          # Caching is disabled in privileged workflows to avoid cache poisoning.
+          cache: false
           require-lockfile: true
 
       - name: Build
@@ -35,7 +36,7 @@ jobs:
 
       - name: Publish JSR Package
         run: |
-          npx jsr publish --allow-slow-types
+          npx --yes jsr@0.14.3 publish --allow-slow-types
 
       - name: Update Summary
         run: |

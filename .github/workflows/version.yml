@@ -11,6 +11,9 @@ on:
       - ".github/workflows/version.yml"
   workflow_dispatch: {}
 
+# The default GITHUB_TOKEN isn't used, pushes are authenticated with the GitHub App token below.
+permissions: {}
+
 jobs:
   version:
     name: Version
@@ -19,7 +22,7 @@ jobs:
     steps:
 
       - name: Create GitHub App Token
-        uses: actions/create-github-app-token@v3
+        uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
         id: app-token
         with:
           app-id: ${{ secrets.FORK_VERSION_RELEASE_BOT_APP_ID }}
@@ -32,7 +35,7 @@ jobs:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
 
       - name: Checkout Repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
           ref: ${{ github.ref }}
           token: ${{ steps.app-token.outputs.token }}
@@ -50,10 +53,11 @@ jobs:
           git config --global user.email "$email"
 
       - name: Setup PNPM, Node.js and Install Dependencies
-        uses: pnpm/setup@v3
+        uses: pnpm/setup@a0881977cd8ea73b1ed212236c99ca10dcc80cf4 # v3.1.1
         with:
           node-version-file: .node-version
-          cache: true
+          # Caching is disabled in privileged workflows to avoid cache poisoning.
+          cache: false
           require-lockfile: true
 
       - name: Build

@@ -24,7 +24,14 @@ export async function getCommitsSinceTag(
 	const tags = await git.getTags(config.tagPrefix, config.preRelease);
 	const latestTag = tags.length > 0 ? tags[0] : undefined;
 	if (!latestTag) {
-		logger.warn("No previous tag found, using all commits");
+		if (await git.isShallowRepository()) {
+			logger.warn(
+				"No previous tag found in a shallow clone, the full commit history and tags may not be available.\n" +
+					"If running in CI, fetch the full history (e.g. `fetch-depth: 0` with actions/checkout, or `git fetch --unshallow --tags`).",
+			);
+		} else {
+			logger.warn("No previous tag found, using all commits");
+		}
 	}
 
 	const foundCommits = await git.getCommits(latestTag, "HEAD", ...(config.commitPath ?? []));

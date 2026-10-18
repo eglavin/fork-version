@@ -1,3 +1,6 @@
+import { mkdtemp, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 
 import { IS_E2E } from "../../../tests/options";
@@ -443,6 +446,27 @@ system so we'll see what happens.`,
 
 		const commits = await git.getCommits();
 		expect(commits).toStrictEqual([]);
+	});
+
+	it("should throw if git log fails in a repository with commits", async () => {
+		const { config } = await setupTest("execute-file");
+		const git = new Git(config);
+
+		await git.commit("--allow-empty", "-m", "feat: initial commit");
+
+		await expect(git.getCommits("v9.9.9")).rejects.toThrow(/unknown revision/);
+	});
+
+	it("should throw if git log is ran outside of a repository", async () => {
+		const { config } = await setupTest("execute-file");
+		const outside = await mkdtemp(join(tmpdir(), "fork-version-git-"));
+		try {
+			const git = new Git({ ...config, path: outside });
+
+			await expect(git.getTags("v")).rejects.toThrow(/not a git repository/);
+		} finally {
+			await rm(outside, { recursive: true, force: true });
+		}
 	});
 
 	it("should handle unset user email in git config", async () => {

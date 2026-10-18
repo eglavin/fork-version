@@ -116,12 +116,38 @@ export class Git {
 	 * ```ts
 	 * await git.log("--oneline");
 	 * ```
+	 *
+	 * @throws If git fails for any reason other than the repository not having any commits yet,
+	 * e.g. an unknown revision or git refusing a repository with "dubious ownership".
 	 */
 	async log(...args: (string | undefined)[]): Promise<string> {
 		try {
 			return await this.#execGit("log", args.filter(Boolean) as string[]);
+		} catch (error) {
+			// A new repository without any commits has nothing to log.
+			if (await this.#isEmptyRepository()) {
+				return "";
+			}
+
+			throw error;
+		}
+	}
+
+	/**
+	 * Check if `path` is a git repository without any commits, in which case `HEAD` can't be resolved.
+	 */
+	async #isEmptyRepository(): Promise<boolean> {
+		try {
+			await this.#execGit("rev-parse", ["--git-dir"]);
 		} catch {
-			return "";
+			return false;
+		}
+
+		try {
+			await this.#execGit("rev-parse", ["--verify", "--quiet", "HEAD"]);
+			return false;
+		} catch {
+			return true;
 		}
 	}
 

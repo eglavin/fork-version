@@ -3,18 +3,31 @@ name: Publish Package
 on:
   release:
     types: [created]
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      registry:
+        description: "Registry to publish to, e.g. to retry a single registry that failed."
+        type: choice
+        options:
+          - all
+          - npm
+          - jsr
+        default: all
 
 permissions:
   contents: read
   id-token: write
 
+# npm and JSR publish in separate jobs so a failure in one doesn't block the other, and either can be
+# re-run on its own. Manual runs may only publish from main.
 jobs:
-  release:
-    name: Release
+  npm:
+    name: Publish to npm
     runs-on: ubuntu-latest
-    # Manual runs may only publish from main.
-    if: github.event_name != 'workflow_dispatch' || github.ref == 'refs/heads/main'
+    timeout-minutes: 10
+    if: >-
+      github.event_name != 'workflow_dispatch' ||
+      (github.ref == 'refs/heads/main' && inputs.registry != 'jsr')
 
     steps:
       - name: Checkout Repository
@@ -36,11 +49,37 @@ jobs:
         run: |
           pnpm publish --no-git-checks
 
+      - name: Update Summary
+        run: |
+          version=$(node ./dist/cli.js inspect-version)
+          echo "## Released version to npm: $version" >> "$GITHUB_STEP_SUMMARY"
+
+  jsr:
+    name: Publish to JSR
+    runs-on: ubuntu-latest
+    # Publishing normally takes about a minute, fail rather than wait on a stuck publish.
+    timeout-minutes: 10
+    if: >-
+      github.event_name != 'workflow_dispatch' ||
+      (github.ref == 'refs/heads/main' && inputs.registry != 'npm')
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+
+      - name: Setup PNPM, Node.js and Install Dependencies
+        uses: pnpm/setup@a0881977cd8ea73b1ed212236c99ca10dcc80cf4 # v3.1.1
+        with:
+          node-version-file: .node-version
+          # Caching is disabled in privileged workflows to avoid cache poisoning.
+          cache: false
+          require-lockfile: true
+
       - name: Publish JSR Package
         run: |
           npx --yes jsr@0.14.3 publish --allow-slow-types
 
       - name: Update Summary
         run: |
-          version=$(node ./dist/cli.js inspect-version)
-          echo "## Released version: $version" >> "$GITHUB_STEP_SUMMARY"
+          version=$(node -p "require('./jsr.json').version")
+          echo "## Released version to JSR: $version" >> "$GITHUB_STEP_SUMMARY"

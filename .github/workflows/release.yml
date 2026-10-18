@@ -13,6 +13,8 @@ jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
+    # Manual runs may only publish from main.
+    if: github.event_name != 'workflow_dispatch' || github.ref == 'refs/heads/main'
 
     steps:
       - name: Checkout Repository

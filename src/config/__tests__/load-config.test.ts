@@ -1,3 +1,8 @@
+import { execSync } from "node:child_process";
+import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+
 import { setupTest } from "../../../tests/setup-tests";
 import { loadConfigFile } from "../load-config";
 
@@ -113,6 +118,40 @@ describe("load-config", () => {
 		await expect(loadConfigFile(relativeTo("sub-folder", "sub-folder-2"))).resolves.toStrictEqual({
 			commitAll: true,
 		});
+	});
+
+	it("should not load config from above the git repository root", async () => {
+		const { create, relativeTo } = await setupTest("load-config");
+
+		create.file(`throw new Error("should not be loaded");`, "fork.config.js");
+		create.directory("nested-repo");
+		execSync("git init", { cwd: relativeTo("nested-repo"), stdio: "ignore" });
+
+		await expect(loadConfigFile(relativeTo("nested-repo"))).resolves.toStrictEqual({});
+	});
+
+	it("should treat a .git file as the repository root for worktrees and submodules", async () => {
+		const { create, relativeTo } = await setupTest("load-config");
+
+		create.file(`throw new Error("should not be loaded");`, "fork.config.js");
+		create.directory("submodule");
+		create.directory("submodule", "sub-folder");
+		create.file("gitdir: ../.git/modules/submodule", "submodule", ".git");
+
+		await expect(loadConfigFile(relativeTo("submodule", "sub-folder"))).resolves.toStrictEqual({});
+	});
+
+	it("should only check the current directory when not in a git repository", async () => {
+		const outside = await mkdtemp(join(tmpdir(), "fork-version-load-config-"));
+		try {
+			await writeFile(join(outside, "fork.config.json"), JSON.stringify({ commitAll: true }));
+			await mkdir(join(outside, "sub-folder"));
+
+			await expect(loadConfigFile(join(outside, "sub-folder"))).resolves.toStrictEqual({});
+			await expect(loadConfigFile(outside)).resolves.toStrictEqual({ commitAll: true });
+		} finally {
+			await rm(outside, { recursive: true, force: true });
+		}
 	});
 
 	it("should load a single config file", async () => {

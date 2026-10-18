@@ -43,8 +43,8 @@ export const CHANGELOG_ENTRY_TEMPLATE = `## {{#if compareUrl}}[{{version}}]({{co
 /**
  * Compiles and renders `template` against `context`.
  *
- * Compiled with `noEscape: true` so markdown/HTML characters in commit subjects (e.g. `<`, `>`, `&`)
- * are emitted as-is, matching the plain string based renderer this replaces.
+ * Compiled with `noEscape: true` as handlebars' html escaping would also mangle markdown. Commit
+ * provided text is instead escaped beforehand by `escapeChangelogText` in the `ChangelogWriter`.
  *
  * @param template - Defaults to {@link CHANGELOG_ENTRY_TEMPLATE}. Exposed as a parameter so a future
  * user-supplied override can be threaded through without changing this function's shape.

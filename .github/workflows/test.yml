@@ -24,10 +24,10 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
 
       - name: Setup PNPM, Node.js and Install Dependencies
-        uses: pnpm/setup@v3
+        uses: pnpm/setup@a0881977cd8ea73b1ed212236c99ca10dcc80cf4 # v3.1.1
         with:
           runtime: node@${{ matrix.node }}
           cache: true
@@ -53,4 +53,4 @@ jobs:
 
       - name: Report Coverage
         if: matrix.node == '22.18' && matrix.os == 'ubuntu-latest' && github.event_name == 'pull_request' && always()
-        uses:  davelosert/vitest-coverage-report-action@v2
+        uses: davelosert/vitest-coverage-report-action@8f86cfb56ed6d5613ea8cdc5259f207fbfd51ece # v2.13.1

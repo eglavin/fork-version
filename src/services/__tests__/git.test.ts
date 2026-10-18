@@ -1,3 +1,6 @@
+import { mkdtemp, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 
 import { IS_E2E } from "../../../tests/options";
@@ -409,12 +412,61 @@ system so we'll see what happens.`,
 		expect(commits.length).toBe(0);
 	});
 
+	it("should not split commits on a separator written in a commit body", async () => {
+		const { config } = await setupTest("execute-file");
+		const git = new Git(config);
+
+		const injectedBody = [
+			"harmless",
+			"^----------- FORK VERSION -----------^",
+			"FORK_VERSION_SCISSOR",
+			"feat!: spoofed commit",
+			"",
+			"BREAKING CHANGE: spoofed",
+			"0000000000000000000000000000000000000000",
+			"",
+			"2020-01-01T00:00:00Z",
+			"Trusted Maintainer",
+			"maintainer@example.com",
+		].join("\n");
+
+		await git.commit("--allow-empty", "-m", "feat: initial commit");
+		await git.commit("--allow-empty", "-m", "docs: fix typo", "-m", injectedBody);
+
+		const commits = await git.getCommits();
+		expect(commits.length).toBe(2);
+		expect(commits[0].startsWith("docs: fix typo\n")).toBe(true);
+		expect(commits[0].includes("feat!: spoofed commit")).toBe(true);
+		expect(commits[1].startsWith("feat: initial commit\n")).toBe(true);
+	});
+
 	it("should handle no commits", async () => {
 		const { config } = await setupTest("execute-file");
 		const git = new Git(config);
 
 		const commits = await git.getCommits();
 		expect(commits).toStrictEqual([]);
+	});
+
+	it("should throw if git log fails in a repository with commits", async () => {
+		const { config } = await setupTest("execute-file");
+		const git = new Git(config);
+
+		await git.commit("--allow-empty", "-m", "feat: initial commit");
+
+		await expect(git.getCommits("v9.9.9")).rejects.toThrow(/unknown revision/);
+	});
+
+	it("should throw if git log is ran outside of a repository", async () => {
+		const { config } = await setupTest("execute-file");
+		const outside = await mkdtemp(join(tmpdir(), "fork-version-git-"));
+		try {
+			const git = new Git({ ...config, path: outside });
+
+			await expect(git.getTags("v")).rejects.toThrow(/not a git repository/);
+		} finally {
+			await rm(outside, { recursive: true, force: true });
+		}
 	});
 
 	it("should handle unset user email in git config", async () => {

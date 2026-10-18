@@ -7,15 +7,33 @@ import { CONFIG_FILE_NAMES, IGNORE_DIRS, PACKAGE_JSON_CONFIG_KEY } from "./const
 import { ForkConfigJSONSchema, ForkConfigJSSchema } from "./schema";
 
 /**
+ * Find the root of the git repository containing `cwd`, the nearest directory with a `.git`
+ * directory (or a `.git` file for worktrees and submodules).
+ *
+ * @returns The repository root, or `undefined` if `cwd` isn't inside a git repository.
+ */
+function findRepositoryRoot(cwd: string): string | undefined {
+	const root = parse(cwd).root;
+
+	for (let dir = cwd; ; dir = dirname(dir)) {
+		if (existsSync(join(dir, ".git"))) return dir;
+		if (dir === root) return undefined;
+	}
+}
+
+/**
  * Walks up from `cwd` looking for the first config file it finds.
+ *
+ * The search stops at the root of the git repository, or at `cwd` when not inside a repository,
+ * so a config file (which may be executable javascript) outside the project is never loaded.
  *
  * @see {@link CONFIG_FILE_NAMES} List of file names to consider as a fork-version config.
  * @see {@link PACKAGE_JSON_CONFIG_KEY} Name of the key fork-version can be configured under within a `package.json` file.
  */
 async function resolveConfigFile(cwd: string) {
-	const root = parse(cwd).root;
+	const stopDir = findRepositoryRoot(cwd) ?? cwd;
 
-	for (let dir = cwd; dir !== root; dir = dirname(dir)) {
+	for (let dir = cwd; ; dir = dirname(dir)) {
 		if (IGNORE_DIRS.has(basename(dir))) return undefined;
 
 		for (const fileName of CONFIG_FILE_NAMES) {
@@ -34,6 +52,8 @@ async function resolveConfigFile(cwd: string) {
 
 			return candidate;
 		}
+
+		if (dir === stopDir || dir === dirname(dir)) break;
 	}
 
 	return undefined;

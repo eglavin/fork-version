@@ -1,6 +1,7 @@
 import { createParserOptions, type ParserOptions } from "../commit-parser/options";
 import type { Commit, CommitReference } from "../commit-parser/types";
 import type { CommitType } from "../config/types";
+import { escapeChangelogText } from "../utils/escape-changelog-text";
 import { splitRepository } from "../utils/split-repository";
 import type { WriterOptions } from "./options";
 import { renderChangelogEntry } from "./templates";
@@ -199,7 +200,7 @@ export class ChangelogWriter {
 				continue;
 			}
 
-			const scope = commit.scope === "*" ? "" : commit.scope;
+			const scope = escapeChangelogText(commit.scope === "*" ? "" : commit.scope);
 			const seenIssues = new Set<string>();
 
 			transformed.commits.push({
@@ -208,7 +209,9 @@ export class ChangelogWriter {
 				// Changes" section instead of being listed with no heading.
 				groupTitle: entry?.section || "Other Changes",
 				scope,
-				displaySubject: this.resolveSubjectUrls(commit.title || commit.subject, seenIssues),
+				displaySubject: escapeChangelogText(
+					this.resolveSubjectUrls(commit.title || commit.subject, seenIssues),
+				),
 				shortHash: commit.hash ? commit.hash.slice(0, 7) : "",
 				commitUrl: this.resolveCommitUrl(commit.hash),
 				references: commit.references
@@ -220,7 +223,7 @@ export class ChangelogWriter {
 				transformed.notes.push({
 					title: "BREAKING CHANGES",
 					scope,
-					text: note.text,
+					text: escapeChangelogText(note.text),
 				});
 			}
 		}

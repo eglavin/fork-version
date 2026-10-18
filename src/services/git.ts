@@ -116,12 +116,38 @@ export class Git {
 	 * ```ts
 	 * await git.log("--oneline");
 	 * ```
+	 *
+	 * @throws If git fails for any reason other than the repository not having any commits yet,
+	 * e.g. an unknown revision or git refusing a repository with "dubious ownership".
 	 */
 	async log(...args: (string | undefined)[]): Promise<string> {
 		try {
 			return await this.#execGit("log", args.filter(Boolean) as string[]);
+		} catch (error) {
+			// A new repository without any commits has nothing to log.
+			if (await this.#isEmptyRepository()) {
+				return "";
+			}
+
+			throw error;
+		}
+	}
+
+	/**
+	 * Check if `path` is a git repository without any commits, in which case `HEAD` can't be resolved.
+	 */
+	async #isEmptyRepository(): Promise<boolean> {
+		try {
+			await this.#execGit("rev-parse", ["--git-dir"]);
 		} catch {
-			return "";
+			return false;
+		}
+
+		try {
+			await this.#execGit("rev-parse", ["--verify", "--quiet", "HEAD"]);
+			return false;
+		} catch {
+			return true;
 		}
 	}
 
@@ -330,7 +356,13 @@ export class Git {
 	 * ```
 	 */
 	async getCommits(from = "", to = "HEAD", ...paths: string[]): Promise<string[]> {
-		const SCISSOR = "^----------- FORK VERSION -----------^";
+		/**
+		 * Commits are separated with a NUL wrapped marker, git writes the NUL bytes from the `%x00`
+		 * placeholders. Commit messages can't contain NUL bytes, so a crafted commit body can't fake
+		 * the separator and inject extra commits into the parsed output.
+		 */
+		const SCISSOR = "\0FORK_VERSION_SCISSOR\0";
+		const SCISSOR_FORMAT = "%x00FORK_VERSION_SCISSOR%x00";
 
 		const LOG_FORMAT = [
 			"%s", // subject
@@ -340,7 +372,7 @@ export class Git {
 			"%cI", // committer date
 			"%cN", // committer name
 			"%cE", // committer email
-			SCISSOR,
+			SCISSOR_FORMAT,
 		].join("%n");
 
 		const logOutput = await this.log(

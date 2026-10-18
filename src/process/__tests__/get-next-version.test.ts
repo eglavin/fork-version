@@ -349,6 +349,15 @@ describe("getNextVersion", () => {
 		expect(() => getNextVersion(config, logger, [], "invalid")).toThrow("Invalid Version: invalid");
 	});
 
+	it("should throw an error if the pre-release identifier is invalid", async () => {
+		const { config, logger } = await setupTest("version getNextVersion");
+		config.preRelease = "beta_1";
+
+		expect(() => getNextVersion(config, logger, [], "1.2.3")).toThrow(
+			'Unable to determine next version from 1.2.3 (prepatch, pre-release: "beta_1")',
+		);
+	});
+
 	it("should handle capitalized feat commit types", async () => {
 		const { config, logger } = await setupTest("version getNextVersion");
 

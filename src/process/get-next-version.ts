@@ -106,12 +106,16 @@ export function getNextVersion(
 	}
 
 	const releaseTypeOrPreRelease = getReleaseType(releaseType, currentVersion, config.preRelease);
-	const nextVersion =
-		semver.inc(
-			currentVersion,
-			releaseTypeOrPreRelease,
-			typeof config.preRelease === "string" ? config.preRelease : "",
-		) ?? "";
+	const preReleaseIdentifier = typeof config.preRelease === "string" ? config.preRelease : "";
+	const nextVersion = semver.inc(currentVersion, releaseTypeOrPreRelease, preReleaseIdentifier);
+
+	// `semver.inc` returns null rather than throwing, e.g. for an invalid pre-release identifier
+	// like "beta_1". Fail here instead of writing an empty version to files, commits and tags.
+	if (!nextVersion) {
+		throw new Error(
+			`Unable to determine next version from ${currentVersion} (${releaseTypeOrPreRelease}${preReleaseIdentifier ? `, pre-release: "${preReleaseIdentifier}"` : ""})`,
+		);
+	}
 
 	logger.log(`Next version: ${nextVersion} (${releaseTypeOrPreRelease})`);
 

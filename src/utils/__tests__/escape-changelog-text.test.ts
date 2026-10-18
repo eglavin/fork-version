@@ -24,6 +24,31 @@ describe("escape-changelog-text", () => {
 		);
 	});
 
+	it("should only close a code span with a backtick run of the same length", () => {
+		expect(escapeChangelogText("``a ` <b> ``")).toBe("``a ` <b> ``");
+		expect(escapeChangelogText("`a`` <b>")).toBe("`a`` &lt;b>");
+		expect(escapeChangelogText("unclosed ` <b>")).toBe("unclosed ` &lt;b>");
+	});
+
+	it("should escape headings directly after a code span on a new line", () => {
+		expect(escapeChangelogText("`code`\n## [9.9.9]")).toBe("`code`\n\\## [9.9.9]");
+		expect(escapeChangelogText("`code` ## not a heading")).toBe("`code` ## not a heading");
+	});
+
+	it("should handle long runs of backticks in linear time", () => {
+		const inputs = [
+			"`".repeat(100_000),
+			"`a".repeat(100_000),
+			"``a".repeat(50_000),
+			`${"`".repeat(50_000)}a${"<b>".repeat(10_000)}`,
+			Array.from({ length: 2_000 }, (_, index) => "`".repeat(index + 1)).join("a"),
+		];
+
+		const start = performance.now();
+		for (const input of inputs) escapeChangelogText(input);
+		expect(performance.now() - start).toBeLessThan(1_000);
+	});
+
 	it("should escape lines that would render as headings", () => {
 		expect(escapeChangelogText("first line\n## [9.9.9]")).toBe("first line\n\\## [9.9.9]");
 		expect(escapeChangelogText("#")).toBe("\\#");

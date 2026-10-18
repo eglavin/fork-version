@@ -37,7 +37,8 @@ export async function commitChanges(
 	if (config.commitAll) {
 		await git.add("--all");
 	} else {
-		await git.add(...filesToCommit);
+		// End of options, so a file path starting with "-" can't be parsed as a git option.
+		await git.add("--", ...filesToCommit);
 	}
 
 	const shouldVerify = config.verify ? undefined : "--no-verify";

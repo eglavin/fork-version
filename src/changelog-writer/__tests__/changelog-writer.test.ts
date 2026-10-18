@@ -708,4 +708,23 @@ describe("changelog-writer", () => {
 			`);
 		});
 	});
+
+	describe("escaping commit text", () => {
+		it("escapes html in subjects, scopes and notes, keeping links and code", () => {
+			const writer = new ChangelogWriter(createPresetConfig(), types);
+
+			const { commits, notes } = writer.transformCommits([
+				commit(
+					"feat(<b>ui</b>)!: add <img src=x onerror=alert(1)> for `Array<string>` #42",
+					'BREAKING CHANGE: drops support\n<a name="9.9.9"></a>',
+				),
+			]);
+
+			expect(commits[0].scope).toBe("&lt;b>ui&lt;/b>");
+			expect(commits[0].displaySubject).toBe(
+				"add &lt;img src=x onerror=alert(1)> for `Array<string>` [#42](https://example.com/owner/repo/issues/42)",
+			);
+			expect(notes[0].text).toBe('drops support\n&lt;a name="9.9.9">&lt;/a>');
+		});
+	});
 });

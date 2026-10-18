@@ -24,8 +24,10 @@ export async function tagChanges(
 	await git.tag(
 		shouldSign,
 		"--annotate",
-		tag,
 		"--message",
 		formatCommitMessage(config?.releaseMessageFormat, nextVersion),
+		// End of options, so a tag starting with "-" can't be parsed as a git option.
+		"--",
+		tag,
 	);
 }

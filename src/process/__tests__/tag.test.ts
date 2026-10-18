@@ -31,4 +31,14 @@ describe("tagChanges", () => {
 
 		await expect(execGit.raw("tag")).resolves.not.toContain("v1.2.4");
 	});
+
+	it("should not parse a tag starting with a dash as a git option", async () => {
+		const { config, execGit, git, logger } = await setupTest("tagChanges");
+		config.tagPrefix = "--force-v";
+
+		execGit.commit("feat: A feature commit");
+		await expect(tagChanges(config, logger, git, "1.2.4")).rejects.toThrow(
+			"'--force-v1.2.4' is not a valid tag name",
+		);
+	});
 });
